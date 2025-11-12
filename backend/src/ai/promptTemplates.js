@@ -115,7 +115,7 @@ Rules:
 export const PROMPT_DASHBOARD_INSIGHT = (stats) => {
   const data = JSON.stringify(stats);
   return `
-  You are the Chief Analyst for Agri-Trust Ledger.
+  You are the Chief Analyst for AgroDex Ledger.
   Analyze these dashboard statistics: ${data}
   Your task is to provide a single, professional insight (1-2 sentences) for the dashboard.
   Analyze the *business data* (e.g., "Activity is increasing, but 20% of new lots require review.").
