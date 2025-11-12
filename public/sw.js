@@ -1,5 +1,5 @@
 // Service Worker for PWA offline support
-const CACHE_NAME = 'agri-agro-dex-v1';
+const CACHE_NAME = 'agro-dex-v1';
 const urlsToCache = [
   '/',
   '/index.html',
