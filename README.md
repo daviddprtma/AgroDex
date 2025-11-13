@@ -16,10 +16,10 @@ AgroDex fights food fraud in Indonesian by pairing Hedera’s immutable ledger w
 ## About The Project
 
 The Problem
+<br>
 Food fraud and missing traceability drain billions from Indonesian agricultural sector. Farmers cannot prove premium quality (e.g., organic), and buyers cannot verify authenticity, hurting trust and revenue.
 
-Our Hedera-Based Solution
-AgroDex creates a digital twin (NFT) for every batch, audited by AI and anchored to Hedera for an immutable trail of evidence.
+Our Hedera-Based Solution offer AgroDex to creates a digital twin (NFT) for every batch, audited by AI and anchored to Hedera for an immutable trail of evidence.
 
 ## Hedera Integration Summary (Required)
 We chose Hedera because predictable, low fees are the only sustainable option for low-margin Indonesian logistics.
