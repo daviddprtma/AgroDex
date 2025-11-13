@@ -127,7 +127,7 @@ pnpm run dev
 ## Demo Video
 Here's the demo video for this project: 
 <br> 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi//0.jpg)]()
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/8eDvpoJo5As/0.jpg)](https://www.youtube.com/watch?v=8eDvpoJo5As)
 
 ## Pitch Deck
 For the pitch deck, see it in 👉[AgroDex](https://drive.google.com/file/d/11GCPQooNam1s5ia6bG4XmaHjxkOmFLN9/view?usp=sharing).
