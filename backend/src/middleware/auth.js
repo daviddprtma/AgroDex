@@ -9,10 +9,8 @@ const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
  */
 export async function requireAuth(req, res, next) {
   try {
-    res.setHeader(
-      "Access-Control-Allow-Origin",
-      "https://agro-dex-psi.vercel.app"
-    );
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader(
       "Access-Control-Allow-Methods",
       "GET, POST, PUT, DELETE, OPTIONS"
