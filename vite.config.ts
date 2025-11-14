@@ -1,38 +1,36 @@
-import react from '@vitejs/plugin-react';
-import path from 'path';
-import { defineConfig } from 'vitest/config';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
-import componentTagger from './plugins/component-tagger';
+import react from "@vitejs/plugin-react";
+import path from "path";
+import { defineConfig } from "vitest/config";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
+import componentTagger from "./plugins/component-tagger";
 
 export default defineConfig({
   plugins: [react(), componentTagger(), nodePolyfills()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/lib/__tests__/setup.ts',
+    environment: "jsdom",
+    setupFiles: "./src/lib/__tests__/setup.ts",
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'src/lib/__tests__/',
-      ],
+      provider: "v8",
+      reporter: ["text", "json", "html"],
+      exclude: ["node_modules/", "src/lib/__tests__/"],
     },
   },
   server: {
     proxy: {
-      '/api': {
-        target: 'https://agro-dex-psi.vercel.app',
+      "/api": {
+        target: "https://agro-dex-psi.vercel.app",
         changeOrigin: true,
         headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          "Access-Control-Allow-Origin": "https://agro-dex-psi.vercel.app",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+          "Access-Control-Allow-Headers":
+            "application/json, Authorization, Content-Type",
         },
       },
     },

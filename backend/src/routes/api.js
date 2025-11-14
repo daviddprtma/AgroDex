@@ -181,15 +181,19 @@ router.get("/dashboard-health", requireAuth, async (_req, res) => {
 
   const supabaseStart = Date.now();
   try {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
+    res.setHeader(
+      "Access-Control-Allow-Origin",
+      "https://agro-dex-psi.vercel.app"
+    ); // Allow all origins or specify specific origins
     res.setHeader(
       "Access-Control-Allow-Methods",
       "GET, POST, PUT, DELETE, OPTIONS"
     );
     res.setHeader(
       "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
+      "Content-Type, Authorization, X-CSRF-Token"
     ); // Allow specific headers
+    res.setHeaders("Access-Control-Allow-Credentials", "true");
     const { error } = await supabase
       .from("batches")
       .select("id", { head: true, count: "exact" });
