@@ -166,9 +166,15 @@ router.get("/dashboard-stats", requireAuth, async (_req, res) => {
  */
 router.get("/dashboard-health", requireAuth, async (_req, res) => {
   // handle cors
-  res.setHeader("Access-Control-Allow-Origin", "https://agro-dex-6sp2.vercel.app");
+  res.setHeader("Access-Control-Allow-Origin", [
+    "https://agro-dex-6sp2.vercel.app",
+    "https://agro-dex-psi.vercel.app",
+  ]);
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
   res.setHeader("Access-Control-Allow-Credentials", "true");
 
   const supabaseStatus = { ok: false, ms: 0 };
@@ -388,7 +394,10 @@ router.post("/tokenize-batch", requireAuth, async (req, res) => {
     if (batchRecord && tokenRecord) {
       await supabase
         .from("batches")
-        .update({ hedera_token_id: batchRecord.hedera_token_id, hedera_serial_number: batchRecord.hedera_serial_number })
+        .update({
+          hedera_token_id: batchRecord.hedera_token_id,
+          hedera_serial_number: batchRecord.hedera_serial_number,
+        })
         .eq("id", batchRecord.id);
     }
 
