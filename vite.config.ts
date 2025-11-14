@@ -27,7 +27,7 @@ export default defineConfig({
         target: "https://agro-dex-psi.vercel.app",
         changeOrigin: true,
         headers: {
-          "Access-Control-Allow-Origin": "https://agro-dex-psi.vercel.app",
+          "Access-Control-Allow-Origin": "https://agro-dex-6sp2.vercel.app",
           "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
           "Access-Control-Allow-Headers":
             "application/json, Authorization, Content-Type",
