@@ -12,7 +12,7 @@ export async function requireAuth(req, res, next) {
     res.setHeader(
       "Access-Control-Allow-Origin",
       "https://agro-dex-psi.vercel.app"
-    ); // Allow all origins or specify specific origins
+    );
     res.setHeader(
       "Access-Control-Allow-Methods",
       "GET, POST, PUT, DELETE, OPTIONS"
@@ -20,8 +20,7 @@ export async function requireAuth(req, res, next) {
     res.setHeader(
       "Access-Control-Allow-Headers",
       "Content-Type, Authorization, X-CSRF-Token"
-    ); // Allow specific headers
-    res.setHeaders("Access-Control-Allow-Credentials", "true");
+    );
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
