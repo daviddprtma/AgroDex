@@ -175,22 +175,22 @@ router.get("/dashboard-stats", requireAuth, async (_req, res) => {
  * Protected: Requires authentication
  */
 router.get("/dashboard-health", requireAuth, async (_req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeaders("Access-Control-Allow-Credentials", "true");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, X-CSRF-Token"
+  );
   const supabaseStatus = { ok: false, ms: 0 };
   const hederaStatus = { ok: false, ms: 0 };
   const geminiStatus = { ok: false, ms: 0 };
 
   const supabaseStart = Date.now();
   try {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeaders("Access-Control-Allow-Credentials", "true");
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization, X-CSRF-Token"
-    );
     const { error } = await supabase
       .from("batches")
       .select("id", { head: true, count: "exact" });
@@ -222,7 +222,6 @@ router.get("/dashboard-health", requireAuth, async (_req, res) => {
     );
     hederaStatus.ok = true;
     hederaStatus.ms = Date.now() - hederaStart;
-    res.status(200).end();
   } catch (error) {
     hederaStatus.ms = Date.now() - hederaStart;
     hederaStatus.error =
