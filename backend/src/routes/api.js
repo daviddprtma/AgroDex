@@ -166,10 +166,10 @@ router.get("/dashboard-stats", requireAuth, async (_req, res) => {
  */
 router.get("/dashboard-health", requireAuth, async (_req, res) => {
   // handle cors
-  res.setHeader("Access-Control-Allow-Origin", [
-    "https://agro-dex-6sp2.vercel.app",
-    "https://agro-dex-psi.vercel.app",
-  ]);
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://agro-dex-6sp2.vercel.app, https://agro-dex-psi.vercel.app"
+  );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader(
     "Access-Control-Allow-Methods",
