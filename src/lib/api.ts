@@ -311,11 +311,6 @@ export const getDashboardHealth = async () => {
 
   const headers: Record<string, string> = {
     Accept: "application/json",
-    // handle cors
-    "Access-Control-Allow-Origin": "https://agro-dex-psi.vercel.app",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Credentials": "true",
   };
   if (session?.access_token) {
     headers["Authorization"] = `Bearer ${session.access_token}`;
