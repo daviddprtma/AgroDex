@@ -2,15 +2,15 @@
  * AI Routes - Gemini-powered endpoints for image analysis, provenance, Q&A, etc.
  */
 
-import express from "express";
+import express from 'express';
 import {
   analyzeImage,
   summarizeProvenance,
   buyerQA,
   translateMarketing,
-  priceSuggestion,
-} from "../ai/gemini.js";
-import { supabase } from "../db.js";
+  priceSuggestion
+} from '../ai/gemini.js';
+import { supabase } from '../db.js';
 
 const router = express.Router();
 
@@ -18,22 +18,12 @@ const router = express.Router();
  * POST /api/ai/analyze-image
  * Analyze agricultural product image
  */
-router.post("/analyze-image", async (req, res) => {
+router.post('/analyze-image', async (req, res) => {
   try {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    ); // Allow specific headers
-
     const { photoUrl, batchId } = req.body;
 
     if (!photoUrl) {
-      return res.status(400).json({ ok: false, error: "photoUrl is required" });
+      return res.status(400).json({ ok: false, error: 'photoUrl is required' });
     }
 
     const result = await analyzeImage(photoUrl);
@@ -42,28 +32,27 @@ router.post("/analyze-image", async (req, res) => {
     // Cache to database if batchId provided
     if (batchId && !result.error) {
       const { error: dbError } = await supabase
-        .from("batches")
-        .update({
+        .from('batches')
+        .update({ 
           ai_analysis: {
             caption: result.caption,
             anomalies: result.anomalies,
             confidence: result.confidence,
             tags: result.tags,
             generatedAt: new Date().toISOString(),
-            ms: result.ms,
-          },
+            ms: result.ms
+          }
         })
-        .eq("id", batchId);
+        .eq('id', batchId);
 
       if (dbError) {
-        console.error("Failed to cache AI analysis:", dbError);
+        console.error('Failed to cache AI analysis:', dbError);
       }
     }
 
     res.json({ ok: true, data: result });
-    res.status(200).end();
   } catch (error) {
-    console.error("AI analyze-image error:", error);
+    console.error('AI analyze-image error:', error);
     res.status(500).json({ ok: false, error: error.message });
   }
 });
@@ -72,34 +61,21 @@ router.post("/analyze-image", async (req, res) => {
  * POST /api/ai/summarize-provenance
  * Generate provenance summary from HCS timeline
  */
-router.post("/summarize-provenance", async (req, res) => {
+router.post('/summarize-provenance', async (req, res) => {
   try {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    ); // Allow specific headers
     const { hcsTimeline, tokenId, serial } = req.body;
 
     if (!hcsTimeline || !Array.isArray(hcsTimeline)) {
-      return res
-        .status(400)
-        .json({ ok: false, error: "hcsTimeline array is required" });
+      return res.status(400).json({ ok: false, error: 'hcsTimeline array is required' });
     }
 
     const result = await summarizeProvenance(hcsTimeline);
-    console.log(
-      `✅ Provenance summary completed in ${result.ms}ms (trust: ${result.trustScore})`
-    );
+    console.log(`✅ Provenance summary completed in ${result.ms}ms (trust: ${result.trustScore})`);
 
     // Cache to database if tokenId/serial provided
     if (tokenId && serial && !result.error) {
       const { error: dbError } = await supabase
-        .from("verifications")
+        .from('verifications')
         .update({
           trace: {
             ai: {
@@ -109,22 +85,21 @@ router.post("/summarize-provenance", async (req, res) => {
               trustScore: result.trustScore,
               trustExplanation: result.trustExplanation,
               generatedAt: new Date().toISOString(),
-              ms: result.ms,
-            },
-          },
+              ms: result.ms
+            }
+          }
         })
-        .eq("token_id", tokenId)
-        .eq("serial_number", serial);
+        .eq('token_id', tokenId)
+        .eq('serial_number', serial);
 
       if (dbError) {
-        console.error("Failed to cache provenance summary:", dbError);
+        console.error('Failed to cache provenance summary:', dbError);
       }
     }
 
     res.json({ ok: true, data: result });
-    res.status(200).end();
   } catch (error) {
-    console.error("AI summarize-provenance error:", error);
+    console.error('AI summarize-provenance error:', error);
     res.status(500).json({ ok: false, error: error.message });
   }
 });
@@ -133,36 +108,24 @@ router.post("/summarize-provenance", async (req, res) => {
  * POST /api/ai/buyer-qa
  * Answer buyer questions about product provenance
  */
-router.post("/buyer-qa", async (req, res) => {
+router.post('/buyer-qa', async (req, res) => {
   try {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    ); // Allow specific headers
     const { question, hcsTimeline } = req.body;
 
     if (!question) {
-      return res.status(400).json({ ok: false, error: "question is required" });
+      return res.status(400).json({ ok: false, error: 'question is required' });
     }
 
     if (!hcsTimeline || !Array.isArray(hcsTimeline)) {
-      return res
-        .status(400)
-        .json({ ok: false, error: "hcsTimeline array is required" });
+      return res.status(400).json({ ok: false, error: 'hcsTimeline array is required' });
     }
 
     const result = await buyerQA(question, hcsTimeline);
     console.log(`✅ Buyer Q&A completed in ${result.ms}ms`);
 
     res.json({ ok: true, data: result });
-    res.status(200).end();
   } catch (error) {
-    console.error("AI buyer-qa error:", error);
+    console.error('AI buyer-qa error:', error);
     res.status(500).json({ ok: false, error: error.message });
   }
 });
@@ -171,32 +134,20 @@ router.post("/buyer-qa", async (req, res) => {
  * POST /api/ai/translate-marketing
  * Translate and generate marketing content
  */
-router.post("/translate-marketing", async (req, res) => {
+router.post('/translate-marketing', async (req, res) => {
   try {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    ); // Allow specific headers
     const { summary_en } = req.body;
 
     if (!summary_en) {
-      return res
-        .status(400)
-        .json({ ok: false, error: "summary_en is required" });
+      return res.status(400).json({ ok: false, error: 'summary_en is required' });
     }
 
     const result = await translateMarketing(summary_en);
     console.log(`✅ Marketing translation completed in ${result.ms}ms`);
 
     res.json({ ok: true, data: result });
-    res.status(200).end();
   } catch (error) {
-    console.error("AI translate-marketing error:", error);
+    console.error('AI translate-marketing error:', error);
     res.status(500).json({ ok: false, error: error.message });
   }
 });
@@ -205,39 +156,25 @@ router.post("/translate-marketing", async (req, res) => {
  * POST /api/ai/price-suggestion
  * Suggest price uplift based on quality and traceability
  */
-router.post("/price-suggestion", async (req, res) => {
+router.post('/price-suggestion', async (req, res) => {
   try {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    ); // Allow specific headers
     const { commodity, region, qualityTags, trustScore } = req.body;
 
     if (!commodity) {
-      return res
-        .status(400)
-        .json({ ok: false, error: "commodity is required" });
+      return res.status(400).json({ ok: false, error: 'commodity is required' });
     }
 
     const result = await priceSuggestion({
       commodity,
-      region: region || "unknown",
+      region: region || 'unknown',
       qualityTags: qualityTags || [],
-      trustScore: trustScore || 0,
+      trustScore: trustScore || 0
     });
-    console.log(
-      `✅ Price suggestion completed in ${result.ms}ms: ${result.upliftPct}%`
-    );
+    console.log(`✅ Price suggestion completed in ${result.ms}ms: ${result.upliftPct}%`);
 
     res.json({ ok: true, data: result });
-    res.status(200).end();
   } catch (error) {
-    console.error("AI price-suggestion error:", error);
+    console.error('AI price-suggestion error:', error);
     res.status(500).json({ ok: false, error: error.message });
   }
 });

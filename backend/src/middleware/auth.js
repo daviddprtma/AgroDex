@@ -1,5 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
-import { env } from "../utils/config.js";
+import { createClient } from '@supabase/supabase-js';
+import { env } from '../utils/config.js';
 
 // Create Supabase client for auth verification
 const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
@@ -9,46 +9,33 @@ const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
  */
 export async function requireAuth(req, res, next) {
   try {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization, X-CSRF-Token"
-    );
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
-        error: "Missing or invalid authorization header",
+        error: 'Missing or invalid authorization header'
       });
     }
 
     const token = authHeader.substring(7);
-
+    
     // Verify JWT token
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser(token);
-
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    
     if (error || !user) {
       return res.status(401).json({
-        error: "Invalid or expired token",
+        error: 'Invalid or expired token'
       });
     }
 
     // Attach user to request object
     req.user = user;
     next();
-    res.status(200).end();
   } catch (error) {
-    console.error("Auth middleware error:", error);
+    console.error('Auth middleware error:', error);
     res.status(500).json({
-      error: "Authentication failed",
-      details: error.message,
+      error: 'Authentication failed',
+      details: error.message
     });
   }
 }
@@ -59,17 +46,15 @@ export async function requireAuth(req, res, next) {
 export async function optionalAuth(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
-
-    if (authHeader && authHeader.startsWith("Bearer ")) {
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
-      const {
-        data: { user },
-      } = await supabase.auth.getUser(token);
+      const { data: { user } } = await supabase.auth.getUser(token);
       req.user = user || null;
     } else {
       req.user = null;
     }
-
+    
     next();
   } catch (error) {
     req.user = null;

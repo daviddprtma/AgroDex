@@ -311,11 +311,6 @@ export const getDashboardHealth = async () => {
 
   const headers: Record<string, string> = {
     Accept: "application/json",
-    // access control allow origin header to avoid cors issues
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Credentials": "true",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-CSRF-Token",
   };
   if (session?.access_token) {
     headers["Authorization"] = `Bearer ${session.access_token}`;
