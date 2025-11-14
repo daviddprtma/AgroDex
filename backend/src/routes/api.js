@@ -28,16 +28,17 @@ const router = express.Router();
  * Protected: Requires authentication
  */
 router.get("/dashboard-stats", requireAuth, async (_req, res) => {
+  // add cors
+  res.setHeader("Access-Control-Allow-Origin", "https://agro-dex-psi.vercel.app"); // Allow all origins or specify specific origins
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  ); // Allow specific headers
   try {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    ); // Allow specific headers
     const [
       batchCountResult,
       tokenCountResult,
