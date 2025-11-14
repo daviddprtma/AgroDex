@@ -29,6 +29,15 @@ const router = express.Router();
  */
 router.get("/dashboard-stats", requireAuth, async (_req, res) => {
   try {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    ); // Allow specific headers
     const [
       batchCountResult,
       tokenCountResult,
@@ -149,6 +158,7 @@ router.get("/dashboard-stats", requireAuth, async (_req, res) => {
         error: insight.error || null,
       },
     });
+    res.status(200).end();
   } catch (error) {
     console.error("Dashboard stats error:", error);
     res.status(500).json({
@@ -171,6 +181,15 @@ router.get("/dashboard-health", requireAuth, async (_req, res) => {
 
   const supabaseStart = Date.now();
   try {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    ); // Allow specific headers
     const { error } = await supabase
       .from("batches")
       .select("id", { head: true, count: "exact" });
@@ -179,6 +198,7 @@ router.get("/dashboard-health", requireAuth, async (_req, res) => {
       throw error;
     }
     supabaseStatus.ok = true;
+    res.status(200).end();
   } catch (error) {
     supabaseStatus.ms = Date.now() - supabaseStart;
     supabaseStatus.error = error.message || "Supabase unreachable";
@@ -186,12 +206,22 @@ router.get("/dashboard-health", requireAuth, async (_req, res) => {
 
   const hederaStart = Date.now();
   try {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    ); // Allow specific headers
     await axios.get(
       `${env.MIRROR_NODE_URL}/api/v1/topics/${env.HEDERA_TOPIC_ID}`,
       { timeout: 5000 }
     );
     hederaStatus.ok = true;
     hederaStatus.ms = Date.now() - hederaStart;
+    res.status(200).end();
   } catch (error) {
     hederaStatus.ms = Date.now() - hederaStart;
     hederaStatus.error =
@@ -235,6 +265,15 @@ router.get("/dashboard-health", requireAuth, async (_req, res) => {
  */
 router.post("/register-batch", requireAuth, async (req, res) => {
   try {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    ); // Allow specific headers
     const { batchName, location, photoUrl } = req.body;
 
     // Validate input
@@ -286,6 +325,7 @@ router.post("/register-batch", requireAuth, async (req, res) => {
       ai_analysis: aiAnalysis,
       message: "Batch registered successfully on Hedera HCS",
     });
+    res.status(200).end();
   } catch (error) {
     console.error("Register batch error:", error);
     const errorMessage = error?.message || String(error);
@@ -318,6 +358,15 @@ router.post("/register-batch", requireAuth, async (req, res) => {
  */
 router.post("/tokenize-batch", requireAuth, async (req, res) => {
   try {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    ); // Allow specific headers
     const { hcsTransactionIds } = req.body;
 
     // Validate input
@@ -382,7 +431,10 @@ router.post("/tokenize-batch", requireAuth, async (req, res) => {
     if (batchRecord && tokenRecord) {
       await supabase
         .from("batches")
-        .update({ hedera_token_id: batchRecord.hedera_token_id, hedera_serial_number: batchRecord.hedera_serial_number })
+        .update({
+          hedera_token_id: batchRecord.hedera_token_id,
+          hedera_serial_number: batchRecord.hedera_serial_number,
+        })
         .eq("id", batchRecord.id);
     }
 
@@ -403,6 +455,7 @@ router.post("/tokenize-batch", requireAuth, async (req, res) => {
       ai_summary: aiSummary,
       message: "Batch tokenized successfully as NFT",
     });
+    res.status(200).end();
   } catch (error) {
     console.error("Tokenize batch error:", error);
     res.status(500).json({
@@ -418,6 +471,15 @@ router.post("/tokenize-batch", requireAuth, async (req, res) => {
  */
 router.get("/verify-batch/:tokenId/:serialNumber", async (req, res) => {
   try {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    ); // Allow specific headers
     const { tokenId, serialNumber } = req.params;
 
     // Check cache first
@@ -524,6 +586,7 @@ router.get("/verify-batch/:tokenId/:serialNumber", async (req, res) => {
       ...trace,
       ai_summary: aiSummary,
     });
+    res.status(200).end();
   } catch (error) {
     console.error("Verify batch error:", error);
     res.status(500).json({
@@ -538,11 +601,18 @@ router.get("/verify-batch/:tokenId/:serialNumber", async (req, res) => {
  * Health check endpoint
  */
 router.get("/health", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // Allow all origins or specify specific origins
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"); // Allow specific headers
   res.json({
     status: "ok",
     timestamp: new Date().toISOString(),
     service: "AgroDex-backend",
   });
+  res.status(200).end();
 });
 
 export default router;
