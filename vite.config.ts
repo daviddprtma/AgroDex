@@ -27,7 +27,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://agro-dex-psi.vercel.app/',
+        target: 'https://agro-dex-6sp2.vercel.app',
         changeOrigin: true,
       },
     },

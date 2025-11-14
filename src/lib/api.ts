@@ -1,7 +1,7 @@
 import { supabase } from "./supabaseClient";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://agro-dex-psi.vercel.app";
+  import.meta.env.VITE_API_BASE_URL || "https://agro-dex-6sp2.vercel.app";
 
 /**
  * Normalize date from DD-MM-YYYY to YYYY-MM-DD (ISO date-only format)
