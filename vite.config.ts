@@ -24,7 +24,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://agro-dex-psi.vercel.app/api/(.*)",
+        target: "https://agro-dex-psi.vercel.app/api/dashboard-health",
         changeOrigin: true,
         headers: {
           "Access-Control-Allow-Origin": "*",
