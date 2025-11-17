@@ -314,7 +314,7 @@ export const getDashboardHealth = async () => {
   };
   if (session?.access_token) {
     headers["Authorization"] = `Bearer ${session.access_token}`;
-    headers["Access-Control-Allow-Origin"] = "*";
+    headers["Access-Control-Allow-Origin"] = "https://agro-dex-nine.vercel.app";
   }
 
   const response = await fetch(`${API_BASE_URL}/api/dashboard-health`, {

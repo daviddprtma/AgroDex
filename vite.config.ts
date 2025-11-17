@@ -24,10 +24,10 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://agro-dex-1u85.vercel.app",
+        target: "https://agro-dex-nine.vercel.app",
         changeOrigin: true,
         headers: {
-          "Access-Control-Allow-Origin": "https://agro-dex-nine.vercel.app",
+          "Access-Control-Allow-Origin": "https://agro-dex-1u85.vercel.app",
           "Access-Control-Allow-Headers": "Content-Type, Authorization",
           "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
           "Access-Control-Allow-Credentials": "true",
