@@ -311,13 +311,10 @@ export const getDashboardHealth = async () => {
 
   const headers: Record<string, string> = {
     Accept: "application/json",
-    "Access-Control-Allow-Origin": "https://agro-dex-nine.vercel.app",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Credentials": "true",
   };
   if (session?.access_token) {
     headers["Authorization"] = `Bearer ${session.access_token}`;
+    headers["Access-Control-Allow-Origin"] = "*";
   }
 
   const response = await fetch(`${API_BASE_URL}/api/dashboard-health`, {
