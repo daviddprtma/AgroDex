@@ -69,7 +69,7 @@ Adoption in Indonesia demands sub-$1 fees per transaction. Hedera’s fixed, neg
 ## Deployed on Hedera IDs (Testnet)
 - Operator Account: 0.0.7147874
 - Topic ID (HCS): 0.0.7206092
-- Demo Token ID (HTS): 0.0.7193630 (serial #1)
+- Demo Token ID (HTS): 0.0.7245654 (serial #1)
 
 
 ### Built With
