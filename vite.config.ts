@@ -24,7 +24,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:4000",
+        target: "https://agro-dex-1u85.vercel.app",
         changeOrigin: true,
         headers: {
           "Access-Control-Allow-Origin": "https://agro-dex-nine.vercel.app",
