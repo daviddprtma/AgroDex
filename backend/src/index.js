@@ -16,6 +16,8 @@ app.use(
       /https:\/\/.*\.codenut\.dev$/, // CodeNut preview domains (HTTPS)
       "http://localhost:5173", // Vite dev server
       "http://localhost:3000", // Alternative dev port
+      "https://agro-dex-nine.vercel.app", // Deployed frontend
+      "https://agro-dex-1u85.vercel.app", // Alternative deployed frontend
     ],
     // Allow credentials (cookies, auth headers)
     credentials: true,
