@@ -311,6 +311,7 @@ export const getDashboardHealth = async () => {
 
   const headers: Record<string, string> = {
     Accept: "application/json",
+    "x-api-key": import.meta.env.VITE_SUPABASE_ANON_KEY,
   };
   if (session?.access_token) {
     headers["Authorization"] = `Bearer ${session.access_token}`;
