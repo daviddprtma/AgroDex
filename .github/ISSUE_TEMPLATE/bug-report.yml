@@ -1,0 +1,76 @@
+name: "🐞 Bug Report"
+description: "Report a bug, malfunction, or issue in the project."
+title: "🐛: "
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "🔍 Description"
+      description: "Clearly explain the bug or issue you encountered."
+      placeholder: "Describe what went wrong, steps that led to it, and any visible errors..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "✅ Expected Behavior"
+      description: "Explain what you expected to happen instead."
+      placeholder: "Describe the correct or intended behavior..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: media
+    attributes:
+      label: "📷 Screenshots / 🎥 Video"
+      description: "Attach relevant screenshots or videos showing the issue (optional)."
+      placeholder: "Drag and drop media files here."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: page
+    attributes:
+      label: "📄 Affected Page(s)"
+      description: "Select the page where you found the bug."
+      options:
+        - label: "Home Page"
+        - label: "Alerts & Risks"
+        - label: "Disaster Coordination"
+        - label: "Evacuation Safety"
+        - label: "Community"
+        - label: "Disaster Updates"
+        - label: "Get Educated"
+        - label: "Get Involved"
+        - label: "AI Assistant"
+        - label: "Others (mention)"
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: "💻 Environment"
+      description: "Provide details about where you encountered the issue."
+      placeholder: "Example: Windows 11, Chrome 127, Mobile view, etc."
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: "💬 Additional Info"
+      placeholder: "Add any related issues, logs, or notes."
+    validations:
+      required: false
+
+  - type: textarea
+    id: contact
+    attributes:
+      label: "📞 Contact"
+      description: "Provide your details so we can reach you if needed."
+      placeholder: "Name:\nGitHub ID:\nEmail:"
+    validations:
+      required: true
