@@ -38,15 +38,8 @@ body:
       label: "📄 Affected Page(s)"
       description: "Select the page where you found the bug."
       options:
-        - label: "Home Page"
-        - label: "Alerts & Risks"
-        - label: "Disaster Coordination"
-        - label: "Evacuation Safety"
-        - label: "Community"
-        - label: "Disaster Updates"
-        - label: "Get Educated"
-        - label: "Get Involved"
-        - label: "AI Assistant"
+        - label: "Frontend Page"
+        - label: "Backend Page"
         - label: "Others (mention)"
 
   - type: textarea
