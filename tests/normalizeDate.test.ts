@@ -17,8 +17,10 @@ function test(description: string, fn: () => void) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function expect(actual: any) {
   return {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     toBe(expected: any) {
       if (actual !== expected) {
         throw new Error(`Expected ${expected}, got ${actual}`);

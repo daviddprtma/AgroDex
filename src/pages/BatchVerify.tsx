@@ -41,13 +41,15 @@ import { Helmet } from "react-helmet-async";
 type NotFoundResult = Extract<VerifyBatchResult, { reason: "not_found" }>;
 
 const isNotFoundResult = (
-  result: VerifyBatchResult | undefined | null
+  result: VerifyBatchResult | undefined | null,
 ): result is NotFoundResult =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Boolean(result && (result as any).reason === "not_found");
 
 const isVerifiedResponse = (
-  result: VerifyBatchResult | undefined | null
+  result: VerifyBatchResult | undefined | null,
 ): result is VerifyBatchResponse =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Boolean(result && (result as any).success === true);
 
 export default function BatchVerify() {
@@ -56,6 +58,7 @@ export default function BatchVerify() {
   const [tokenId, setTokenId] = useState("");
   const [serialNumber, setSerialNumber] = useState("");
   const [question, setQuestion] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [qaResponse, setQaResponse] = useState<any>(null);
   const [qaLoading, setQaLoading] = useState(false);
   const [language, setLanguage] = useState<"en" | "fr">("en");
@@ -72,6 +75,7 @@ export default function BatchVerify() {
         serialNumber: params.serialNumber,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tokenId, params.serialNumber]);
 
   const mutation = useMutation<
@@ -131,6 +135,7 @@ export default function BatchVerify() {
       });
 
       setQaResponse(response.data.data);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast({
         title: "Question unavailable",
@@ -359,7 +364,7 @@ export default function BatchVerify() {
                             </p>
                             <p className="text-sm font-semibold text-gray-900">
                               {new Date(
-                                verifiedResult.verifiedAt
+                                verifiedResult.verifiedAt,
                               ).toLocaleString()}
                             </p>
                           </div>
@@ -387,7 +392,7 @@ export default function BatchVerify() {
                                 >
                                   {txId} <ExternalLink className="h-3 w-3" />
                                 </a>
-                              )
+                              ),
                             )}
                           </div>
                         </div>
@@ -455,7 +460,7 @@ export default function BatchVerify() {
                                   </p>
                                   <div className="space-y-3 relative before:absolute before:left-4 before:top-8 before:bottom-8 before:w-0.5 before:bg-blue-200">
                                     {verifiedResult.ai_summary.timeline.map(
-                                      (item: any, idx: number) => (
+                                      (item, idx: number) => (
                                         <div
                                           key={idx}
                                           className="flex items-start gap-4 relative"
@@ -470,7 +475,7 @@ export default function BatchVerify() {
                                             <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
                                               <Calendar className="h-3 w-3" />
                                               {new Date(
-                                                item.timestamp
+                                                item.timestamp,
                                               ).toLocaleString()}
                                             </div>
                                             <a
@@ -484,7 +489,7 @@ export default function BatchVerify() {
                                             </a>
                                           </div>
                                         </div>
-                                      )
+                                      ),
                                     )}
                                   </div>
                                 </div>
@@ -550,7 +555,7 @@ export default function BatchVerify() {
                                                   {txId.substring(0, 20)}...{" "}
                                                   <ExternalLink className="h-3 w-3" />
                                                 </a>
-                                              )
+                                              ),
                                             )}
                                           </div>
                                         </div>
@@ -575,7 +580,7 @@ export default function BatchVerify() {
                               {JSON.stringify(
                                 verifiedResult.nftMetadata,
                                 null,
-                                2
+                                2,
                               )}
                             </pre>
                           </details>
@@ -590,6 +595,8 @@ export default function BatchVerify() {
                 <Alert className="mt-6 border-red-200 bg-red-50 shadow-md">
                   <AlertCircle className="h-5 w-5 text-red-600" />
                   <AlertDescription className="text-red-900 font-semibold">
+                    {" "}
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}{" "}
                     {(mutation.error as any)?.response?.data?.details ||
                       mutation.error.message}
                   </AlertDescription>

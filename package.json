@@ -7,7 +7,7 @@
     "dev": "vite",
     "prebuild": "cp -f contracts/interfaces/metadata.json src/metadata.json || true",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint src",
     "postcss:check": "postcss src/**/*.css --no-map --dry-run > /dev/null",
     "preview": "vite preview"
   },

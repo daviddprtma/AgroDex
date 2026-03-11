@@ -1,63 +1,84 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import { QRCodeCanvas } from 'qrcode.react';
-import { tokenizeBatch } from '@/lib/api';
-import { TrustBadge } from '@/components/TrustBadge';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, CheckCircle2, AlertCircle, Sparkles, Award, Copy, ExternalLink, FileText, Link2, ArrowRight } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { Helmet } from 'react-helmet-async';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { QRCodeCanvas } from "qrcode.react";
+import { tokenizeBatch } from "@/lib/api";
+import { TrustBadge } from "@/components/TrustBadge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  Award,
+  Copy,
+  ExternalLink,
+  FileText,
+  Link2,
+  ArrowRight,
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Helmet } from "react-helmet-async";
 
 export default function BatchTokenize() {
   const navigate = useNavigate();
-  const [txIds, setTxIds] = useState('');
+  const [txIds, setTxIds] = useState("");
   const [isDemoMode, setIsDemoMode] = useState(true);
   const { toast } = useToast();
 
   const mutation = useMutation({
-    mutationFn: async (data: { hcsTransactionIds: string[]; isDemoMode: boolean }) => {
+    mutationFn: async (data: {
+      hcsTransactionIds: string[];
+      isDemoMode: boolean;
+    }) => {
       const result = await tokenizeBatch(
         { hcsTransactionIds: data.hcsTransactionIds },
-        data.isDemoMode
+        data.isDemoMode,
       );
       return { ...result, hcsTransactionIds: data.hcsTransactionIds };
     },
     onSuccess: (data) => {
       toast({
-        title: 'AI Report Generated & Certificate Minted!',
+        title: "AI Report Generated & Certificate Minted!",
         description: `Token ID: ${data.tokenId} | Serial: ${data.serialNumber}`,
       });
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       toast({
-        title: 'Tokenization Failed',
+        title: "Tokenization Failed",
         description: error.response?.data?.details || error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const hcsTransactionIds = txIds
       .split(/[\n,]/)
-      .map(id => id.trim())
-      .filter(id => id.length > 0);
+      .map((id) => id.trim())
+      .filter((id) => id.length > 0);
 
     if (hcsTransactionIds.length === 0) {
       toast({
-        title: 'Invalid Input',
-        description: 'Please enter at least one HCS transaction ID',
-        variant: 'destructive',
+        title: "Invalid Input",
+        description: "Please enter at least one HCS transaction ID",
+        variant: "destructive",
       });
       return;
     }
@@ -82,8 +103,11 @@ export default function BatchTokenize() {
             <h1 className="text-3xl md:text-4xl font-bold text-green-600 mb-2">
               Report Generated & Certificate Minted!
             </h1>
-            <p className="text-gray-600 mb-8">Your AI trust analysis is complete and permanently stored on Hedera</p>
-            
+            <p className="text-gray-600 mb-8">
+              Your AI trust analysis is complete and permanently stored on
+              Hedera
+            </p>
+
             {ai_summary && (
               <>
                 <div className="my-8">
@@ -95,7 +119,9 @@ export default function BatchTokenize() {
                     <Sparkles className="h-5 w-5" />
                     <span>AI Summary (EN)</span>
                   </div>
-                  <p className="text-gray-700 text-left italic">"{ai_summary.summary_en}"</p>
+                  <p className="text-gray-700 text-left italic">
+                    "{ai_summary.summary_en}"
+                  </p>
                 </div>
 
                 {ai_summary.summary_fr && (
@@ -104,7 +130,9 @@ export default function BatchTokenize() {
                       <Sparkles className="h-5 w-5" />
                       <span>Résumé IA (FR)</span>
                     </div>
-                    <p className="text-gray-700 text-left italic">"{ai_summary.summary_fr}"</p>
+                    <p className="text-gray-700 text-left italic">
+                      "{ai_summary.summary_fr}"
+                    </p>
                   </div>
                 )}
 
@@ -114,22 +142,30 @@ export default function BatchTokenize() {
                       <Award className="h-5 w-5" />
                       <span>Trust Score Explanation</span>
                     </div>
-                    <p className="text-gray-700 text-sm text-left">{ai_summary.trustExplanation}</p>
+                    <p className="text-gray-700 text-sm text-left">
+                      {ai_summary.trustExplanation}
+                    </p>
                   </div>
                 )}
               </>
             )}
-            
+
             <div className="my-6 space-y-3 p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-gray-700">Token ID:</span>
-                <span className="font-mono text-sm text-gray-900">{tokenId}</span>
+                <span className="font-mono text-sm text-gray-900">
+                  {tokenId}
+                </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-gray-700">Serial Number:</span>
-                <span className="font-mono text-sm text-gray-900">{serialNumber}</span>
+                <span className="font-semibold text-gray-700">
+                  Serial Number:
+                </span>
+                <span className="font-mono text-sm text-gray-900">
+                  {serialNumber}
+                </span>
               </div>
-              <a 
+              <a
                 href={`https://hashscan.io/testnet/token/${tokenId}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -142,21 +178,23 @@ export default function BatchTokenize() {
 
             <div className="flex flex-col items-center my-8 p-6 bg-white border-2 border-dashed border-gray-300 rounded-lg">
               <QRCodeCanvas value={verifyUrl} size={160} />
-              <p className="mt-3 text-sm font-semibold text-gray-600">Scan to verify certificate</p>
+              <p className="mt-3 text-sm font-semibold text-gray-600">
+                Scan to verify certificate
+              </p>
               <Button
                 size="sm"
                 variant="outline"
                 className="mt-3"
                 onClick={() => {
                   navigator.clipboard.writeText(verifyUrl);
-                  toast({ title: 'Verification URL copied!' });
+                  toast({ title: "Verification URL copied!" });
                 }}
               >
                 <Copy className="h-4 w-4 mr-2" />
                 Copy Verification Link
               </Button>
             </div>
-            
+
             <Button
               onClick={() => navigate(`/verify/${tokenId}/${serialNumber}`)}
               className="w-full text-lg px-6 py-4 font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-lg hover:shadow-xl transition-all"
@@ -188,15 +226,16 @@ export default function BatchTokenize() {
             Generate AI Trust Report & Certificate
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Our AI will analyze your HCS proof, generate a Trust Score, and mint it all as a permanent NFT certificate.
+            Our AI will analyze your HCS proof, generate a Trust Score, and mint
+            it all as a permanent NFT certificate.
           </p>
         </div>
 
         {/* Illustration */}
         <div className="relative rounded-2xl overflow-hidden shadow-lg">
-          <img 
-            src="https://assets-gen.codenut.dev/images/1761555094_85537f24.png" 
-            alt="AI Trust Analysis" 
+          <img
+            src="https://assets-gen.codenut.dev/images/1761555094_85537f24.png"
+            alt="AI Trust Analysis"
             className="w-full h-48 md:h-64 object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
@@ -210,13 +249,17 @@ export default function BatchTokenize() {
               AI Analysis & NFT Minting
             </CardTitle>
             <CardDescription className="text-base">
-              Link HCS transaction IDs to generate an AI trust report and create a permanent NFT certificate
+              Link HCS transaction IDs to generate an AI trust report and create
+              a permanent NFT certificate
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="txIds" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <Label
+                  htmlFor="txIds"
+                  className="text-sm font-semibold text-gray-700 flex items-center gap-2"
+                >
                   <Link2 className="h-4 w-4 text-violet-600" />
                   HCS Transaction IDs
                 </Label>
@@ -232,7 +275,8 @@ export default function BatchTokenize() {
                 />
                 <p className="text-xs text-gray-600 flex items-start gap-1">
                   <FileText className="h-3 w-3 mt-0.5 text-gray-500" />
-                  Enter transaction IDs from batch registration (one per line or comma-separated)
+                  Enter transaction IDs from batch registration (one per line or
+                  comma-separated)
                 </p>
               </div>
 
@@ -240,14 +284,17 @@ export default function BatchTokenize() {
                 <Checkbox
                   id="demoMode"
                   checked={isDemoMode}
-                  onCheckedChange={(checked) => setIsDemoMode(checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    setIsDemoMode(checked as boolean)
+                  }
                   disabled={mutation.isPending}
                 />
                 <Label
                   htmlFor="demoMode"
                   className="text-sm font-medium text-gray-700 cursor-pointer"
                 >
-                  Use Demo Mode (No wallet required - guaranteed success for presentations)
+                  Use Demo Mode (No wallet required - guaranteed success for
+                  presentations)
                 </Label>
               </div>
 
@@ -274,7 +321,9 @@ export default function BatchTokenize() {
               <Alert className="mt-6 border-red-200 bg-red-50 shadow-md">
                 <AlertCircle className="h-5 w-5 text-red-600" />
                 <AlertDescription className="text-red-900 font-semibold">
-                  {(mutation.error as any)?.response?.data?.details || mutation.error.message}
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(mutation.error as any)?.response?.data?.details ||
+                    mutation.error.message}
                 </AlertDescription>
               </Alert>
             )}

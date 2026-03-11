@@ -11,8 +11,6 @@ import {
   Coins,
   ShieldCheck,
   Activity,
-  Clock,
-  Database,
   Zap,
   Sparkles,
   AlertTriangle,
@@ -113,15 +111,15 @@ export default function Dashboard() {
     statsQuery.error instanceof Error
       ? statsQuery.error.message
       : statsQuery.error
-      ? "Failed to load dashboard stats"
-      : null;
+        ? "Failed to load dashboard stats"
+        : null;
 
   const healthError =
     healthQuery.error instanceof Error
       ? healthQuery.error.message
       : healthQuery.error
-      ? "Failed to load service status"
-      : null;
+        ? "Failed to load service status"
+        : null;
 
   const healthStatus = healthData?.status as HealthStatus | undefined;
   const statsLoading = statsQuery.isLoading;
@@ -331,7 +329,7 @@ export default function Dashboard() {
             {statsLoading ? (
               <div className="text-center py-4 text-gray-500 flex items-center justify-center gap-2">
                 <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
-                The AI ​​analyst examines the data...
+                The AI analyst examines the data...
               </div>
             ) : statsError ? (
               <div className="text-center py-4 text-red-600 font-semibold">
@@ -345,7 +343,7 @@ export default function Dashboard() {
                 <p className="text-xs text-gray-500 mt-3">
                   Summary generated on{" "}
                   {new Date(
-                    statsData?.generatedAt ?? Date.now()
+                    statsData?.generatedAt ?? Date.now(),
                   ).toLocaleString()}
                 </p>
               </>
@@ -380,7 +378,7 @@ export default function Dashboard() {
               {statsLoading ? (
                 <div className="text-center py-8 text-gray-500 flex items-center justify-center gap-2">
                   <Loader2 className="h-5 w-5 animate-spin text-emerald-500" />
-                  Change in the AI ​​log...
+                  Change in the AI log...
                 </div>
               ) : statsError ? (
                 <div className="text-center py-8 text-red-600 font-semibold">

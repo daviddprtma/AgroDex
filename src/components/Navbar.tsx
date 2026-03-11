@@ -1,41 +1,50 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { FileText, Coins, ShieldCheck, User, Settings, LogOut, Menu, BarChart3 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useState } from 'react';
-import { useServiceStatus } from '@/hooks/useServiceStatus';
-import logoUrl from '@/assets/agritrust-logo.svg';
+} from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  FileText,
+  Coins,
+  ShieldCheck,
+  User,
+  Settings,
+  LogOut,
+  Menu,
+  BarChart3,
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
+import { useServiceStatus } from "@/hooks/useServiceStatus";
+import logoUrl from "@/assets/agritrust-logo.svg";
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isSuccess, isError, isLoading } = useServiceStatus();
+  const { isSuccess, isError } = useServiceStatus();
 
   // Déterminer la couleur et le texte du tooltip
-  let statusColor = 'bg-gray-400';
-  let statusTooltip = 'Connecting to services...';
+  let statusColor = "bg-gray-400";
+  let statusTooltip = "Connecting to services...";
   if (isSuccess) {
-    statusColor = 'bg-green-500';
-    statusTooltip = 'All systems operational.';
+    statusColor = "bg-green-500";
+    statusTooltip = "All systems operational.";
   } else if (isError) {
-    statusColor = 'bg-red-500';
-    statusTooltip = 'Service disruption detected.';
+    statusColor = "bg-red-500";
+    statusTooltip = "Service disruption detected.";
   }
 
   const navLinks = [
-    { to: '/dashboard', label: 'Dashboard', icon: BarChart3 },
-    { to: '/register', label: 'Register', icon: FileText },
-    { to: '/tokenize', label: 'Tokenize', icon: Coins },
-    { to: '/verify', label: 'Verify', icon: ShieldCheck },
+    { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
+    { to: "/register", label: "Register", icon: FileText },
+    { to: "/tokenize", label: "Tokenize", icon: Coins },
+    { to: "/verify", label: "Verify", icon: ShieldCheck },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -45,15 +54,14 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <img
-              src={logoUrl}
-              alt="AgroDex"
-              className="h-10 w-auto"
-            />
+          <Link
+            to="/"
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
+            <img src={logoUrl} alt="AgroDex" className="h-10 w-auto" />
             <div className="flex items-center gap-2">
               {/* Status Indicator */}
-              <div 
+              <div
                 className={`w-3 h-3 rounded-full ${statusColor} transition-colors duration-300`}
                 title={statusTooltip}
               />
@@ -71,8 +79,8 @@ export default function Navbar() {
                   variant="ghost"
                   className={
                     isActive(to)
-                      ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-full px-4 py-2'
-                      : 'text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-full px-4 py-2'
+                      ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-full px-4 py-2"
+                      : "text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-full px-4 py-2"
                   }
                 >
                   <Icon className="h-4 w-4 mr-2" />
@@ -87,7 +95,7 @@ export default function Navbar() {
             <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg">
               <User className="h-4 w-4 text-gray-600" />
               <span className="text-sm font-body text-gray-700 max-w-[150px] truncate">
-                {user?.email || 'Wallet User'}
+                {user?.email || "Wallet User"}
               </span>
             </div>
             <DropdownMenu>
@@ -110,7 +118,10 @@ export default function Navbar() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={signOut} className="cursor-pointer text-red-600">
+                <DropdownMenuItem
+                  onClick={signOut}
+                  className="cursor-pointer text-red-600"
+                >
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
                 </DropdownMenuItem>
@@ -131,20 +142,24 @@ export default function Navbar() {
                 <div className="flex items-center gap-3 bg-gray-50 px-4 py-3 rounded-lg">
                   <User className="h-5 w-5 text-gray-600" />
                   <span className="text-sm font-body text-gray-700 truncate">
-                    {user?.email || 'Wallet User'}
+                    {user?.email || "Wallet User"}
                   </span>
                 </div>
 
                 {/* Navigation Links */}
                 <nav className="flex flex-col gap-2">
                   {navLinks.map(({ to, label, icon: Icon }) => (
-                    <Link key={to} to={to} onClick={() => setMobileMenuOpen(false)}>
+                    <Link
+                      key={to}
+                      to={to}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
                       <Button
                         variant="ghost"
                         className={`w-full justify-start rounded-full ${
                           isActive(to)
-                            ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-                            : 'text-gray-700 hover:text-emerald-600 hover:bg-emerald-50'
+                            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                            : "text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
                         }`}
                       >
                         <Icon className="h-4 w-4 mr-2" />
@@ -160,13 +175,22 @@ export default function Navbar() {
                 {/* User Actions */}
                 <div className="flex flex-col gap-2">
                   <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full justify-start text-gray-700">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-gray-700"
+                    >
                       <User className="h-4 w-4 mr-2" />
                       Profile
                     </Button>
                   </Link>
-                  <Link to="/session-settings" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full justify-start text-gray-700">
+                  <Link
+                    to="/session-settings"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-gray-700"
+                    >
                       <Settings className="h-4 w-4 mr-2" />
                       Settings
                     </Button>

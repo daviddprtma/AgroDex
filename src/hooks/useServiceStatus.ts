@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { getDashboardHealth } from '@/lib/api';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useQuery } from "@tanstack/react-query";
+import { getDashboardHealth } from "@/lib/api";
 
 interface HealthCheckResponse {
   ok: boolean;
@@ -12,23 +13,23 @@ interface HealthCheckResponse {
 
 const fetchHealth = async (): Promise<HealthCheckResponse> => {
   const data = await getDashboardHealth();
-  
+
   if (!data.ok) {
-    throw new Error('Health check failed');
+    throw new Error("Health check failed");
   }
-  
+
   // Vérifie si tous les services sont 'ok'
   const allOk = Object.values(data.services || {}).every((s: any) => s?.ok);
   if (!allOk) {
-    throw new Error('One or more services are down');
+    throw new Error("One or more services are down");
   }
-  
+
   return { ok: data.ok, status: data.services };
 };
 
 export const useServiceStatus = () => {
   return useQuery({
-    queryKey: ['serviceHealth'],
+    queryKey: ["serviceHealth"],
     queryFn: fetchHealth,
     // Ping toutes les 60 secondes en arrière-plan
     refetchInterval: 60000,
