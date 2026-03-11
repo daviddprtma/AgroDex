@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -14,21 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  AlertCircle,
-  Mail,
-  Lock,
-  Leaf,
-  Shield,
-  Sparkles,
-  Globe,
-  TrendingUp,
-} from "lucide-react";
+import { AlertCircle, Mail, Lock, Shield, Sparkles, Globe } from "lucide-react";
 import WalletLogin from "@/components/WalletLogin";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import logoUrl from "@/assets/agritrust-logo.svg";
-import { DEMO_VERIFY_URL } from "@/lib/demo";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -63,6 +53,7 @@ export default function Login() {
         if (error) throw error;
         navigate("/dashboard");
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setAuthError(error.message || "Authentication failed");
     } finally {

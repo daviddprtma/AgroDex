@@ -1,24 +1,16 @@
 import { Link } from "react-router-dom";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   FileText,
   Coins,
   ShieldCheck,
-  Leaf,
   ArrowRight,
   CheckCircle2,
   AlertTriangle,
   TrendingUp,
   Users,
   Globe,
-  Play,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";

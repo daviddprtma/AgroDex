@@ -54,6 +54,7 @@ export default function BatchRegistration() {
       setOrigin("");
       setHarvestDate("");
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       console.error("Registration error:", error);
 
@@ -263,13 +264,13 @@ export default function BatchRegistration() {
                           >
                             {mutation.data.hcsTransactionId.substring(0, 10)}...
                             {mutation.data.hcsTransactionId.substring(
-                              mutation.data.hcsTransactionId.length - 5
+                              mutation.data.hcsTransactionId.length - 5,
                             )}
                           </a>
                           <button
                             onClick={() => {
                               navigator.clipboard.writeText(
-                                mutation.data.hcsTransactionId
+                                mutation.data.hcsTransactionId,
                               );
                               setIsCopied(true);
                               setTimeout(() => setIsCopied(false), 2000);
@@ -331,7 +332,7 @@ export default function BatchRegistration() {
                                   >
                                     {tag}
                                   </span>
-                                )
+                                ),
                               )}
                             </div>
                           )}
@@ -348,7 +349,7 @@ export default function BatchRegistration() {
                                   {mutation.data.ai_analysis.anomalies.map(
                                     (anomaly: string, idx: number) => (
                                       <li key={idx}>{anomaly}</li>
-                                    )
+                                    ),
                                   )}
                                 </ul>
                               </div>
@@ -375,6 +376,7 @@ export default function BatchRegistration() {
               <Alert className="mt-6 border-red-200 bg-red-50 shadow-md">
                 <AlertCircle className="h-5 w-5 text-red-600" />
                 <AlertDescription className="text-red-900 font-semibold">
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(mutation.error as any)?.response?.data?.details ||
                     mutation.error.message}
                 </AlertDescription>

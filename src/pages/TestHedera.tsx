@@ -1,12 +1,19 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { supabase } from '@/lib/supabaseClient';
-import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from "@/lib/supabaseClient";
+import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 
 export default function TestHedera() {
   const [testing, setTesting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,9 +23,12 @@ export default function TestHedera() {
     setError(null);
 
     try {
-      const { data, error: invokeError } = await supabase.functions.invoke('test-hedera-simple', {
-        body: {},
-      });
+      const { data, error: invokeError } = await supabase.functions.invoke(
+        "test-hedera-simple",
+        {
+          body: {},
+        },
+      );
 
       if (invokeError) {
         throw invokeError;
@@ -29,8 +39,9 @@ export default function TestHedera() {
       } else {
         setResult(data);
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      setError(err.message || 'Failed to test credentials');
+      setError(err.message || "Failed to test credentials");
     } finally {
       setTesting(false);
     }
@@ -42,18 +53,23 @@ export default function TestHedera() {
         <CardHeader>
           <CardTitle>Test Hedera Credentials</CardTitle>
           <CardDescription>
-            Verify that your Hedera operator credentials are configured correctly
+            Verify that your Hedera operator credentials are configured
+            correctly
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button onClick={testCredentials} disabled={testing} className="w-full">
+          <Button
+            onClick={testCredentials}
+            disabled={testing}
+            className="w-full"
+          >
             {testing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Testing...
               </>
             ) : (
-              'Test Credentials'
+              "Test Credentials"
             )}
           </Button>
 
@@ -62,12 +78,23 @@ export default function TestHedera() {
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertDescription>
                 <div className="space-y-2">
-                  <p className="font-semibold text-green-800">{result.message}</p>
+                  <p className="font-semibold text-green-800">
+                    {result.message}
+                  </p>
                   <div className="text-sm space-y-1 text-green-700">
-                    <p><strong>Operator ID:</strong> {result.operatorId}</p>
-                    <p><strong>Key Method:</strong> {result.keyMethod}</p>
-                    <p><strong>Public Key:</strong> <code className="text-xs">{result.publicKey}</code></p>
-                    <p><strong>Balance:</strong> {result.balance}</p>
+                    <p>
+                      <strong>Operator ID:</strong> {result.operatorId}
+                    </p>
+                    <p>
+                      <strong>Key Method:</strong> {result.keyMethod}
+                    </p>
+                    <p>
+                      <strong>Public Key:</strong>{" "}
+                      <code className="text-xs">{result.publicKey}</code>
+                    </p>
+                    <p>
+                      <strong>Balance:</strong> {result.balance}
+                    </p>
                   </div>
                 </div>
               </AlertDescription>
@@ -98,8 +125,8 @@ export default function TestHedera() {
               <li>Performs a simple balance query (no transaction signing)</li>
             </ul>
             <p className="pt-2">
-              If this test succeeds, your credentials are valid. If tokenization still fails,
-              the issue is with transaction signing logic.
+              If this test succeeds, your credentials are valid. If tokenization
+              still fails, the issue is with transaction signing logic.
             </p>
           </div>
         </CardContent>

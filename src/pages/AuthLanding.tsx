@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
@@ -7,11 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Mail, Lock, Wallet, Play } from "lucide-react";
+import { AlertCircle, Mail, Lock } from "lucide-react";
 import WalletLogin from "@/components/WalletLogin";
 import { Helmet } from "react-helmet-async";
 import logoUrl from "@/assets/agritrust-logo.svg";
-import { DEMO_VERIFY_URL } from "@/lib/demo";
 
 export default function AuthLanding() {
   const navigate = useNavigate();
@@ -47,6 +46,7 @@ export default function AuthLanding() {
         if (error) throw error;
         navigate("/");
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setAuthError(error.message || "Authentication failed");
     } finally {

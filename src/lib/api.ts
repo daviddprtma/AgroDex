@@ -26,7 +26,7 @@ export function normalizeDate(input: string): string {
     }
     if (monthNum < 1 || monthNum > 12) {
       throw new Error(
-        `Invalid month: ${mm}. Expected DD-MM-YYYY or YYYY-MM-DD`
+        `Invalid month: ${mm}. Expected DD-MM-YYYY or YYYY-MM-DD`,
       );
     }
 
@@ -35,7 +35,7 @@ export function normalizeDate(input: string): string {
 
   // Invalid format
   throw new Error(
-    `Invalid date format: ${input}. Expected DD-MM-YYYY or YYYY-MM-DD`
+    `Invalid date format: ${input}. Expected DD-MM-YYYY or YYYY-MM-DD`,
   );
 }
 
@@ -92,8 +92,10 @@ export interface VerifyBatchResponse {
   cached: boolean;
   tokenId: string;
   serialNumber: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   nftMetadata: any;
   hcsTransactionIds: string[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   hcsMessages: any[];
   ai_summary?: {
     summary_en: string;
@@ -122,7 +124,7 @@ export interface VerifyBatchNotFoundResult {
 export type VerifyBatchResult = VerifyBatchResponse | VerifyBatchNotFoundResult;
 
 export const registerBatch = async (
-  data: RegisterBatchRequest
+  data: RegisterBatchRequest,
 ): Promise<RegisterBatchResponse> => {
   // Normalize harvestDate before sending
   const normalizedData = {
@@ -150,11 +152,12 @@ export const registerBatch = async (
     {
       body: normalizedData,
       headers,
-    }
+    },
   );
 
   if (error) {
     // Try to extract structured error from Edge Function response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let serverError: any = null;
     try {
       serverError = JSON.parse(error.message);
@@ -178,13 +181,13 @@ export const registerBatch = async (
 
 export const tokenizeBatch = async (
   data: TokenizeBatchRequest,
-  isDemoMode: boolean = false
+  isDemoMode: boolean = false,
 ): Promise<TokenizeBatchResponse> => {
   console.log(
     "[api] Calling tokenize-batch with:",
     data,
     "Demo mode:",
-    isDemoMode
+    isDemoMode,
   );
 
   const headers: Record<string, string> = {
@@ -203,7 +206,7 @@ export const tokenizeBatch = async (
       method: "POST",
       headers,
       body: JSON.stringify(data),
-    }
+    },
   );
 
   const result = await response.json();
@@ -220,7 +223,7 @@ export const tokenizeBatch = async (
     throw new Error(
       `${errorDetails}${errorStack ? "\n\nDetails: " + errorStack : ""}${
         timestamp ? "\n\nTime: " + timestamp : ""
-      }`
+      }`,
     );
   }
 
@@ -229,7 +232,7 @@ export const tokenizeBatch = async (
 
 export const verifyBatch = async (
   tokenId: string,
-  serialNumber: string | number
+  serialNumber: string | number,
 ): Promise<VerifyBatchResult> => {
   const res = await fetch(
     "https://udnpbqtvbnepicwyubnm.supabase.co/functions/v1/verify-batch",
@@ -237,9 +240,10 @@ export const verifyBatch = async (
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ tokenId, serialNumber: Number(serialNumber) }),
-    }
+    },
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let json: any = null;
   try {
     json = await res.json();
@@ -286,6 +290,7 @@ export const getDashboardStats = async () => {
     headers,
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let payload: any = null;
   try {
     payload = await response.json();
@@ -319,9 +324,9 @@ export const getDashboardHealth = async () => {
   const response = await fetch(`${API_BASE_URL}/api/dashboard-health`, {
     method: "GET",
     headers,
-    
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let payload: any = null;
   try {
     payload = await response.json();

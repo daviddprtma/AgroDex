@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabaseClient';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { User, Session } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabaseClient";
 
 interface AuthContextType {
   user: User | null;
@@ -42,15 +42,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const linkHederaWallet = async (accountId: string) => {
-    if (!user) throw new Error('No user logged in');
+    if (!user) throw new Error("No user logged in");
 
     const { error } = await supabase
-      .from('profiles')
-      .update({ 
+      .from("profiles")
+      .update({
         hedera_account_id: accountId,
-        auth_method: session?.user.email ? 'hybrid' : 'wallet'
+        auth_method: session?.user.email ? "hybrid" : "wallet",
       })
-      .eq('id', user.id);
+      .eq("id", user.id);
 
     if (error) throw error;
   };
@@ -66,10 +66,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
