@@ -23,6 +23,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useWallet } from "@/hooks/useWallet";
 import { useState } from "react";
 import { useServiceStatus } from "@/hooks/useServiceStatus";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import logoUrl from "@/assets/agritrust-logo.svg";
 
 export default function Navbar() {
@@ -62,7 +63,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-100 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 supports-[backdrop-filter]:dark:bg-slate-950/80">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -77,7 +78,7 @@ export default function Navbar() {
                 className={`w-3 h-3 rounded-full ${statusColor} transition-colors duration-300`}
                 title={statusTooltip}
               />
-              <span className="hidden sm:block text-xl font-heading font-bold text-gray-900">
+              <span className="hidden sm:block text-xl font-heading font-bold text-gray-900 dark:text-white">
                 AgroDex
               </span>
             </div>
@@ -91,8 +92,8 @@ export default function Navbar() {
                   variant="ghost"
                   className={
                     isActive(to)
-                      ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-full px-4 py-2"
-                      : "text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-full px-4 py-2"
+                      ? "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900 rounded-full px-4 py-2"
+                      : "text-gray-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-full px-4 py-2"
                   }
                 >
                   <Icon className="h-4 w-4 mr-2" />
@@ -106,9 +107,9 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {/* Wallet indicator (shown when connected via wallet) */}
             {isConnected && accountId && (
-              <div className="flex items-center gap-1.5 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">
-                <Wallet className="h-3.5 w-3.5 text-blue-600" />
-                <span className="text-xs font-mono text-blue-700">
+              <div className="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-950/30 px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800/50">
+                <Wallet className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                <span className="text-xs font-mono text-blue-700 dark:text-blue-300">
                   {accountId}
                 </span>
                 <span
@@ -120,16 +121,17 @@ export default function Navbar() {
               </div>
             )}
 
-            <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg">
-              <User className="h-4 w-4 text-gray-600" />
-              <span className="text-sm font-body text-gray-700 max-w-[150px] truncate">
+            <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-900 px-3 py-2 rounded-lg border border-gray-100 dark:border-slate-800">
+              <User className="h-4 w-4 text-gray-600 dark:text-slate-400" />
+              <span className="text-sm font-body text-gray-700 dark:text-slate-300 max-w-[150px] truncate">
                 {displayName}
               </span>
             </div>
+            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
-                  <Settings className="h-5 w-5 text-gray-600" />
+                  <Settings className="h-5 w-5 text-gray-600 dark:text-slate-400" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -158,105 +160,112 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu */}
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[280px] sm:w-[320px]">
-              <div className="flex flex-col gap-6 mt-8">
-                {/* User Info */}
-                <div className="flex items-center gap-3 bg-gray-50 px-4 py-3 rounded-lg">
-                  <User className="h-5 w-5 text-gray-600" />
-                  <span className="text-sm font-body text-gray-700 truncate">
-                    {displayName}
-                  </span>
-                </div>
-
-                {/* Wallet info (mobile) */}
-                {isConnected && accountId && (
-                  <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
-                    <Wallet className="h-4 w-4 text-blue-600" />
-                    <span className="text-xs font-mono text-blue-700 truncate">
-                      {accountId}
-                    </span>
-                    <span
-                      className={`ml-auto px-2 py-0.5 text-xs rounded-full font-semibold ${
-                        network === "testnet"
-                          ? "bg-amber-100 text-amber-700"
-                          : "bg-green-100 text-green-700"
-                      }`}
-                    >
-                      {network}
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6 text-gray-700 dark:text-slate-300" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[280px] sm:w-[320px] dark:bg-slate-950 dark:border-slate-800">
+                <div className="flex flex-col gap-6 mt-8">
+                  {/* User Info */}
+                  <div className="flex items-center gap-3 bg-gray-50 dark:bg-slate-900 px-4 py-3 rounded-lg border border-gray-100 dark:border-slate-800">
+                    <User className="h-5 w-5 text-gray-600 dark:text-slate-400" />
+                    <span className="text-sm font-body text-gray-700 dark:text-slate-300 truncate">
+                      {displayName}
                     </span>
                   </div>
-                )}
 
-                {/* Navigation Links */}
-                <nav className="flex flex-col gap-2">
-                  {navLinks.map(({ to, label, icon: Icon }) => (
+                  {/* Wallet info (mobile) */}
+                  {isConnected && accountId && (
+                    <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-950/30 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-800/50">
+                      <Wallet className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <span className="text-xs font-mono text-blue-700 dark:text-blue-300 truncate">
+                        {accountId}
+                      </span>
+                      <span
+                        className={`ml-auto px-2 py-0.5 text-xs rounded-full font-semibold ${
+                          network === "testnet"
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300"
+                            : "bg-green-100 text-green-700 dark:bg-green-950/50 dark:text-green-300"
+                        }`}
+                      >
+                        {network}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Navigation Links */}
+                  <nav className="flex flex-col gap-2">
+                    {navLinks.map(({ to, label, icon: Icon }) => (
+                      <Link
+                        key={to}
+                        to={to}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Button
+                          variant="ghost"
+                          className={`w-full justify-start rounded-full ${
+                            isActive(to)
+                              ? "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900"
+                              : "text-gray-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                          }`}
+                        >
+                          <Icon className="h-4 w-4 mr-2" />
+                          {label}
+                        </Button>
+                      </Link>
+                    ))}
+                  </nav>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-200 dark:border-slate-800" />
+
+                  {/* User Actions */}
+                  <div className="flex flex-col gap-2">
+                    <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                      >
+                        <User className="h-4 w-4 mr-2" />
+                        Profile
+                      </Button>
+                    </Link>
                     <Link
-                      key={to}
-                      to={to}
+                      to="/session-settings"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <Button
                         variant="ghost"
-                        className={`w-full justify-start rounded-full ${
-                          isActive(to)
-                            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                            : "text-gray-700 hover:text-emerald-600 hover:bg-emerald-50"
-                        }`}
+                        className="w-full justify-start text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
                       >
-                        <Icon className="h-4 w-4 mr-2" />
-                        {label}
+                        <Settings className="h-4 w-4 mr-2" />
+                        Settings
                       </Button>
                     </Link>
-                  ))}
-                </nav>
-
-                {/* Divider */}
-                <div className="border-t border-gray-200" />
-
-                {/* User Actions */}
-                <div className="flex flex-col gap-2">
-                  <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
                     <Button
                       variant="ghost"
-                      className="w-full justify-start text-gray-700"
+                      className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleLogout();
+                      }}
                     >
-                      <User className="h-4 w-4 mr-2" />
-                      Profile
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Logout
                     </Button>
-                  </Link>
-                  <Link
-                    to="/session-settings"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-gray-700"
-                    >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Settings
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleLogout();
-                    }}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </Button>
+                  </div>
                 </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </header>
