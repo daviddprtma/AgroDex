@@ -143,6 +143,23 @@ serve(async (req) => {
       ai_summary: nftMetadata.ai_provenance_summary || null,
     };
 
+    await supabase.from("verifications").upsert(
+      {
+        token_id: nftMetadata.token_id,
+        serial_number: String(nftMetadata.serial_number),
+        trace: {
+          ai: nftMetadata.ai_provenance_summary || null,
+          hcsTimeline: hcsMessages || [],
+          tokenId: nftMetadata.token_id,
+          serialNumber: nftMetadata.serial_number,
+          verifiedAt: new Date().toISOString(),
+          status: "verified",
+        },
+        created_at: new Date().toISOString(),
+      },
+      {onConflict: "token_id,serial_number"}
+    );
+
     console.log("→ Success (200)");
     return json(200, response);
   } catch (error: any) {
