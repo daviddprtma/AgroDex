@@ -10,7 +10,7 @@
 
 <h3><i>🏆 Winner of Basic Track Problem Statement in Hello Future Hedera Ascension Hackathon 2025 🏆</i></h3>
 
-<img width="1538" height="674" alt="AgroDex Dashboard Banner" src="https://github.com/user-attachments/assets/81bd6e83-879e-4319-92d8-38229919ffd5" />
+<img width="700" height=auto alt="AgroDex Dashboard Banner" src="https://github.com/user-attachments/assets/81bd6e83-879e-4319-92d8-38229919ffd5" />
 
 ------
 
