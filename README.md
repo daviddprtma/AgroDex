@@ -14,7 +14,7 @@
 
 ------
 
-<h3><i> 🏆 SSOC 2026 Project Selection</i></h3>
+<h3><i>🏆 SSOC 2026 Project Selection</i></h3>
 
 We are excited to announce that this project has been officially selected for **Social Summer Of Code (SSOC) 2026**.
 
@@ -47,7 +47,7 @@ Food fraud and missing traceability drain billions from the Indonesian agricultu
 
 ---
 
-## 🛠️ Tech Stack
+## ⚙️ Tech Stack
 
 | Category | Technology | Badge |
 | :--- | :--- | :--- |
@@ -116,10 +116,11 @@ Widespread adoption in Indonesia demands sub-$1 fees per transaction. Hedera’s
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 This is the instruction about how to get work with this project:
-### Installation
+
+### ⬇️ Installation
 
 <b>1.</b> Clone the Repository
 ```sh
@@ -148,6 +149,9 @@ This is the instruction about how to get work with this project:
    cd backend
    node scripts/seedDemo.js
    ```
+
+### ⚡ Running
+
 <b>5.</b> Run the application
  ```sh
    # Terminal 1 (Backend)
@@ -161,7 +165,7 @@ pnpm run dev
 
 ---
 
-## 🧭 How to Contribute to this Repo?
+## 🛠️ How to Contribute to this Repo?
 
 1. **Star ⭐ and Fork 🍴** this repository.  
 
