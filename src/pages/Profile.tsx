@@ -267,7 +267,7 @@ export default function Profile() {
                   Manage session duration
                 </Button>
                 
-                <div className="mt-6 pt-4 border-t border-red-100 dark:border-red-950/30">
+               
                   <h3 className="text-sm font-medium text-red-600 dark:text-red-400 mb-2">Danger Zone</h3>
                   <DeleteProfileModal />
                 </div>
