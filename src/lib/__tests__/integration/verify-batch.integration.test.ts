@@ -69,9 +69,23 @@ describe("verify-batch Edge Function Integration Tests", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("access-control-allow-origin")).toBe("*");
-    expect(response.headers.get("access-control-allow-methods")).toContain(
-      "POST",
-    );
+    it("should handle CORS preflight correctly", async () => {
+      const response = await fetch(`${supabaseUrl}/functions/v1/verify-batch`, {
+        method: "OPTIONS",
+        headers: {
+          Origin: "http://localhost:5173",
+          "Access-Control-Request-Method": "POST",
+          "Access-Control-Request-Headers": "content-type,authorization",
+        },
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("access-control-allow-origin")).toBe("*");
+
+      const allowMethods = response.headers.get("access-control-allow-methods");
+      expect(allowMethods).toBeTruthy();
+      expect(allowMethods).toContain("POST");
+    });
   });
 
   it("should verify batch data structure when successful", async () => {
