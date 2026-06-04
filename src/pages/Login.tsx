@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Mail, Lock, Shield, Sparkles, Globe } from "lucide-react";
+import { AlertCircle, Mail, Lock, Shield, Sparkles, Globe, CheckCircle } from "lucide-react";
 import WalletButton from "@/components/WalletButton";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
@@ -39,6 +39,7 @@ export default function Login() {
   const { user, loading } = useAuth();
   const { isConnected } = useWallet();
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authSuccess, setAuthSuccess] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -55,13 +56,27 @@ export default function Login() {
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
+    setAuthSuccess(null);
     setAuthLoading(true);
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin,
+          },
+        });
+
         if (error) throw error;
-        navigate("/dashboard");
+
+        if (data.user && !data.session) {
+          setAuthSuccess("Please check your email and verify your account before signing in.");
+          setIsSignUp(false);
+        } else {
+          navigate("/dashboard");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -268,10 +283,12 @@ export default function Login() {
                 <Card className="border-2 border-gray-200 dark:border-slate-800 dark:bg-slate-900 shadow-2xl rounded-2xl overflow-hidden">
                   <CardHeader className="bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-950/20 dark:to-blue-950/20 pb-8">
                     <CardTitle className="text-3xl font-extrabold text-gray-900 dark:text-white">
-                      Sign In
+                      {isSignUp ? "Create Account" : "Sign In"}
                     </CardTitle>
                     <CardDescription className="font-body text-base text-gray-600 dark:text-slate-400">
-                      Enter your credentials to access your account
+                      {isSignUp
+                        ? "Register to secure your agricultural supply chain"
+                        : "Enter your credentials to access your account"}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-8">
@@ -329,6 +346,22 @@ export default function Login() {
                             <AlertCircle className="h-5 w-5" />
                             <AlertDescription className="font-body text-base">
                               {authError}
+                            </AlertDescription>
+                          </Alert>
+                        </motion.div>
+                      )}
+
+                      {authSuccess && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                        >
+                          <Alert
+                            className="border-2 border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-600 dark:text-emerald-400 rounded-xl"
+                          >
+                            <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                            <AlertDescription className="font-body text-base ml-2">
+                              {authSuccess}
                             </AlertDescription>
                           </Alert>
                         </motion.div>

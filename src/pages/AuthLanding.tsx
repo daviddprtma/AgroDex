@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Mail, Lock } from "lucide-react";
+import { AlertCircle, Mail, Lock, CheckCircle } from "lucide-react";
 import WalletButton from "@/components/WalletButton";
 import { Helmet } from "react-helmet-async";
 import logoUrl from "@/assets/agritrust-logo.svg";
@@ -19,6 +19,7 @@ export default function AuthLanding() {
   const { user, loading } = useAuth();
   const { isConnected } = useWallet();
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authSuccess, setAuthSuccess] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,13 +35,27 @@ export default function AuthLanding() {
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
+    setAuthSuccess(null);
     setAuthLoading(true);
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin,
+          },
+        });
         if (error) throw error;
-        navigate("/");
+        
+        if (data.user && !data.session) {
+          setAuthSuccess("Please check your email and verify your account before signing in.");
+          setIsSignUp(false);
+          setShowEmailForm(false);
+        } else {
+          navigate("/");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -202,6 +217,13 @@ export default function AuthLanding() {
                       <Alert variant="destructive" className="mt-4">
                         <AlertCircle className="h-4 w-4" />
                         <AlertDescription>{authError}</AlertDescription>
+                      </Alert>
+                    )}
+
+                    {authSuccess && (
+                      <Alert className="mt-4 border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400">
+                        <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                        <AlertDescription>{authSuccess}</AlertDescription>
                       </Alert>
                     )}
 
