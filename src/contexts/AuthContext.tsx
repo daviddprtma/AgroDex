@@ -38,7 +38,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.warn("Logout error:", error.message);
+      }
+    } catch (err) {
+      console.error("Caught error during sign out:", err);
+    } finally {
+      // Always forcefully clear local storage tokens to prevent getting stuck
+      if (typeof window !== "undefined") {
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith("sb-") && key.endsWith("-auth-token")) {
+            localStorage.removeItem(key);
+          }
+        }
+      }
+      // Forcefully update local React state
+      setSession(null);
+      setUser(null);
+    }
   };
 
   const linkHederaWallet = async (accountId: string) => {
