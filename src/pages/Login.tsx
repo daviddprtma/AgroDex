@@ -287,7 +287,7 @@ export default function Login() {
                     </CardTitle>
                     <CardDescription className="font-body text-base text-gray-600 dark:text-slate-400">
                       {isSignUp
-                        ? "Register to secure your agricultural supply chain"
+                        ? "Create a new account to AgroDex"
                         : "Enter your credentials to access your account"}
                     </CardDescription>
                   </CardHeader>
