@@ -120,7 +120,6 @@ export default function Dashboard() {
         new Date(a.timestamp || 0).getTime(),
     )
     .slice(0, 10);
-  const aiInsight = (statsData?.aiInsight ?? null) as AIInsight | null;
   const aiInsightText = aiInsight
     ? i18n.language.startsWith("en")
       ? aiInsight.insight_en || null

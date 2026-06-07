@@ -3,12 +3,15 @@ import path from "path";
 import { defineConfig } from "vitest/config";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import componentTagger from "./plugins/component-tagger";
+// @ts-ignore
+import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineConfig({
   plugins: [
     react(),
     componentTagger(),
     nodePolyfills(),
+    visualizer({ filename: "dist/stats.html" }),
   ],
   resolve: {
     alias: {
@@ -20,19 +23,19 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            if (
-              id.includes("@hashgraph") ||
-              id.includes("hashconnect") ||
-              id.includes("@walletconnect")
-            ) {
+            if (id.includes("@hashgraph") || id.includes("hashconnect") || id.includes("@walletconnect")) {
               return "vendor-hedera";
             }
-            if (id.includes("recharts")) {
+            if (id.includes("recharts") || id.includes("d3") || id.includes("victory")) {
               return "vendor-charts";
             }
             if (id.includes("framer-motion")) {
               return "vendor-motion";
             }
+            if (id.includes("react-dom") || id.includes("react-router")) {
+              return "vendor-react";
+            }
+            return "vendor";
           }
         },
       },
