@@ -153,3 +153,52 @@ The app accepts dates in two formats:
 - `YYYY-MM-DD` (e.g., "2025-11-11") - used as-is
 
 Conversion is handled automatically in `src/lib/api.ts` via `normalizeDate()` function.
+
+## Gemini AI Configuration (Issue #7)
+
+The registration flow uses **Gemini Flash Lite** for batch metadata analysis.
+
+### Model
+
+| Variable | Default | Notes |
+|----------|---------|-------|
+| `GEMINI_API_KEY` | *(required)* | Get from [Google AI Studio](https://aistudio.google.com/) |
+| `GEMINI_MODEL` | `gemini-2.0-flash-lite` | Lightweight, fast, cost-efficient tier |
+| `GEMINI_TIMEOUT_MS` | `6000` (Express) / `20000` (Edge Function) | Timeout in milliseconds |
+
+### What the AI Analyses
+
+During batch registration, Gemini analyses the **batch metadata fields** (no image upload required):
+
+- **Product name** — flags unusual names (too short, special characters)
+- **Quantity** — flags implausible values (zero, negative, >1,000,000)
+- **Origin location** — flags vague single-word locations
+- **Harvest date** — flags future dates and dates older than 3 years
+
+### Response Shape
+
+```json
+{
+  "caption": "500 kg of Organic Arabica Coffee from Kigali Region, Rwanda, harvested on 2025-10-15.",
+  "anomalies": [],
+  "confidence": 95,
+  "tags": ["organic", "fresh"],
+  "generatedAt": "2026-06-09T16:00:00.000Z",
+  "ms": 412
+}
+```
+
+Stored in the `batches.ai_analysis` JSONB column and displayed in the registration success panel.
+
+### Supabase Edge Function Secrets
+
+Set these in your Supabase project dashboard under **Settings → Edge Functions → Secrets**:
+
+```
+GEMINI_API_KEY=your_api_key
+GEMINI_MODEL=gemini-2.0-flash-lite
+```
+
+### Graceful Degradation
+
+If `GEMINI_API_KEY` is not set or Gemini times out, registration still completes normally — `ai_analysis` will be `null` in the response and the AI panel will not render in the UI.
