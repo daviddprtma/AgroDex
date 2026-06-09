@@ -6,6 +6,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import {
   ANALYZE_IMAGE_PROMPT,
+  ANALYZE_BATCH_PROMPT,
   SUMMARIZE_PROVENANCE_PROMPT,
   BUYER_QA_PROMPT,
   TRANSLATE_MARKETING_PROMPT,
@@ -15,7 +16,7 @@ import {
 } from './promptTemplates.js';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash-lite';
 const GEMINI_TIMEOUT_MS = parseInt(process.env.GEMINI_TIMEOUT_MS || '6000', 10);
 
 let genAI = null;
@@ -100,6 +101,51 @@ function parseJSON(text, fallback) {
   } catch (error) {
     console.error('JSON parse error:', error.message, 'Text:', text.substring(0, 200));
     return { ...fallback, ai: { error: 'Invalid JSON response' } };
+  }
+}
+
+/**
+ * Analyse batch registration metadata using Gemini Flash Lite.
+ * Used by the Express backend's /api/register-batch route.
+ * The Edge Function has its own equivalent inline implementation.
+ *
+ * @param {Object} params - {productType, quantity, location, harvestDate}
+ * @returns {Promise<{caption, anomalies, confidence, tags, ms}>}
+ */
+export async function analyzeBatch({ productType, quantity, location, harvestDate }) {
+  console.log(`🔍 Analysing batch metadata: ${productType} @ ${location}`);
+
+  const fallback = {
+    caption: 'Batch metadata analysis unavailable',
+    anomalies: [],
+    confidence: 0,
+    tags: []
+  };
+
+  if (!productType || !location || !harvestDate) {
+    return { ...fallback, ms: 0, error: 'Missing required batch fields' };
+  }
+
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const prompt = fillTemplate(ANALYZE_BATCH_PROMPT, {
+      PRODUCT_TYPE: productType,
+      QUANTITY: String(quantity),
+      LOCATION: location,
+      HARVEST_DATE: harvestDate,
+      TODAY: today
+    });
+
+    const { result, ms, error } = await callWithTimeout(prompt);
+
+    if (error) {
+      return { ...fallback, ms, error };
+    }
+
+    const parsed = parseJSON(result, fallback);
+    return { ...parsed, ms };
+  } catch (error) {
+    return { ...fallback, ms: 0, error: error.message };
   }
 }
 
