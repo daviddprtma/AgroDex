@@ -11,14 +11,17 @@ export default defineConfig({
     react(),
     componentTagger(),
     nodePolyfills(),
+<<<<<<< HEAD
     visualizer({ filename: "dist/stats.html" }),
+=======
+>>>>>>> upstream/main
   ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
-   build: {
+  build: {
     rollupOptions: {
       output: {
         manualChunks(id) {

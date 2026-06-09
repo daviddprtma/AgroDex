@@ -10,17 +10,16 @@ import { HelmetProvider } from 'react-helmet-async';
 import { DEMO_VERIFY_URL } from '@/lib/demo';
 import { lazy, Suspense } from 'react';
 
-// Route-based code splitting — each page loads only when navigated to
-const Index            = lazy(() => import('./pages/Index'));
-const Login            = lazy(() => import('./pages/Login'));
-const AuthLanding      = lazy(() => import('./pages/AuthLanding'));
-const Profile          = lazy(() => import('./pages/Profile'));
-const SessionSettings  = lazy(() => import('./pages/SessionSettings'));
+const Index             = lazy(() => import('./pages/Index'));
+const Login             = lazy(() => import('./pages/Login'));
+const AuthLanding       = lazy(() => import('./pages/AuthLanding'));
+const Profile           = lazy(() => import('./pages/Profile'));
+const SessionSettings   = lazy(() => import('./pages/SessionSettings'));
 const BatchRegistration = lazy(() => import('./pages/BatchRegistration'));
-const BatchTokenize    = lazy(() => import('./pages/BatchTokenize'));
-const BatchVerify      = lazy(() => import('./pages/BatchVerify'));
-const TestHedera       = lazy(() => import('./pages/TestHedera'));
-const Dashboard        = lazy(() => import('./pages/Dashboard'));
+const BatchTokenize     = lazy(() => import('./pages/BatchTokenize'));
+const BatchVerify       = lazy(() => import('./pages/BatchVerify'));
+const TestHedera        = lazy(() => import('./pages/TestHedera'));
+const Dashboard         = lazy(() => import('./pages/Dashboard'));
 
 const queryClient = new QueryClient();
 
