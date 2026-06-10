@@ -109,7 +109,7 @@ router.post("/register-batch", requireAuth, strictLimiter, validateRegisterBatch
       return res.status(400).json({ error: "Missing required fields: batchName, location, photoUrl" });
     }
 
-    // AI batch metadata analysis using Gemini Flash Lite (optional, non-blocking)
+    // AI batch metadata analysis using Gemini AI (optional, non-blocking)
     // AI failures must never stop registration — wrapped in try/catch.
 
     let aiAnalysis = null;

@@ -21,7 +21,7 @@ Rules:
 - Return ONLY the JSON object, no markdown, no explanation`;
 
 /**
- * Batch metadata analysis prompt for Gemini Flash Lite.
+ * Batch metadata analysis prompt for Gemini AI.
  * Used during product registration when no image is available.
  * Analyses structured text fields: productType, quantity, location, harvestDate.
  *

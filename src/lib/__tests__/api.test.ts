@@ -115,7 +115,7 @@ describe("verifyBatch", () => {
 // ---------------------------------------------------------------------------
 // registerBatch — Issue #7 tests
 // Verifies that the function correctly forwards batch data to the Edge Function
-// and surfaces the ai_analysis returned by Gemini Flash Lite.
+// and surfaces the ai_analysis returned by Gemini AI.
 // ---------------------------------------------------------------------------
 describe("registerBatch", () => {
   const validRequest = {

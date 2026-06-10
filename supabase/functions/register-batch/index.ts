@@ -273,7 +273,7 @@ async function submitToHCS(batchData: any, signal?: AbortSignal) {
   }
 }
 
-// Gemini Flash Lite batch metadata analysis
+// Gemini AI batch metadata analysis
 // Analyses structured text fields instead of an image URL (imageData is not captured in the registration form).
 async function analyzeBatch(
   batchData: { productType: string; quantity: string; location: string; harvestDate: string },
@@ -295,7 +295,7 @@ async function analyzeBatch(
   const startTime = Date.now()
   const genAI = new GoogleGenerativeAI(apiKey)
   const model = genAI.getGenerativeModel({
-    model: Deno.env.get('GEMINI_MODEL') || 'gemini-2.0-flash-lite',
+    model: Deno.env.get('GEMINI_MODEL') || 'gemini-3.1-flash-lite',
     generationConfig: {
       temperature: 0.2,
       topP: 0.8,
@@ -398,7 +398,7 @@ Deno.serve(async (req) => {
         SUPABASE_URL: !!Deno.env.get('SUPABASE_URL'),
         SUPABASE_SERVICE_ROLE_KEY: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
         GEMINI_API_KEY: !!Deno.env.get('GEMINI_API_KEY'),
-        GEMINI_MODEL: Deno.env.get('GEMINI_MODEL') || 'gemini-2.0-flash-lite'
+        GEMINI_MODEL: Deno.env.get('GEMINI_MODEL') || 'gemini-3.1-flash-lite'
       }
       console.log(`[${requestId}] Debug mode - env check:`, envInfo)
       return new Response(
@@ -487,7 +487,7 @@ Deno.serve(async (req) => {
 
     console.log(`[${requestId}] 📦 Registering batch: ${productType} (${quantity} units) - Harvest: ${harvestDateISO}`)
 
-    // AI batch metadata analysis via Gemini Flash Lite (optional, non-blocking)
+    // AI batch metadata analysis via Gemini AI (optional, non-blocking)
     // Note: imageData is not used — the registration form does not capture image uploads.
     // Analysis is performed on structured text fields: productType, quantity, location, harvestDate.
     let aiAnalysis = null
@@ -495,7 +495,7 @@ Deno.serve(async (req) => {
       const geminiResult = await withTimeout(
         async (signal) => await analyzeBatch({ productType, quantity, location, harvestDate: harvestDateISO }, signal),
         20000,
-        'Gemini Flash Lite batch analysis'
+        'Gemini AI batch analysis'
       )
 
       if (!geminiResult.error) {
