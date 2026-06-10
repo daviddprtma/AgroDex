@@ -82,7 +82,7 @@ serve(async (req) => {
       .select("*")
       .eq("token_id", tokenId)
       .eq("serial_number", serialNumber)
-      .single();
+      .maybeSingle();
 
     if (metadataError) {
       console.error("→ Database error:", metadataError.message);
