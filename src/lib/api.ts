@@ -21,12 +21,9 @@ export function normalizeDate(input: string): string {
     const monthNum = parseInt(mm, 10);
 
     // Validate ranges to reject ambiguous US format (MM-DD-YYYY)
-    if (dayNum < 1 || dayNum > 31) {
-      throw new Error(`Invalid day: ${dd}. Expected DD-MM-YYYY or YYYY-MM-DD`);
-    }
-    if (monthNum < 1 || monthNum > 12) {
+    if (dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12) {
       throw new Error(
-        `Invalid month: ${mm}. Expected DD-MM-YYYY or YYYY-MM-DD`,
+        `Invalid date format: ${input}. Expected DD-MM-YYYY or YYYY-MM-DD`,
       );
     }
 
