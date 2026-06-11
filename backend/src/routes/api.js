@@ -1,9 +1,8 @@
 import express from "express";
 import axios from "axios";
-import { submitBatchData, fetchHCSMessage } from "../hcs.js";
+import { submitBatchData } from "../hcs.js";
 import { createBatchNFT, fetchNFTMetadata } from "../hts.js";
-import { analyzeBatch } from "../ai.js";
-import { insertBatch, insertToken, upsertVerification, getVerification, getToken } from "../db.js";
+import { supabase, insertBatch, insertToken, upsertVerification, getVerification, getToken } from "../db.js";
 import { env } from "../utils/config.js";
 import { requireAuth } from "../middleware/auth.js";
 import {
@@ -12,7 +11,6 @@ import {
   dashboardInsight,
   healthCheck as geminiHealthCheck,
 } from "../ai/gemini.js";
-import { supabase } from "../db.js";
 import { strictLimiter } from "../middleware/rateLimiter.js";
 import { validateRegisterBatch, validateTokenizeBatch, validateVerifyBatch } from "../middleware/validators.js";
 
