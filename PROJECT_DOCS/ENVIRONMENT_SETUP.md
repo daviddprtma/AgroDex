@@ -9,7 +9,7 @@ The following environment variables are required for the frontend application:
 ```bash
 VITE_API_BASE_URL=http://localhost:4000
 VITE_SUPABASE_URL=https://udnpbqtvbnepicwyubnm.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkbnBicXR2Ym5lcGljd3l1Ym5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyMjAxMjUsImV4cCI6MjA3Nzc5NjEyNX0.TAA7bxPqhDuO-8O6DHNazHo67n0kh7PmyH6aiyepUmQ
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_MIRROR_NODE_URL=https://testnet.mirrornode.hedera.com
 VITE_WALLETCONNECT_PROJECT_ID=ac9166dd615752bda362b92887c6a1ad
 ```
@@ -73,9 +73,8 @@ The Supabase client is configured in `src/lib/supabaseClient.ts`:
 ```typescript
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = "https://udnpbqtvbnepicwyubnm.supabase.co";
-const supabaseAnonKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkbnBicXR2Ym5lcGljd3l1Ym5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyMjAxMjUsImV4cCI6MjA3Nzc5NjEyNX0.TAA7bxPqhDuO-8O6DHNazHo67n0kh7PmyH6aiyepUmQ";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 ```
@@ -104,8 +103,7 @@ fetch("https://udnpbqtvbnepicwyubnm.supabase.co/functions/v1/register-batch", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
-    apikey:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkbnBicXR2Ym5lcGljd3l1Ym5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyMjAxMjUsImV4cCI6MjA3Nzc5NjEyNX0.TAA7bxPqhDuO-8O6DHNazHo67n0kh7PmyH6aiyepUmQ",
+    apikey: "your_supabase_anon_key",
   },
   body: JSON.stringify({
     batchId: "TEST-UI",
