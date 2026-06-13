@@ -82,7 +82,7 @@ serve(async (req) => {
       .select("*")
       .eq("token_id", tokenId)
       .eq("serial_number", serialNumber)
-      .single();
+      .maybeSingle();
 
     if (metadataError) {
       console.error("→ Database error:", metadataError.message);
@@ -144,6 +144,36 @@ serve(async (req) => {
     };
 
     console.log("→ Success (200)");
+
+    const trace = {
+  tokenId: nftMetadata.token_id,
+  serialNumber: nftMetadata.serial_number,
+  nftMetadata,
+  hcsTransactionIds,
+  hcsMessages: hcsMessages || [],
+  ai: nftMetadata.ai_provenance_summary || null,
+  verifiedAt: new Date().toISOString(),
+  status: "verified",
+};
+
+const { error: verificationError } = await supabase
+  .from("verifications")
+  .upsert(
+    [{
+      token_id: nftMetadata.token_id,
+      serial_number: nftMetadata.serial_number,
+      trace,
+    }],
+    {
+      onConflict: "token_id,serial_number",
+    }
+  );
+
+if (verificationError) {
+  console.error("Failed to save verification:", verificationError);
+}
+
+
     return json(200, response);
   } catch (error: any) {
     console.error("=== EXCEPTION ===");
