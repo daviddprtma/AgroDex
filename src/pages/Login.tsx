@@ -110,7 +110,13 @@ export default function Login() {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-white dark:from-emerald-950/20 dark:via-blue-950/20 dark:to-slate-950 dark:bg-slate-950 relative overflow-hidden">
       <Helmet>
-        <title>Login | AgroDex</title>
+        <title>Sign In to AgroDex | Secure Agricultural Traceability</title>
+        <meta name="description" content="Log in to your AgroDex account via email or HashPack wallet to manage and verify agricultural batches." />
+        <link rel="canonical" href="https://agrodex.vercel.app/login" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://agrodex.vercel.app/login" />
+        <meta property="og:title" content="Sign In | AgroDex" />
+        <meta property="og:description" content="Log in to your AgroDex account via email or HashPack wallet to manage and verify agricultural batches." />
       </Helmet>
       {/* Theme Toggle in top-right */}
       <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
@@ -154,6 +160,8 @@ export default function Login() {
             <img
               src={logoUrl}
               alt="AgroDex"
+              width="64"
+              height="64"
               className="h-16 w-auto drop-shadow-2xl bg-white/90 dark:bg-white/10 dark:backdrop-blur-md p-2 rounded-xl"
             />
           </div>
@@ -225,8 +233,10 @@ export default function Login() {
           <div className="relative">
             <div className="absolute -inset-2 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-2xl blur-xl opacity-50" />
             <img
-              src="https://assets-gen.codenut.dev/images/1761634617_bb2f7a28.png"
-              alt="African agricultural landscape"
+              src="/images/hero.webp"
+              alt="Indonesian agricultural landscape"
+              width="500"
+              height="500"
               className="relative rounded-2xl shadow-2xl border-4 border-white/30"
             />
           </div>
@@ -250,6 +260,8 @@ export default function Login() {
               <img
                 src={logoUrl}
                 alt="AgroDex"
+                width="64"
+                height="64"
                 className="h-16 w-auto mx-auto mb-4 lg:hidden bg-white dark:bg-slate-800 p-2 rounded-xl"
               />
               <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">

@@ -20,12 +20,11 @@
  * @see https://docs.hashpack.app/dapp-developers/walletconnect
  */
 
-import {
-  HashConnect,
-  HashConnectConnectionState,
-  SessionData,
-} from "hashconnect";
-import { LedgerId } from "@hashgraph/sdk";
+import type { SessionData } from "hashconnect";
+
+let HashConnectClass: any = null;
+let ConnectionStateEnum: any = null;
+let LedgerIdEnum: any = null;
 
 // =============================================================================
 // Type Definitions
@@ -84,7 +83,7 @@ const WALLETCONNECT_PROJECT_ID =
 // =============================================================================
 
 /** The single HashConnect instance */
-let hashConnect: HashConnect | null = null;
+let hashConnect: any = null;
 
 /** Current wallet state */
 let currentState: WalletState = {
@@ -173,10 +172,18 @@ export const walletService = {
     }, 8000);
 
     try {
-      const ledgerId =
-        NETWORK === "mainnet" ? LedgerId.MAINNET : LedgerId.TESTNET;
+      // Dynamically load dependencies to prevent bundling on initial load
+      const hcModule = await import("hashconnect");
+      const sdkModule = await import("@hashgraph/sdk");
 
-      hashConnect = new HashConnect(
+      HashConnectClass = hcModule.HashConnect;
+      ConnectionStateEnum = hcModule.HashConnectConnectionState;
+      LedgerIdEnum = sdkModule.LedgerId;
+
+      const ledgerId =
+        NETWORK === "mainnet" ? LedgerIdEnum.MAINNET : LedgerIdEnum.TESTNET;
+
+      hashConnect = new HashConnectClass(
         ledgerId,
         WALLETCONNECT_PROJECT_ID,
         APP_METADATA,
@@ -185,12 +192,12 @@ export const walletService = {
 
       // Register event listeners BEFORE calling init()
       hashConnect.connectionStatusChangeEvent.on(
-        (status: HashConnectConnectionState) => {
+        (status: any) => {
           console.log("[HashConnect] Connection status:", status);
           // Note: Disconnected fires on WebSocket errors too — don't clear
           // user state here unless we were previously connected.
           if (
-            status === HashConnectConnectionState.Disconnected &&
+            status === ConnectionStateEnum.Disconnected &&
             currentState.status === "connected"
           ) {
             localStorage.removeItem(SESSION_STORAGE_KEY);
@@ -352,7 +359,7 @@ export const walletService = {
    *
    * Returns null if not initialized.
    */
-  getHashConnect(): HashConnect | null {
+  getHashConnect(): any {
     return hashConnect;
   },
 };

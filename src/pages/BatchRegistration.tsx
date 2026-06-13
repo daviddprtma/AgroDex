@@ -99,7 +99,9 @@ export default function BatchRegistration() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 dark:from-emerald-950/20 dark:via-background dark:to-blue-950/20 dark:bg-background text-foreground">
       <Helmet>
-        <title>Register Batch | AgroDex</title>
+        <title>Register New Agricultural Batch | AgroDex</title>
+        <meta name="description" content="Register a new agricultural batch with photos, GPS coordinates, and crop details for AI analysis and blockchain certification on Hedera." />
+        <link rel="canonical" href="https://agrodex.vercel.app/register" />
       </Helmet>
       <Navbar />
       <div className="max-w-4xl mx-auto space-y-8 p-4 md:p-8">

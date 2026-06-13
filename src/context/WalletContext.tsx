@@ -68,8 +68,11 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    // Initialize HashConnect when the provider mounts
-    walletService.init();
+    // Only initialize HashConnect immediately if a session exists in localStorage
+    const savedSession = localStorage.getItem("agrodex_hashconnect_session");
+    if (savedSession) {
+      walletService.init();
+    }
 
     // Subscribe to state changes from the service layer
     // This ensures React re-renders whenever the wallet state changes
@@ -83,6 +86,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   // Memoize actions so they don't cause unnecessary re-renders
   const connect = useCallback(async () => {
+    await walletService.init();
     await walletService.connect();
   }, []);
 

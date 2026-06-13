@@ -148,7 +148,9 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet>
-        <title>Dashboard | AgroDex</title>
+        <title>Producer Dashboard | AgroDex Traceability</title>
+        <meta name="description" content="Manage your agricultural batches, monitor quality analytics, and track tokenized products on the Hedera blockchain." />
+        <link rel="canonical" href="https://agrodex.vercel.app/dashboard" />
       </Helmet>
       <Navbar />
 
@@ -179,6 +181,8 @@ export default function Dashboard() {
                 <img
                   src={logoUrl}
                   alt="AgroDex logo"
+                  width="80"
+                  height="80"
                   className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl shadow-lg object-cover bg-white dark:bg-slate-900 p-2"
                 />
                 <div>

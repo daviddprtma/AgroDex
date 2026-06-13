@@ -70,7 +70,9 @@ export default function SessionSettings() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 dark:bg-background text-foreground p-4">
       <Helmet>
-        <title>Session Settings | AgroDex</title>
+        <title>Settings | AgroDex</title>
+        <meta name="description" content="Configure your AgroDex account preferences, translation preferences, and application settings." />
+        <link rel="canonical" href="https://agrodex.vercel.app/session-settings" />
       </Helmet>
       <div className="container mx-auto max-w-2xl py-8">
         <Button

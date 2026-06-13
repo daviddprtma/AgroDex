@@ -118,7 +118,9 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 dark:bg-background text-foreground">
       <Helmet>
-        <title>Profile | AgroDex</title>
+        <title>User Profile | AgroDex</title>
+        <meta name="description" content="View and update your AgroDex profile settings, authentication methods, and connected wallet details." />
+        <link rel="canonical" href="https://agrodex.vercel.app/profile" />
       </Helmet>
       <Navbar />
       
