@@ -51,7 +51,7 @@ export default function Login() {
   // Auto-redirect if authenticated via either method
   useEffect(() => {
     if (!loading && (user || isConnected)) {
-      navigate("/dashboard");
+      navigate("/");
     }
   }, [user, loading, isConnected, navigate]);
 
@@ -78,7 +78,7 @@ export default function Login() {
           setAuthSuccess("Please check your email and verify your account before signing in.");
           setIsSignUp(false);
         } else {
-          navigate("/dashboard");
+          navigate("/");
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -86,7 +86,7 @@ export default function Login() {
           password,
         });
         if (error) throw error;
-        navigate("/dashboard");
+        navigate("/");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
