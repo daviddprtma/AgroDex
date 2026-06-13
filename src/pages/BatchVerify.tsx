@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
 import { verifyBatch, verifyBatchById } from "@/lib/api";
-import type { VerifyBatchResult, VerifyBatchResponse } from "@/lib/api";
+import type { VerifyBatchResult, VerifyBatchResponse, VerifyBatchDeletedResult } from "@/lib/api";
 import { QRCodeCanvas } from "qrcode.react";
 import { QrScannerModal } from "@/components/QrScannerModal";
 import { Button } from "@/components/ui/button";
@@ -237,7 +237,70 @@ export default function BatchVerify() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-blue-950/20 dark:via-background dark:to-indigo-950/20 dark:bg-background text-foreground">
       <Helmet>
-        <title>Verify Batch | AgroDex</title>
+        <title>Verify Agricultural Batch | AgroDex Product Authenticity</title>
+        <meta name="description" content="Verify the origin, quality, and blockchain history of your agricultural products. Scan QR codes or input token IDs to trace the provenance instantly on Hedera." />
+        <link rel="canonical" href="https://agrodex.vercel.app/verify" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://agrodex.vercel.app/verify" />
+        <meta property="og:title" content="Verify Batch | AgroDex" />
+        <meta property="og:description" content="Verify the origin, quality, and blockchain history of your agricultural products. Scan QR codes or input token IDs to trace the provenance instantly on Hedera." />
+        <meta property="og:image" content="https://agrodex.vercel.app/images/verify-hero.webp" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="https://agrodex.vercel.app/images/verify-hero.webp" />
+        {verifiedResult && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Product",
+              "name": verifiedResult.batch?.batch_name || `Batch NFT #${verifiedResult.serialNumber}`,
+              "image": verifiedResult.batch?.photo_url || "https://agrodex.vercel.app/images/verify-hero.webp",
+              "description": verifiedResult.ai_summary?.summary_en || "Verifiable agricultural batch authenticated via Hedera HCS/HTS and Gemini AI.",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "IDR",
+                "availability": "https://schema.org/InStock"
+              },
+              "additionalProperty": [
+                {
+                  "@type": "PropertyValue",
+                  "name": "Hedera Token ID",
+                  "value": verifiedResult.tokenId
+                },
+                {
+                  "@type": "PropertyValue",
+                  "name": "Serial Number",
+                  "value": String(verifiedResult.serialNumber)
+                },
+                {
+                  "@type": "PropertyValue",
+                  "name": "Verification Date",
+                  "value": verifiedResult.verifiedAt
+                },
+                {
+                  "@type": "PropertyValue",
+                  "name": "Status",
+                  "value": verifiedResult.status
+                },
+                {
+                  "@type": "PropertyValue",
+                  "name": "Product Type",
+                  "value": verifiedResult.batch?.product_type || "N/A"
+                },
+                {
+                  "@type": "PropertyValue",
+                  "name": "Harvest Date",
+                  "value": verifiedResult.batch?.harvest_date || "N/A"
+                },
+                {
+                  "@type": "PropertyValue",
+                  "name": "Origin Location",
+                  "value": verifiedResult.batch?.location || "N/A"
+                }
+              ]
+            })}
+          </script>
+        )}
       </Helmet>
       <Navbar />
       <div className="max-w-5xl mx-auto space-y-8 p-4 md:p-8">
@@ -257,7 +320,7 @@ export default function BatchVerify() {
         {/* Illustration */}
         <div className="relative rounded-2xl overflow-hidden shadow-lg">
           <img
-            src="https://assets-gen.codenut.dev/images/1761555183_d10ca27c.png"
+            src="/images/verify-hero.webp"
             alt="Batch Verification"
             className="w-full h-48 md:h-64 object-cover"
           />

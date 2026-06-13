@@ -87,7 +87,13 @@ export default function AuthLanding() {
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-emerald-600 via-teal-600 to-blue-600 dark:from-emerald-950 dark:via-slate-900 dark:to-blue-950">
       <Helmet>
-        <title>Welcome | AgroDex</title>
+        <title>Welcome to AgroDex | Secure Agricultural Traceability</title>
+        <meta name="description" content="Welcome to AgroDex. Set up your profile, connect your HashPack wallet, and manage AI-powered agricultural batch verification." />
+        <link rel="canonical" href="https://agrodex.vercel.app/welcome" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://agrodex.vercel.app/welcome" />
+        <meta property="og:title" content="Welcome | AgroDex" />
+        <meta property="og:description" content="Welcome to AgroDex. Set up your profile, connect your HashPack wallet, and manage AI-powered agricultural batch verification." />
       </Helmet>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
         {/* Top bar */}
@@ -96,6 +102,8 @@ export default function AuthLanding() {
             <img
               src={logoUrl}
               alt="AgroDex"
+              width="36"
+              height="36"
               className="h-9 w-auto drop-shadow-sm brightness-0 invert bg-white/80 dark:bg-white/10 dark:backdrop-blur-sm p-1 rounded-md"
             />
             <span className="sr-only">AgroDex</span>
@@ -187,8 +195,10 @@ export default function AuthLanding() {
                     className="flex items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 via-lime-400 to-amber-300 p-4 min-h-[160px] sm:min-h-0"
                   >
                     <motion.img
-                      src="https://assets-gen.codenut.dev/images/1761557179_721de6c2.png"
+                      src="/images/auth-hero.webp"
                       alt="Secure blockchain traceability"
+                      width="200"
+                      height="200"
                       className="max-h-40 sm:max-h-56 w-full object-contain drop-shadow-md"
                       loading="eager"
                       animate={{ y: [0, -6, 0] }}

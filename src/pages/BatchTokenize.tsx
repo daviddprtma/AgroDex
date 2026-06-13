@@ -102,6 +102,8 @@ export default function BatchTokenize() {
       <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 dark:from-violet-950/20 dark:via-background dark:to-fuchsia-950/20 dark:bg-background text-foreground">
         <Helmet>
           <title>Report Generated | AgroDex</title>
+          <meta name="description" content="AI trust analysis complete and permanently stored on the Hedera blockchain as an NFT certificate." />
+          <link rel="canonical" href="https://agrodex.vercel.app/tokenize" />
         </Helmet>
         <Navbar />
         <div className="max-w-3xl mx-auto p-4 md:p-8 animate-fade-in">
@@ -267,7 +269,9 @@ export default function BatchTokenize() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 dark:from-violet-950/20 dark:via-background dark:to-fuchsia-950/20 dark:bg-background text-foreground">
       <Helmet>
-        <title>Generate AI Trust Report | AgroDex</title>
+        <title>Tokenize Batch as NFT | AgroDex</title>
+        <meta name="description" content="Mint secure Hedera NFT certificates for registered agricultural batches to verify ownership and supply chain events." />
+        <link rel="canonical" href="https://agrodex.vercel.app/tokenize" />
       </Helmet>
       <Navbar />
       <div className="max-w-4xl mx-auto space-y-8 p-4 md:p-8">

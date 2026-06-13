@@ -23,11 +23,51 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet>
-        <title>Home | AgroDex</title>
+        <title>AgroDex - AI-Powered Agricultural Traceability in Indonesia</title>
+        <meta name="description" content="Combat food fraud in Indonesia using Hedera Hashgraph blockchain and Gemini AI. Real-time verification, NFT certification, and automated quality validation for agricultural products." />
+        <meta name="keywords" content="blockchain, agriculture, traceability, Hedera, HCS, HTS, NFT, AI, Gemini, food safety, authenticity, Indonesia" />
+        <link rel="canonical" href="https://agrodex.vercel.app/" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://agrodex.vercel.app/" />
+        <meta property="og:title" content="AgroDex - AI-Powered Agricultural Traceability" />
+        <meta property="og:description" content="Combat food fraud and guarantee agricultural product authenticity using Hedera Hashgraph blockchain and Gemini AI." />
+        <meta property="og:image" content="https://agrodex.vercel.app/images/hero.webp" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content="https://agrodex.vercel.app/" />
+        <meta name="twitter:title" content="AgroDex - AI-Powered Agricultural Traceability" />
+        <meta name="twitter:description" content="Combat food fraud and guarantee agricultural product authenticity using Hedera Hashgraph blockchain and Gemini AI." />
+        <meta name="twitter:image" content="https://agrodex.vercel.app/images/hero.webp" />
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "AgroDex",
+              "url": "https://agrodex.vercel.app/",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://agrodex.vercel.app/verify?tokenId={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            }
+          `}
+        </script>
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "AgroDex",
+              "url": "https://agrodex.vercel.app/",
+              "logo": "https://agrodex.vercel.app/assets/agritrust-logo.svg",
+              "description": "AI-Powered Agricultural Traceability in Indonesia using Hedera Hashgraph and Gemini AI."
+            }
+          `}
+        </script>
       </Helmet>
       <Navbar />
 
-      {/* Hero Section */}
+      <main id="main-content">
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-blue-50 to-white dark:from-emerald-950/20 dark:via-blue-950/20 dark:to-background">
         {/* Decorative Elements */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
@@ -54,13 +94,15 @@ export default function Index() {
                 <img
                   src={logoUrl}
                   alt="AgroDex logo"
+                  width="80"
+                  height="80"
                   className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl shadow-lg object-cover bg-white dark:bg-slate-900 p-2"
                 />
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
                     AgroDex
                   </h2>
-                  <p className="text-sm sm:text-base text-emerald-600 font-semibold mt-0.5">
+                  <p className="text-sm sm:text-base text-emerald-700 font-semibold mt-0.5">
                     AI-Powered Agricultural Traceability
                   </p>
                 </div>
@@ -77,7 +119,7 @@ export default function Index() {
               </motion.div>
 
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-gray-900 dark:text-white leading-tight">
-                Fighting <span className="text-emerald-600">Food Fraud</span> in
+                Fighting <span className="text-emerald-700">Food Fraud</span> in
                 Indonesia
               </h1>
 
@@ -87,12 +129,7 @@ export default function Index() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Link to={DEMO_VERIFY_URL} className="w-full sm:w-auto">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  ></motion.div>
-                </Link>
+
                 <Link to="/register" className="w-full sm:w-auto">
                   <motion.div
                     whileHover={{ scale: 1.05 }}
@@ -100,7 +137,7 @@ export default function Index() {
                   >
                     <Button
                       size="lg"
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-shadow"
+                      className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-shadow"
                     >
                       Get Started
                       <ArrowRight className="ml-2 h-5 w-5" />
@@ -115,7 +152,7 @@ export default function Index() {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="w-full border-2 border-gray-300 dark:border-slate-700 hover:border-emerald-600 font-bold text-lg px-8 py-6 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-gray-700 dark:text-slate-300 transition-colors"
+                      className="w-full border-2 border-gray-300 dark:border-slate-700 hover:border-emerald-700 font-bold text-lg px-8 py-6 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-gray-700 dark:text-slate-300 transition-colors"
                     >
                       Verify Batch
                     </Button>
@@ -132,8 +169,10 @@ export default function Index() {
             >
               <div className="absolute -inset-4 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-3xl blur-2xl opacity-20" />
               <img
-                src="https://assets-gen.codenut.dev/images/1761634617_bb2f7a28.png"
-                alt="Producteur africain avec grains de café"
+                src="/images/hero.webp"
+                alt="Indonesian coffee farmer with coffee beans"
+                width="600"
+                height="600"
                 className="relative w-full h-auto rounded-2xl shadow-2xl"
               />
             </motion.div>
@@ -223,7 +262,7 @@ export default function Index() {
               </div>
               <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white mb-6">
                 AgroDex:{" "}
-                <span className="text-emerald-600">Blockchain + AI</span>
+                <span className="text-emerald-700">Blockchain + AI</span>
               </h2>
               <p className="text-lg sm:text-xl font-body text-gray-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
                 A complete platform combining Hedera Hashgraph and Gemini AI for
@@ -266,7 +305,7 @@ export default function Index() {
                   emerald: {
                     border: "border-emerald-100 dark:border-emerald-950/30",
                     bg: "bg-emerald-100 dark:bg-emerald-950/50",
-                    text: "text-emerald-600 dark:text-emerald-400",
+                    text: "text-emerald-700 dark:text-emerald-400",
                   },
                   blue: {
                     border: "border-blue-100 dark:border-blue-950/30",
@@ -332,7 +371,7 @@ export default function Index() {
               transition={{ duration: 0.6 }}
             >
               <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white mb-6">
-                How It <span className="text-emerald-600">Works</span>
+                How It <span className="text-emerald-700">Works</span>
               </h2>
               <p className="text-lg sm:text-xl font-body text-gray-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
                 A simple 3-step process to guarantee the authenticity of your
@@ -411,7 +450,7 @@ export default function Index() {
               transition={{ duration: 0.6 }}
             >
               <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white mb-6">
-                Impact for <span className="text-emerald-600">Everyone</span>
+                Impact for <span className="text-emerald-700">Everyone</span>
               </h2>
               <p className="text-lg sm:text-xl font-body text-gray-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
                 A solution that benefits all actors in the agricultural value
@@ -461,7 +500,7 @@ export default function Index() {
                     from: "from-emerald-50 dark:from-emerald-950/20",
                     border: "border-emerald-100 dark:border-emerald-950/30",
                     bg: "bg-emerald-100 dark:bg-emerald-950/50",
-                    text: "text-emerald-600 dark:text-emerald-400",
+                    text: "text-emerald-700 dark:text-emerald-400",
                   },
                   blue: {
                     from: "from-blue-50 dark:from-blue-950/20",
@@ -567,6 +606,7 @@ export default function Index() {
           </motion.div>
         </div>
       </section>
+    </main>
 
       <Footer />
     </div>

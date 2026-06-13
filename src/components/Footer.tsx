@@ -10,7 +10,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <img src={logoUrl} alt="AgroDex" className="h-8 w-auto" />
+            <img src={logoUrl} alt="AgroDex" width="32" height="32" className="h-8 w-auto" />
             <span className="text-lg font-heading font-bold">AgroDex</span>
           </div>
           <div className="text-center md:text-right">

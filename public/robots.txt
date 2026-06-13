@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Allow: /verify
+Allow: /login
+Allow: /welcome
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /session-settings
+Disallow: /register
+Disallow: /tokenize
+Disallow: /test-hedera
+
+Sitemap: https://agrodex.vercel.app/sitemap.xml
