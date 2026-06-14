@@ -22,8 +22,13 @@
 
 import type { SessionData } from "hashconnect";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let HashConnectClass: any = null;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let ConnectionStateEnum: any = null;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let LedgerIdEnum: any = null;
 
 // =============================================================================
