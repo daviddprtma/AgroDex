@@ -1,5 +1,5 @@
 import { Leaf } from 'lucide-react';
-import logoUrl from '@/assets/agritrust-logo.svg';
+import logoUrl from '@/assets/agritrust-logo.png';
 import { useTranslation } from 'react-i18next';
 
 export default function Footer() {

@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Mail, Lock, CheckCircle } from "lucide-react";
 import WalletButton from "@/components/WalletButton";
 import { Helmet } from "react-helmet-async";
-import logoUrl from "@/assets/agritrust-logo.svg";
+import logoUrl from "@/assets/agritrust-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function AuthLanding() {
