@@ -367,7 +367,8 @@ export const walletService = {
    *
    * Returns null if not initialized.
    */
-  getHashConnect(): any {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    getHashConnect(): any {
     return hashConnect;
   },
 };
