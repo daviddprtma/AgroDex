@@ -199,6 +199,7 @@ export const walletService = {
 
       // Register event listeners BEFORE calling init()
       hashConnect.connectionStatusChangeEvent.on(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (status: any) => {
           console.log("[HashConnect] Connection status:", status);
           // Note: Disconnected fires on WebSocket errors too — don't clear
