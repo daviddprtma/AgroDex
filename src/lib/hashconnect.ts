@@ -87,7 +87,9 @@ const WALLETCONNECT_PROJECT_ID =
 // Singleton State
 // =============================================================================
 
-/** The single HashConnect instance */
+// The single HashConnect instance
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let hashConnect: any = null;
 
 /** Current wallet state */
