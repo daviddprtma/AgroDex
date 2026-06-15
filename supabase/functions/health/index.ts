@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 import { Client } from 'npm:@hashgraph/sdk@^2.49.0'
-import { GoogleGenerativeAI } from 'npm:@google/generative-ai@^0.21.0'
+import { GoogleGenerativeAI } from 'npm:@google/generative-ai@^0.24.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     }
     
     health.checks.supabase.ok = true
-  } catch (error) {
+  } catch (error: any) {
     health.checks.supabase.error = error.message
   }
 
@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
     }
     
     health.checks.hedera.ok = true
-  } catch (error) {
+  } catch (error: any) {
     health.checks.hedera.error = error.message
   }
 
@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
     }
     
     const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+    const model = genAI.getGenerativeModel({ model: Deno.env.get('GEMINI_MODEL') || 'gemini-3.1-flash-lite' })
     
     const result = await model.generateContent('Return JSON: {"pong": true}')
     const response = await result.response
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
     } else {
       throw new Error('Invalid response from Gemini')
     }
-  } catch (error) {
+  } catch (error: any) {
     health.checks.gemini.error = error.message
   }
 

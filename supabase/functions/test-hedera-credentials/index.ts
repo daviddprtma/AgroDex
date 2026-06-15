@@ -72,7 +72,7 @@ function loadPrivateKeyAny(raw: string): PrivateKey {
 
     // Fallback to generic parser
     return PrivateKey.fromString(cleanKey)
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(
       `Failed to parse key: ${error.message}\n` +
       `Key fingerprint: ${cleanKey.length} chars, starts with "${cleanKey.substring(0, 10)}..."`
@@ -173,7 +173,7 @@ Deno.serve(async (req) => {
       { status: 200, headers: corsHeaders }
     )
 
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[${requestId}] ❌ Credential test failed:`, error)
 
     // Enhanced error messages

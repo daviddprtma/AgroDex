@@ -125,7 +125,7 @@ Verify → Buyer Q&A + Evidence Links
 
 1. **Health Check** (verify AI is working)
    - Visit: http://localhost:4000/api/health/full
-   - Look for: `gemini: { ok: true, model: "gemini-2.0-flash-exp", ms: <number> }`
+   - Look for: `gemini: { ok: true, model: "gemini-3.1-flash-lite", ms: <number> }`
 
 2. **Register a Batch**
    - Go to: http://localhost:5173/register

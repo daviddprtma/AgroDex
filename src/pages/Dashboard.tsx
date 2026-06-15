@@ -690,7 +690,7 @@ export default function Dashboard() {
               </div>
               <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-slate-900/30 rounded-lg border border-purple-100/50 dark:border-purple-900/20">
                 <p className="text-sm font-semibold text-purple-900 dark:text-purple-400 mb-1">
-                  Gemini AI 2.5
+                  Gemini AI
                 </p>
                 <p className="text-xs text-purple-700 dark:text-purple-500">Analysis & Provenance</p>
               </div>

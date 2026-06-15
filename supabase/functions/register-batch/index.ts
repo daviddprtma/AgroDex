@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 import { Client, TopicMessageSubmitTransaction, TopicId, PrivateKey, AccountId } from 'npm:@hashgraph/sdk@^2.49.0'
-import { GoogleGenerativeAI } from 'npm:@google/generative-ai@^0.21.0'
+import { GoogleGenerativeAI } from 'npm:@google/generative-ai@^0.24.1'
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts'
 
 const corsHeaders = {
@@ -150,7 +150,7 @@ function loadPrivateKeyAny(raw: string): PrivateKey {
     // Case 3: Fallback to generic parser
     console.log('🔑 Using generic key parser')
     return PrivateKey.fromString(cleanKey)
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(
       `Failed to parse HEDERA_OPERATOR_KEY: ${error.message}\n` +
       `Key format: ${cleanKey.length} chars, starts with "${cleanKey.substring(0, 10)}..."\n` +
@@ -182,7 +182,7 @@ function getHederaClient() {
 
     console.log(`✅ Hedera client initialized for ${network} - Account: ${operatorId}`)
     return client
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Failed to initialize Hedera client:', error.message)
     throw new Error(`Hedera client initialization failed: ${error.message}`)
   }
@@ -243,7 +243,7 @@ async function submitToHCS(batchData: any, signal?: AbortSignal) {
         topicSequenceNumber: receipt.topicSequenceNumber?.toString()
       }
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ HCS submission failed:', error)
     
     // Enhanced error messages with troubleshooting hints
@@ -291,7 +291,7 @@ async function analyzeImage(photoUrl: string, signal?: AbortSignal) {
   const startTime = Date.now()
   const genAI = new GoogleGenerativeAI(apiKey)
   const model = genAI.getGenerativeModel({ 
-    model: Deno.env.get('GEMINI_MODEL') || 'gemini-2.0-flash-exp',
+    model: Deno.env.get('GEMINI_MODEL') || 'gemini-3.1-flash-lite',
     generationConfig: {
       temperature: 0.3,
       topP: 0.8,
@@ -343,7 +343,7 @@ Deno.serve(async (req) => {
     
     try {
       body = rawText ? JSON.parse(rawText) : null
-    } catch (jsonError) {
+    } catch (jsonError: any) {
       console.error(`[${requestId}] JSON parse error:`, jsonError)
       return new Response(
         JSON.stringify({
@@ -369,7 +369,7 @@ Deno.serve(async (req) => {
         SUPABASE_URL: !!Deno.env.get('SUPABASE_URL'),
         SUPABASE_SERVICE_ROLE_KEY: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
         GEMINI_API_KEY: !!Deno.env.get('GEMINI_API_KEY'),
-        GEMINI_MODEL: Deno.env.get('GEMINI_MODEL') || 'gemini-2.0-flash-exp'
+        GEMINI_MODEL: Deno.env.get('GEMINI_MODEL') || 'gemini-3.1-flash-lite'
       }
       console.log(`[${requestId}] Debug mode - env check:`, envInfo)
       return new Response(
@@ -417,7 +417,7 @@ Deno.serve(async (req) => {
       if (isNaN(dateObj.getTime())) {
         throw new Error('Invalid date value')
       }
-    } catch (dateError) {
+    } catch (dateError: any) {
       console.error(`[${requestId}] Date normalization error:`, dateError)
       return new Response(
         JSON.stringify({
@@ -477,7 +477,7 @@ Deno.serve(async (req) => {
           ms: geminiResult.ms
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.warn(`[${requestId}] AI analysis failed, continuing without it:`, error.message)
       // AI failure is non-critical, continue without it
     }
@@ -496,7 +496,7 @@ Deno.serve(async (req) => {
         25000,
         'Hedera HCS submission'
       )
-    } catch (hcsError) {
+    } catch (hcsError: any) {
       console.error(`[${requestId}] HCS submission error:`, hcsError)
       
       // Determine if timeout or other network error
@@ -618,7 +618,7 @@ Deno.serve(async (req) => {
       }
 
       batchRecord = data
-    } catch (dbTimeoutError) {
+    } catch (dbTimeoutError: any) {
       console.error(`[${requestId}] Database timeout:`, dbTimeoutError)
       const errorMsg = String(dbTimeoutError.message || dbTimeoutError)
       const isTimeout = errorMsg.includes('timeout') || errorMsg.includes('aborted')
@@ -655,7 +655,7 @@ Deno.serve(async (req) => {
         headers: corsHeaders
       }
     )
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[${requestId}] Register batch fatal error:`, error)
     
     return new Response(

@@ -10,7 +10,7 @@ import {
   TokenMintTransaction,
   TokenId,
   AccountId,
-} from "npm:@hashgraph/sdk@2.49.2";
+} from "npm:@hashgraph/sdk@^2.49.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -122,7 +122,7 @@ serve(async (req) => {
     // Create NFT token
     const tokenName = batchData?.product_type || "AgroDex Certificate";
     const tokenSymbol = "AGRI";
-    let tokenId = TokenId;
+    let tokenId: TokenId | null = null;
 
     console.log("[tokenize-batch] Creating token transaction...");
     const tokenCreateTx = await new TokenCreateTransaction()
@@ -179,7 +179,7 @@ serve(async (req) => {
 
     console.log("[tokenize-batch] Creating mint transaction...");
     const mintTx = await new TokenMintTransaction()
-      .setTokenId(tokenId)
+      .setTokenId(tokenId!)
       .setMetadata([metadata])
       .freezeWith(client);
 
@@ -222,7 +222,7 @@ serve(async (req) => {
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("[tokenize-batch] Error:", error);
     console.error("[tokenize-batch] Error stack:", error.stack);
     return new Response(
