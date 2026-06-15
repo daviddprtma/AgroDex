@@ -27,6 +27,8 @@ export const env = cleanEnv(process.env, {
   HEDERA_TOPIC_ID: str(),
   MIRROR_NODE_URL: str({ default: "https://testnet.mirrornode.hedera.com" }),
   GEMINI_API_KEY: str(),
+  GEMINI_MODEL: str({ default: "gemini-3.5-flash" }),
+  GEMINI_TIMEOUT_MS: num({ default: 6000 }),
   PORT: num({ default: 4000 }),
   NODE_ENV: str({ default: "development" }),
   FRONTEND_URL: str({ default: "http://localhost:5173" }),

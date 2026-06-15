@@ -65,7 +65,9 @@ Deno.serve(async (req) => {
     }
     
     const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+    const model = genAI.getGenerativeModel({ 
+      model: Deno.env.get('GEMINI_MODEL') || 'gemini-3.5-flash' 
+    })
     
     const result = await model.generateContent('Return JSON: {"pong": true}')
     const response = await result.response

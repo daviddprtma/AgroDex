@@ -291,7 +291,7 @@ async function analyzeImage(photoUrl: string, signal?: AbortSignal) {
   const startTime = Date.now()
   const genAI = new GoogleGenerativeAI(apiKey)
   const model = genAI.getGenerativeModel({ 
-    model: Deno.env.get('GEMINI_MODEL') || 'gemini-2.0-flash-exp',
+    model: Deno.env.get('GEMINI_MODEL') || 'gemini-3.5-flash',
     generationConfig: {
       temperature: 0.3,
       topP: 0.8,
@@ -369,7 +369,7 @@ Deno.serve(async (req) => {
         SUPABASE_URL: !!Deno.env.get('SUPABASE_URL'),
         SUPABASE_SERVICE_ROLE_KEY: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
         GEMINI_API_KEY: !!Deno.env.get('GEMINI_API_KEY'),
-        GEMINI_MODEL: Deno.env.get('GEMINI_MODEL') || 'gemini-2.0-flash-exp'
+        GEMINI_MODEL: Deno.env.get('GEMINI_MODEL') || 'gemini-3.5-flash'
       }
       console.log(`[${requestId}] Debug mode - env check:`, envInfo)
       return new Response(
