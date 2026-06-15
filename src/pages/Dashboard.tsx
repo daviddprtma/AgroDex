@@ -29,7 +29,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { motion } from "framer-motion";
-import logoUrl from "@/assets/agritrust-logo.svg";
+import logoUrl from "@/assets/agritrust-logo.png";
 
 interface DashboardKPIs {
   totalBatches: number;

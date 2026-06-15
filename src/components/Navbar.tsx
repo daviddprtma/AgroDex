@@ -26,7 +26,7 @@ import { useWallet } from "@/hooks/useWallet";
 import { useState } from "react";
 import { useServiceStatus } from "@/hooks/useServiceStatus";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import logoUrl from "@/assets/agritrust-logo.svg";
+import logoUrl from "@/assets/agritrust-logo.png";
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
