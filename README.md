@@ -289,3 +289,17 @@ Here's the demo video for this project:
 
 ## 📄 Pitch Deck
 For the pitch deck, see it in 👉[AgroDex](https://drive.google.com/file/d/11GCPQooNam1s5ia6bG4XmaHjxkOmFLN9/view?usp=sharing).
+
+---
+
+## 🤝 Contributors
+
+Thanks to all the amazing people who have contributed to AgroDex! Your efforts are truly appreciated. 💖👏
+
+<a href="https://github.com/daviddprtma/AgroDex/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=daviddprtma/AgroDex" alt="AgroDex Contributors" />
+</a>
+
+<br/>
+
+See the full list of contributors and their contributions on the [`GitHub Contributors Graph`](https://github.com/daviddprtma/AgroDex/graphs/contributors).
