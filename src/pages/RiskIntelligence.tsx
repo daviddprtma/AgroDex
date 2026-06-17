@@ -3,11 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend, Cell
+  Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import {
   Shield, ShieldAlert, ShieldCheck, AlertTriangle, TrendingUp,
-  Users, MapPin, Activity, Loader2, RefreshCw, Info, ChevronDown, ChevronUp,
+  Users, MapPin, Activity, RefreshCw, Info, ChevronDown, ChevronUp,
   Sparkles, Zap
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
