@@ -9,6 +9,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { HelmetProvider } from 'react-helmet-async';
 import { DEMO_VERIFY_URL } from '@/lib/demo';
 import { lazy, Suspense } from 'react';
+import { ChatbotWidget } from '@/components/chat/ChatbotWidget';
 
 const Index             = lazy(() => import('./pages/Index'));
 const Login             = lazy(() => import('./pages/Login'));
@@ -58,6 +59,7 @@ const App = () => (
                     <Route path="/test-hedera" element={<ProtectedRoute><TestHedera /></ProtectedRoute>} />
                     <Route path="/risk-intelligence" element={<ProtectedRoute><RiskIntelligence /></ProtectedRoute>} />
                   </Routes>
+                  <ChatbotWidget />
                 </Suspense>
               </WalletProvider>
             </AuthProvider>
