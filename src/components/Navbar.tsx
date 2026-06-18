@@ -9,11 +9,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   FileText,
   Coins,
   ShieldCheck,
+  ShieldAlert,
   User,
   Settings,
   LogOut,
@@ -58,8 +60,7 @@ export default function Navbar() {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Display name: prefer email if logged in via Supabase, otherwise show wallet account
-  const displayName = user?.email || (isConnected && accountId) || "User";
+  const accountLabel = user ? "Account" : isConnected ? "Wallet" : "User";
 
   // Handle logout: sign out from Supabase AND disconnect wallet
   const handleLogout = async () => {
@@ -126,13 +127,6 @@ export default function Navbar() {
               </div>
             )}
             <LanguageSelector />
-            <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-900 px-3 py-2 rounded-lg border border-gray-100 dark:border-slate-800"></div>
-            <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-900 px-3 py-2 rounded-lg border border-gray-100 dark:border-slate-800">
-              <User className="h-4 w-4 text-gray-600 dark:text-slate-400" />
-              <span className="text-sm font-body text-gray-700 dark:text-slate-300 max-w-[150px] truncate">
-                {displayName}
-              </span>
-            </div>
             <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -180,7 +174,7 @@ export default function Navbar() {
                   <div className="flex items-center gap-3 bg-gray-50 dark:bg-slate-900 px-4 py-3 rounded-lg border border-gray-100 dark:border-slate-800">
                     <User className="h-5 w-5 text-gray-600 dark:text-slate-400" />
                     <span className="text-sm font-body text-gray-700 dark:text-slate-300 truncate">
-                      {displayName}
+                      {accountLabel}
                     </span>
                   </div>
 
