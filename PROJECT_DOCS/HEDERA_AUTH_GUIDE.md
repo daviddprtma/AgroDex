@@ -180,7 +180,7 @@ curl -X POST "${SUPABASE_URL}/functions/v1/register-batch" \
     "SUPABASE_URL": true,
     "SUPABASE_SERVICE_ROLE_KEY": true,
     "GEMINI_API_KEY": true,
-    "GEMINI_MODEL": "gemini-2.0-flash-exp"
+    "GEMINI_MODEL": "gemini-3.1-flash-lite"
   },
   "received": {
     "productType": "Organic Tomatoes",
@@ -350,7 +350,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...
 
 # Optional: AI Analysis
 GEMINI_API_KEY=AIzaSy...
-GEMINI_MODEL=gemini-2.0-flash-exp
+GEMINI_MODEL=gemini-3.1-flash-lite
 ```
 
 ### How to Set in Supabase

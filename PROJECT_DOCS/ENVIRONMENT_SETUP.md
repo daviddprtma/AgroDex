@@ -161,7 +161,7 @@ The registration flow uses **Gemini Flash Lite** for batch metadata analysis.
 | Variable | Default | Notes |
 |----------|---------|-------|
 | `GEMINI_API_KEY` | *(required)* | Get from [Google AI Studio](https://aistudio.google.com/) |
-| `GEMINI_MODEL` | `gemini-2.0-flash-lite` | Lightweight, fast, cost-efficient tier |
+| `GEMINI_MODEL` | `gemini-3.1-flash-lite` | Lightweight, fast, cost-efficient tier |
 | `GEMINI_TIMEOUT_MS` | `6000` (Express) / `20000` (Edge Function) | Timeout in milliseconds |
 
 ### What the AI Analyses
@@ -194,7 +194,7 @@ Set these in your Supabase project dashboard under **Settings → Edge Functions
 
 ```
 GEMINI_API_KEY=your_api_key
-GEMINI_MODEL=gemini-2.0-flash-lite
+GEMINI_MODEL=gemini-3.1-flash-lite
 ```
 
 ### Graceful Degradation
