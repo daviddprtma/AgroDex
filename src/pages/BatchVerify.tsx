@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
 import { verifyBatch, verifyBatchById } from "@/lib/api";
-import type { VerifyBatchResult, VerifyBatchResponse } from "@/lib/api";
+import type { VerifyBatchResult, VerifyBatchResponse, VerifyBatchDeletedResult } from "@/lib/api";
+import { jsPDF } from "jspdf";
 import { QRCodeCanvas } from "qrcode.react";
 import { QrScannerModal } from "@/components/QrScannerModal";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ import {
   Calendar,
   Download,
   Camera,
+  FileDown,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
@@ -198,6 +200,256 @@ export default function BatchVerify() {
       toast({
         title: "Invalid QR Code",
         description: "The scanned QR code is not a valid AgroDex payload.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportPDF = () => {
+    if (!verifiedResult) return;
+
+    try {
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      // Color Palette
+      const primaryColor = [16, 185, 129]; // Emerald Green (#10B981)
+      const secondaryColor = [37, 99, 235]; // Blue (#2563EB)
+      const darkColor = [31, 41, 55]; // Slate Dark (#1F2937)
+      const borderLight = [229, 231, 235]; // Gray 200
+
+      // 1. Page Header Background
+      doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.rect(0, 0, 210, 35, "F");
+
+      // Header Title
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(22);
+      doc.text("AgroDex Verification Certificate", 15, 18);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text("Decentralized Agricultural Supply Chain Provenance", 15, 25);
+
+      // Date Issued
+      const dateStr = new Date(verifiedResult.verifiedAt).toLocaleString();
+      doc.setFontSize(9);
+      doc.text(`Issued: ${dateStr}`, 150, 25);
+
+      // 2. Certificate Border / Frame
+      doc.setDrawColor(borderLight[0], borderLight[1], borderLight[2]);
+      doc.setLineWidth(0.5);
+      doc.rect(10, 45, 190, 237); // Draw a border frame around content
+
+      // 3. Status Badge
+      const isVerified = verifiedResult.status === "verified";
+      if (isVerified) {
+        doc.setFillColor(209, 250, 229); // emerald-100
+        doc.rect(15, 50, 60, 10, "F");
+        doc.setTextColor(6, 95, 70); // emerald-800
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.text("● LOT FULLY VERIFIED", 20, 56.5);
+      } else {
+        doc.setFillColor(219, 234, 254); // blue-100
+        doc.rect(15, 50, 60, 10, "F");
+        doc.setTextColor(30, 64, 175); // blue-800
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.text("● LOT REGISTERED", 20, 56.5);
+      }
+
+      // 4. Verification Details Section
+      doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("Verification Details", 15, 75);
+
+      // Line separator
+      doc.setDrawColor(borderLight[0], borderLight[1], borderLight[2]);
+      doc.line(15, 78, 195, 78);
+
+      // Grid / Properties layout
+      doc.setFontSize(10);
+
+      // Row 1
+      doc.setFont("helvetica", "bold");
+      doc.text("Token ID:", 15, 87);
+      doc.setFont("helvetica", "normal");
+      doc.text(verifiedResult.tokenId || "Pending Tokenization (Registered)", 45, 87);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Serial Number:", 110, 87);
+      doc.setFont("helvetica", "normal");
+      doc.text(String(verifiedResult.serialNumber || "N/A"), 145, 87);
+
+      // Row 2
+      doc.setFont("helvetica", "bold");
+      doc.text("Batch ID:", 15, 95);
+      doc.setFont("helvetica", "normal");
+      doc.text(verifiedResult.batch?.id || params.batchId || "N/A", 45, 95);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Blockchain Network:", 110, 95);
+      doc.setFont("helvetica", "normal");
+      doc.text("Hedera Testnet", 150, 95);
+
+      // Row 3
+      doc.setFont("helvetica", "bold");
+      doc.text("Verification Date:", 15, 103);
+      doc.setFont("helvetica", "normal");
+      doc.text(new Date(verifiedResult.verifiedAt).toLocaleString(), 45, 103);
+
+      // 5. AI Provenance Summary Section
+      let nextY = 112;
+      if (verifiedResult.ai_summary) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("AI Provenance Summary", 15, nextY);
+
+        // Line separator
+        doc.line(15, nextY + 3, 195, nextY + 3);
+
+        // Trust Score Badge
+        if (verifiedResult.ai_summary.trustScore !== null && verifiedResult.ai_summary.trustScore !== undefined) {
+          doc.setFillColor(240, 253, 244); // light green bg
+          doc.rect(15, nextY + 8, 180, 16, "F");
+          doc.setDrawColor(187, 247, 208); // green border
+          doc.rect(15, nextY + 8, 180, 16);
+
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(11);
+          doc.setTextColor(21, 128, 61); // emerald-700
+          doc.text(`Trust Score: ${verifiedResult.ai_summary.trustScore}/100`, 20, nextY + 14);
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
+          doc.setTextColor(31, 41, 55);
+          const explanationText = doc.splitTextToSize(verifiedResult.ai_summary.trustExplanation || "", 170);
+          doc.text(explanationText, 20, nextY + 19);
+        }
+
+        // AI Summary Text
+        const textY = nextY + 30;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
+        doc.text("Provenance Overview:", 15, textY);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9.5);
+        const summaryText = verifiedResult.ai_summary.summary_en || "";
+        const splitSummary = doc.splitTextToSize(summaryText, 180);
+        doc.text(splitSummary, 15, textY + 6);
+        
+        // Calculate dynamic height of summary text to adjust next element Y coordinate
+        const summaryHeight = splitSummary.length * 5; // roughly 5mm per line
+        nextY = textY + 8 + summaryHeight + 10;
+      }
+
+      // 6. QR Code Embedding
+      const qrCanvas = document.getElementById("verify-qr-canvas") as HTMLCanvasElement;
+      if (qrCanvas) {
+        const qrDataUrl = qrCanvas.toDataURL("image/png");
+        doc.addImage(qrDataUrl, "PNG", 150, 48, 40, 40);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(107, 114, 128); // gray-500
+        doc.text("Scan QR to verify live", 155, 92);
+      }
+
+      // 7. Timeline / Supply Chain History Section
+      if (verifiedResult.ai_summary && verifiedResult.ai_summary.timeline && verifiedResult.ai_summary.timeline.length > 0) {
+        if (nextY > 190) {
+          // If we don't have enough space on the first page, start timeline on Page 2
+          doc.addPage();
+          nextY = 25;
+        } else {
+          nextY += 5;
+        }
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
+        doc.text("Supply Chain Timeline", 15, nextY);
+        doc.line(15, nextY + 3, 195, nextY + 3);
+
+        let currentY = nextY + 10;
+        verifiedResult.ai_summary.timeline.forEach((item: any, idx: number) => {
+          if (currentY > 255) {
+            doc.addPage();
+            currentY = 25;
+          }
+
+          // Draw vertical line connecting dots (except for first item when starting a page)
+          if (idx > 0 && currentY > 25) {
+            doc.setDrawColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+            doc.setLineWidth(0.5);
+            doc.line(20, currentY - 16, 20, currentY);
+          }
+
+          // Draw dot
+          doc.setFillColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+          doc.circle(20, currentY + 1, 2.5, "F");
+
+          // Event Info
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10);
+          doc.setTextColor(darkColor[0], darkColor[1], darkColor[2]);
+          doc.text(`${idx + 1}. ${item.event}`, 26, currentY + 2);
+
+          // Date
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(8);
+          doc.setTextColor(107, 114, 128);
+          const eventDate = new Date(item.timestamp).toLocaleString();
+          doc.text(`Date: ${eventDate}`, 26, currentY + 6);
+
+          // Transaction ID
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(7.5);
+          doc.setTextColor(37, 99, 235);
+          doc.text(`Tx ID: ${item.txId}`, 26, currentY + 10);
+
+          currentY += 16;
+        });
+      }
+
+      // 8. Footer on all pages
+      const pageCount = (doc as any).internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        
+        // Draw border frame on each page
+        doc.setDrawColor(borderLight[0], borderLight[1], borderLight[2]);
+        doc.setLineWidth(0.5);
+        doc.rect(10, 10, 190, 277);
+
+        // Bottom border line
+        doc.line(15, 275, 195, 275);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(156, 163, 175); // gray-400
+        doc.text("AgroDex Certificate of Provenance • Secured by Hedera Hashgraph", 15, 281);
+        doc.text(`Page ${i} of ${pageCount}`, 175, 281);
+      }
+
+      const filename = `agrodex-certificate-${verifiedResult.tokenId || "registered"}-${verifiedResult.serialNumber || "1"}.pdf`;
+      doc.save(filename);
+      
+      toast({
+        title: "Certificate exported",
+        description: "PDF report downloaded successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Export Failed",
+        description: error.message || "Failed to generate PDF.",
         variant: "destructive",
       });
     }
@@ -460,10 +712,20 @@ export default function BatchVerify() {
                   {/* Only show details if batch was found */}
                   {verifiedResult && (
                     <Card className="border-blue-200 dark:border-blue-950/30 bg-card text-card-foreground shadow-lg">
-                      <CardHeader className="pb-4">
+                      <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0">
                         <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">
                           Verification Details
                         </CardTitle>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleExportPDF}
+                          className="flex items-center gap-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-950/30 font-semibold"
+                        >
+                          <FileDown className="h-4 w-4" />
+                          Export PDF
+                        </Button>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
