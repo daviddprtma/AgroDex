@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { env } from './utils/config.js';
 
-const GEMINI_MODEL_RAW = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+const GEMINI_MODEL_RAW = env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+// Normalize by stripping leading 'models/' if present
+const normalizedModel = GEMINI_MODEL_RAW.replace(/^models\//, '');
 // Validate model name to prevent unexpected characters in URL path
-const GEMINI_MODEL = /^[A-Za-z0-9._-]+$/.test(GEMINI_MODEL_RAW) ? GEMINI_MODEL_RAW : 'gemini-3.1-flash-lite';
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GEMINI_MODEL = /^[A-Za-z0-9._-]+$/.test(normalizedModel) ? normalizedModel : 'gemini-3.1-flash-lite';
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`;
 
 /**
  * Analyze batch data using Gemini AI for validation and enrichment

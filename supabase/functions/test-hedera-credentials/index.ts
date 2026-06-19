@@ -16,7 +16,7 @@
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
-import { Client, AccountId, PrivateKey, AccountInfoQuery } from 'npm:@hashgraph/sdk@^2.49.0'
+import { Client, AccountId, PrivateKey, AccountInfoQuery } from 'npm:@hashgraph/sdk@2.49.2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
-import { Client } from 'npm:@hashgraph/sdk@^2.49.0'
-import { GoogleGenerativeAI } from 'npm:@google/generative-ai@^0.24.1'
+import { Client } from 'npm:@hashgraph/sdk@2.49.2'
+import { GoogleGenerativeAI } from 'npm:@google/generative-ai@0.24.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

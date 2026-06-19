@@ -10,7 +10,7 @@ import {
   TokenMintTransaction,
   TokenId,
   AccountId,
-} from "npm:@hashgraph/sdk@^2.49.0";
+} from "npm:@hashgraph/sdk@2.49.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -179,7 +179,7 @@ serve(async (req) => {
 
     console.log("[tokenize-batch] Creating mint transaction...");
     const mintTx = await new TokenMintTransaction()
-      .setTokenId(tokenId!)
+      .setTokenId(tokenId)
       .setMetadata([metadata])
       .freezeWith(client);
 
