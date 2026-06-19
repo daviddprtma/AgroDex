@@ -16,6 +16,7 @@ import {
   Coins,
   ShieldCheck,
   ShieldAlert,
+  MapPin,
   User,
   Settings,
   LogOut,
@@ -55,6 +56,7 @@ export default function Navbar() {
     { to: "/tokenize", label: t('nav.tokenize'), icon: Coins },
     { to: "/verify", label: t('nav.verify'), icon: ShieldCheck },
     { to: "/risk-intelligence", label: "Risk Intelligence", icon: ShieldAlert },
+    { to: "/map", label: "Explore Map", icon: MapPin },
   ];
 
   const isActive = (path: string) => location.pathname === path;
