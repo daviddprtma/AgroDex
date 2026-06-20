@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ai-sdk/react": "^3.0.210",
     "@google/generative-ai": "^0.24.1",
     "@hashgraph/sdk": "^2.75.0",
     "@hookform/resolvers": "^5.1.1",
@@ -51,7 +52,6 @@
     "@testing-library/react": "^16.3.0",
     "@vitest/coverage-v8": "^4.0.5",
     "@vitest/ui": "^4.0.5",
-    "ai": "^6.0.208",
     "axios": "^1.12.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -90,6 +90,7 @@
   "devDependencies": {
     "@babel/parser": "^7.28.0",
     "@eslint/js": "^9.30.1",
+    "@playwright/test": "^1.61.0",
     "@testing-library/dom": "^10.4.1",
     "@types/node": "^24.1.0",
     "@types/react": "^19.1.8",
