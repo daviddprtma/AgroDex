@@ -568,3 +568,67 @@ export const getFraudOverview = async (): Promise<{ ok: boolean; data: FraudOver
   }
   return payload;
 };
+
+export interface AuditLogEntry {
+  token_id: string;
+  serial_number: string;
+  score: number;
+  trustExplanation: string | null;
+  rationale: string;
+  verified_at: string;
+  status: "approved" | "flagged";
+}
+
+export interface AuditLogsPagination {
+  totalRecords: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+}
+
+export interface AuditLogsResponse {
+  ok: boolean;
+  data: AuditLogEntry[];
+  pagination: AuditLogsPagination;
+}
+
+export const getAuditLogs = async (params: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: string;
+  status?: string;
+  search?: string;
+}): Promise<AuditLogsResponse> => {
+  const { page = 1, limit = 10, sortBy = "created_at", sortOrder = "desc", status = "all", search = "" } = params;
+  
+  const headers = await buildAuthHeaders();
+  
+  const queryParams = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    sortBy,
+    sortOrder,
+    status,
+    search,
+  });
+
+  const response = await fetch(`${API_BASE_URL}/api/audit-logs?${queryParams.toString()}`, {
+    method: "GET",
+    headers,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let payload: any = null;
+  try {
+    payload = await response.json();
+  } catch {
+    /* ignore */
+  }
+
+  if (!response.ok) {
+    throw new Error(payload?.error ?? `getAuditLogs failed: HTTP ${response.status}`);
+  }
+  return payload;
+};
+

@@ -98,6 +98,81 @@ router.get("/dashboard-health", requireAuth, async (_req, res) => {
   res.status(ok ? 200 : 503).json({ ok, status, timestamp: new Date().toISOString() });
 });
 
+router.get("/audit-logs", requireAuth, async (req, res) => {
+  try {
+    const page = parseInt(req.query.page || "1", 10);
+    const limit = parseInt(req.query.limit || "10", 10);
+    const sortBy = req.query.sortBy || "created_at";
+    const sortOrder = req.query.sortOrder || "desc";
+    const status = req.query.status || "all";
+    const search = req.query.search || "";
+
+    const offset = (page - 1) * limit;
+
+    let query = supabase
+      .from("verifications")
+      .select("token_id, serial_number, trace, created_at", { count: "exact" });
+
+    // Filter by status (approved: trustScore >= 80, flagged: trustScore < 80)
+    if (status === "approved") {
+      query = query.not("trace->ai", "is", null).gte("trace->ai->>trustScore", "80");
+    } else if (status === "flagged") {
+      query = query.not("trace->ai", "is", null).lt("trace->ai->>trustScore", "80");
+    }
+
+    // Filter by search (case insensitive search in token_id)
+    if (search) {
+      query = query.ilike("token_id", `%${search}%`);
+    }
+
+    // Sorting
+    const ascending = sortOrder === "asc";
+    if (sortBy === "trustScore") {
+      query = query.order("trace->ai->>trustScore", { ascending }).order("created_at", { ascending });
+    } else {
+      query = query.order(sortBy, { ascending });
+    }
+
+    // Pagination range
+    query = query.range(offset, offset + limit - 1);
+
+    const { data, count, error } = await query;
+
+    if (error) throw error;
+
+    const logs = (data || []).map((item) => {
+      const ai = item.trace?.ai || {};
+      const score = Number(ai.trustScore ?? 0);
+      return {
+        token_id: item.token_id,
+        serial_number: item.serial_number,
+        score,
+        trustExplanation: ai.trustExplanation || null,
+        rationale: ai.trustExplanation || "Manual review recommended",
+        verified_at: item.created_at,
+        status: score >= 80 ? "approved" : "flagged",
+      };
+    });
+
+    const totalRecords = count || 0;
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    res.json({
+      ok: true,
+      data: logs,
+      pagination: {
+        totalRecords,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    });
+  } catch (error) {
+    console.error("Audit logs error:", error);
+    res.status(500).json({ ok: false, error: "Failed to fetch audit logs", details: error.message });
+  }
+});
+
 router.post("/register-batch", requireAuth, strictLimiter, validateRegisterBatch, async (req, res) => {
   try {
     const { batchName, location, photoUrl } = req.body;
