@@ -246,7 +246,7 @@ export const registerBatch = async (
 };
 
 export function generateLocalFallbackVerification(data: VerifyRegistrationRequest) {
-  const { productName, harvestBatch, quantity, unit, location, harvestDate, metadata } = data;
+  const { productName, harvestBatch, quantity, unit, location, harvestDate } = data;
   const cleanQty = quantity ? String(quantity).trim() : '';
   const cleanUnit = unit ? String(unit).trim() : '';
   const qtyStr = cleanQty ? `${cleanQty} ${cleanUnit}` : '';
