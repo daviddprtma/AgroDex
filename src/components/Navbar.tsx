@@ -53,7 +53,7 @@ export default function Navbar() {
     { to: "/register", label: t('nav.register'), icon: FileText },
     { to: "/tokenize", label: t('nav.tokenize'), icon: Coins },
     { to: "/verify", label: t('nav.verify'), icon: ShieldCheck },
-    { to: "/about", label: t('nav.about', { defaultValue: 'About' }), icon: Info },
+    { to: "/about", label: t('nav.about'), icon: Info },
   ];
 
   const isActive = (path: string) => location.pathname === path;

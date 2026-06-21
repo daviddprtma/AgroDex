@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { Trans, useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -25,83 +26,38 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import logoUrl from "@/assets/agritrust-logo.png";
 
 const processSteps = [
-  {
-    step: "01",
-    title: "Register a Batch",
-    description:
-      "Producers record product details, photos, location data, and harvest metadata before the batch enters the supply chain.",
-    icon: Sprout,
-  },
-  {
-    step: "02",
-    title: "Anchor Proof on Hedera",
-    description:
-      "Traceability events are written to Hedera so important batch history can be verified without relying on a single private database.",
-    icon: Network,
-  },
-  {
-    step: "03",
-    title: "Verify with a Scan",
-    description:
-      "Consumers, distributors, and buyers can scan a QR code to review origin, tokenization status, and authenticity signals.",
-    icon: ScanSearch,
-  },
-];
+  { key: "register", step: "01", icon: Sprout },
+  { key: "anchor", step: "02", icon: Network },
+  { key: "verify", step: "03", icon: ScanSearch },
+] as const;
 
 const benefits = [
-  {
-    title: "Producers",
-    description:
-      "Protect authentic harvests, prove origin, and build stronger access to premium buyers who value transparency.",
-    icon: Users,
-    items: ["Authenticity records", "Brand protection", "Better market trust"],
-  },
-  {
-    title: "Consumers",
-    description:
-      "See where food comes from, understand its journey, and make purchases with more confidence.",
-    icon: ShieldCheck,
-    items: ["Transparent product history", "Fraud risk visibility", "Instant QR verification"],
-  },
-  {
-    title: "Distributors",
-    description:
-      "Reduce sourcing risk, strengthen compliance workflows, and share verifiable proof with downstream partners.",
-    icon: Truck,
-    items: ["Supply chain confidence", "Audit-ready records", "Differentiated inventory"],
-  },
-];
+  { key: "producers", icon: Users },
+  { key: "consumers", icon: ShieldCheck },
+  { key: "distributors", icon: Truck },
+] as const;
 
 const technology = [
-  {
-    title: "Hedera Consensus Service",
-    description:
-      "Creates tamper-resistant event logs for supply chain milestones, making provenance easier to audit across organizations.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Hedera Token Service",
-    description:
-      "Represents agricultural batches with digital certificates that can be tied to QR verification and ownership records.",
-    icon: Coins,
-  },
-  {
-    title: "AI Risk Intelligence",
-    description:
-      "Helps review batch data, summarize provenance, detect suspicious patterns, and make traceability insights easier to understand.",
-    icon: Brain,
-  },
-];
+  { key: "hcs", icon: ShieldCheck },
+  { key: "hts", icon: Coins },
+  { key: "ai", icon: Brain },
+] as const;
+
+const heroSignals = [
+  { key: "originRecords", icon: Globe2 },
+  { key: "fraudSignals", icon: ShieldAlert },
+  { key: "aiSummaries", icon: Brain },
+  { key: "stakeholderTrust", icon: Handshake },
+] as const;
 
 export default function About() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet>
-        <title>About | AgroDex</title>
-        <meta
-          name="description"
-          content="Learn how AgroDex uses Hedera blockchain and AI to fight food fraud and improve agricultural traceability."
-        />
+        <title>{t("about.meta.title")}</title>
+        <meta name="description" content={t("about.meta.description")} />
       </Helmet>
       <Navbar />
 
@@ -117,17 +73,19 @@ export default function About() {
               >
                 <div className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-4 py-2 rounded-full text-sm font-bold">
                   <Leaf className="h-4 w-4" />
-                  About AgroDex
+                  {t("about.hero.badge")}
                 </div>
                 <div className="space-y-5">
                   <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white leading-tight">
-                    Building trusted food supply chains with{" "}
-                    <span className="text-emerald-600">blockchain and AI</span>
+                    <Trans
+                      i18nKey="about.hero.title"
+                      components={{
+                        highlight: <span className="text-emerald-600" />,
+                      }}
+                    />
                   </h1>
                   <p className="text-lg sm:text-xl text-gray-600 dark:text-slate-300 leading-relaxed max-w-3xl">
-                    AgroDex is an agricultural traceability platform that helps producers,
-                    consumers, and distributors verify product origin, reduce food fraud,
-                    and create confidence from farm registration to final purchase.
+                    {t("about.hero.description")}
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
@@ -136,7 +94,7 @@ export default function About() {
                       size="lg"
                       className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-7"
                     >
-                      Register a Batch
+                      {t("about.hero.primaryCta")}
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
@@ -146,7 +104,7 @@ export default function About() {
                       variant="outline"
                       className="w-full border-2 border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 font-bold px-7"
                     >
-                      Verify a Product
+                      {t("about.hero.secondaryCta")}
                     </Button>
                   </Link>
                 </div>
@@ -161,34 +119,29 @@ export default function About() {
                 <div className="flex items-center gap-4 border-b border-gray-100 dark:border-slate-800 pb-6">
                   <img
                     src={logoUrl}
-                    alt="AgroDex logo"
+                    alt={t("about.heroCard.logoAlt")}
                     className="h-16 w-16 rounded-xl bg-white dark:bg-slate-950 p-2 shadow-sm"
                   />
                   <div>
                     <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                      Traceability Network
+                      {t("about.heroCard.kicker")}
                     </p>
                     <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white">
-                      Farm to verified proof
+                      {t("about.heroCard.title")}
                     </h2>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6">
-                  {[
-                    { label: "Origin records", icon: Globe2 },
-                    { label: "Fraud signals", icon: ShieldAlert },
-                    { label: "AI summaries", icon: Brain },
-                    { label: "Stakeholder trust", icon: Handshake },
-                  ].map(({ label, icon: Icon }) => (
+                  {heroSignals.map(({ key, icon: Icon }) => (
                     <div
-                      key={label}
+                      key={key}
                       className="flex items-center gap-3 rounded-lg border border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-950/60 p-4"
                     >
                       <div className="rounded-lg bg-emerald-100 dark:bg-emerald-950/50 p-2">
                         <Icon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <span className="font-semibold text-gray-800 dark:text-slate-200">
-                        {label}
+                        {t(`about.heroCard.signals.${key}`)}
                       </span>
                     </div>
                   ))}
@@ -203,42 +156,32 @@ export default function About() {
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-14 items-start">
               <div className="space-y-5">
                 <p className="text-sm font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
-                  What is AgroDex?
+                  {t("about.overview.eyebrow")}
                 </p>
                 <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white">
-                  A shared source of truth for agricultural products
+                  {t("about.overview.title")}
                 </h2>
                 <p className="text-gray-600 dark:text-slate-300 leading-relaxed">
-                  AgroDex combines batch registration, QR verification, Hedera-backed
-                  proof, and AI-assisted risk intelligence so agricultural products can
-                  carry verifiable history as they move through the market.
+                  {t("about.overview.description")}
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {[
-                  {
-                    title: "Mission",
-                    text: "Make authentic agricultural products easier to prove, discover, and trust.",
-                    icon: Leaf,
-                  },
-                  {
-                    title: "Goals",
-                    text: "Improve traceability, reduce fraud, support honest producers, and give buyers clearer information.",
-                    icon: Eye,
-                  },
-                ].map(({ title, text, icon: Icon }) => (
-                  <Card key={title} className="h-full border-gray-100 dark:border-slate-800">
+                  { key: "mission", icon: Leaf },
+                  { key: "goals", icon: Eye },
+                ].map(({ key, icon: Icon }) => (
+                  <Card key={key} className="h-full border-gray-100 dark:border-slate-800">
                     <CardHeader>
                       <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-950/50">
                         <Icon className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <CardTitle className="text-gray-900 dark:text-white">
-                        {title}
+                        {t(`about.overview.cards.${key}.title`)}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
-                        {text}
+                        {t(`about.overview.cards.${key}.text`)}
                       </p>
                     </CardContent>
                   </Card>
@@ -253,15 +196,13 @@ export default function About() {
             <div className="max-w-5xl mx-auto text-center space-y-6">
               <div className="inline-flex items-center gap-2 bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-300 px-4 py-2 rounded-full text-sm font-bold">
                 <ShieldAlert className="h-4 w-4" />
-                The problem we solve
+                {t("about.problem.badge")}
               </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white">
-                Food fraud breaks trust across the entire supply chain
+                {t("about.problem.title")}
               </h2>
               <p className="text-lg text-gray-600 dark:text-slate-300 leading-relaxed">
-                Mislabeling, unverifiable origin claims, incomplete records, and opaque
-                handoffs can hurt consumers and honest producers alike. AgroDex helps turn
-                scattered supply chain information into verifiable product history.
+                {t("about.problem.description")}
               </p>
             </div>
           </div>
@@ -272,16 +213,15 @@ export default function About() {
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
-                  How It Works
+                  {t("about.howItWorks.title")}
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-slate-300 max-w-3xl mx-auto">
-                  AgroDex follows the batch from registration to verification with a
-                  practical workflow for real agricultural operations.
+                  {t("about.howItWorks.description")}
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {processSteps.map(({ step, title, description, icon: Icon }) => (
-                  <Card key={step} className="h-full border-gray-100 dark:border-slate-800">
+                {processSteps.map(({ key, step, icon: Icon }) => (
+                  <Card key={key} className="h-full border-gray-100 dark:border-slate-800">
                     <CardHeader>
                       <div className="flex items-center justify-between gap-4">
                         <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-950/50">
@@ -292,12 +232,12 @@ export default function About() {
                         </span>
                       </div>
                       <CardTitle className="text-gray-900 dark:text-white">
-                        {title}
+                        {t(`about.howItWorks.steps.${key}.title`)}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
-                        {description}
+                        {t(`about.howItWorks.steps.${key}.description`)}
                       </p>
                     </CardContent>
                   </Card>
@@ -312,27 +252,26 @@ export default function About() {
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
-                  Hedera + AI Technology
+                  {t("about.technology.title")}
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-slate-300 max-w-3xl mx-auto">
-                  Hedera provides verifiable infrastructure for supply chain proof, while AI
-                  helps interpret data and surface traceability risks faster.
+                  {t("about.technology.description")}
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {technology.map(({ title, description, icon: Icon }) => (
-                  <Card key={title} className="h-full border-gray-100 dark:border-slate-800">
+                {technology.map(({ key, icon: Icon }) => (
+                  <Card key={key} className="h-full border-gray-100 dark:border-slate-800">
                     <CardHeader>
                       <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-950/50">
                         <Icon className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <CardTitle className="text-gray-900 dark:text-white">
-                        {title}
+                        {t(`about.technology.cards.${key}.title`)}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
-                        {description}
+                        {t(`about.technology.cards.${key}.description`)}
                       </p>
                     </CardContent>
                   </Card>
@@ -347,33 +286,33 @@ export default function About() {
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
-                  Benefits for Every Stakeholder
+                  {t("about.benefits.title")}
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-slate-300 max-w-3xl mx-auto">
-                  AgroDex is designed for the people who grow, move, sell, and buy food.
+                  {t("about.benefits.description")}
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {benefits.map(({ title, description, icon: Icon, items }) => (
-                  <Card key={title} className="h-full border-gray-100 dark:border-slate-800">
+                {benefits.map(({ key, icon: Icon }) => (
+                  <Card key={key} className="h-full border-gray-100 dark:border-slate-800">
                     <CardHeader>
                       <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-950/50">
                         <Icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                       </div>
                       <CardTitle className="text-gray-900 dark:text-white">
-                        {title}
+                        {t(`about.benefits.cards.${key}.title`)}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-5">
                       <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
-                        {description}
+                        {t(`about.benefits.cards.${key}.description`)}
                       </p>
                       <ul className="space-y-3">
-                        {items.map((item) => (
-                          <li key={item} className="flex items-start gap-2">
+                        {[0, 1, 2].map((itemIndex) => (
+                          <li key={itemIndex} className="flex items-start gap-2">
                             <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-600 dark:text-emerald-400" />
                             <span className="text-gray-700 dark:text-slate-300">
-                              {item}
+                              {t(`about.benefits.cards.${key}.items.${itemIndex}`)}
                             </span>
                           </li>
                         ))}
@@ -390,13 +329,10 @@ export default function About() {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center space-y-7">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white">
-                Mission & Vision
+                {t("about.missionVision.title")}
               </h2>
               <p className="text-lg sm:text-xl text-emerald-50 leading-relaxed">
-                AgroDex exists to make trustworthy agricultural commerce easier. Our
-                vision is a food ecosystem where product claims can be checked, honest
-                producers are rewarded, and every stakeholder can participate in a more
-                transparent market.
+                {t("about.missionVision.description")}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
                 <Link to="/register">
@@ -404,7 +340,7 @@ export default function About() {
                     size="lg"
                     className="w-full sm:w-auto bg-white text-emerald-700 hover:bg-gray-100 font-bold px-8"
                   >
-                    Start Tracing
+                    {t("about.missionVision.primaryCta")}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
@@ -413,7 +349,7 @@ export default function About() {
                     size="lg"
                     className="w-full sm:w-auto border-2 border-white text-white hover:bg-white/10 font-bold px-8"
                   >
-                    View Dashboard
+                    {t("about.missionVision.secondaryCta")}
                   </Button>
                 </Link>
               </div>
