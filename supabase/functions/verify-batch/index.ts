@@ -123,6 +123,18 @@ const nftMetadata = data?.[0] || null;
       console.warn("→ HCS query warning (non-fatal):", hcsError.message);
     }
 
+    // Parse ai_provenance_summary if it's a string containing JSON
+    let aiSummary = null;
+    if (nftMetadata.ai_provenance_summary) {
+      try {
+        aiSummary = typeof nftMetadata.ai_provenance_summary === "string"
+          ? JSON.parse(nftMetadata.ai_provenance_summary)
+          : nftMetadata.ai_provenance_summary;
+      } catch (e) {
+        console.error("Failed to parse ai_provenance_summary:", e);
+      }
+    }
+
     // Build response
     const response = {
       success: true,
@@ -145,21 +157,21 @@ const nftMetadata = data?.[0] || null;
       },
       hcsTransactionIds,
       hcsMessages: hcsMessages || [],
-      ai_summary: nftMetadata.ai_provenance_summary || null,
+      ai_summary: aiSummary,
     };
 
     console.log("→ Success (200)");
 
     const trace = {
-  tokenId: nftMetadata.token_id,
-  serialNumber: nftMetadata.serial_number,
-  nftMetadata,
-  hcsTransactionIds,
-  hcsMessages: hcsMessages || [],
-  ai: nftMetadata.ai_provenance_summary || null,
-  verifiedAt: new Date().toISOString(),
-  status: "verified",
-};
+      tokenId: nftMetadata.token_id,
+      serialNumber: nftMetadata.serial_number,
+      nftMetadata,
+      hcsTransactionIds,
+      hcsMessages: hcsMessages || [],
+      ai: aiSummary,
+      verifiedAt: new Date().toISOString(),
+      status: "verified",
+    };
 
 const { error: verificationError } = await supabase
   .from("verifications")

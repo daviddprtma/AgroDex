@@ -729,3 +729,62 @@ export const getFraudOverview = async (): Promise<{ ok: boolean; data: FraudOver
   }
   return payload;
 };
+
+export interface AuditLogEntry {
+  token_id: string;
+  serial_number: string;
+  score: number;
+  trustExplanation: string | null;
+  rationale: string;
+  verified_at: string;
+  status: "approved" | "flagged";
+}
+
+export interface AuditLogsPagination {
+  totalRecords: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+}
+
+export interface AuditLogsResponse {
+  ok: boolean;
+  data: AuditLogEntry[];
+  pagination: AuditLogsPagination;
+}
+
+export const getAuditLogs = async (params: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: string;
+  status?: string;
+  search?: string;
+}): Promise<AuditLogsResponse> => {
+  const { page = 1, limit = 10, sortBy = "created_at", sortOrder = "desc", status = "all", search = "" } = params;
+  
+  const headers = await buildAuthHeaders();
+  
+  const { data: result, error } = await supabase.functions.invoke(
+    "audit-logs",
+    {
+      method: "GET",
+      queryParams: {
+        page: String(page),
+        limit: String(limit),
+        sortBy,
+        sortOrder,
+        status,
+        search,
+      },
+      headers,
+    }
+  );
+
+  if (error) {
+    throw new Error(error.message || "Failed to fetch audit logs");
+  }
+
+  return result as AuditLogsResponse;
+};
+

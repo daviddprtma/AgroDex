@@ -35,6 +35,7 @@ import {
   Calendar,
   Download,
   Camera,
+  FileText,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
@@ -42,6 +43,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import { CopyButton } from "@/components/CopyButton";
+import { exportVerifyResultToPDF } from "@/utils/pdfExport";
 
 type NotFoundResult = Extract<VerifyBatchResult, { reason: "not_found" }>;
 
@@ -232,6 +234,34 @@ export default function BatchVerify() {
       });
     } finally {
       setQaLoading(false);
+    }
+  };
+
+  const handleExportPDF = () => {
+    if (!verifiedResult) return;
+    try {
+      const canvas = document.getElementById("verify-qr-canvas") as HTMLCanvasElement;
+      const qrCodeDataUrl = canvas?.toDataURL("image/png");
+
+      const doc = exportVerifyResultToPDF(verifiedResult, {
+        qrCodeDataUrl,
+        language,
+      });
+
+      const filenameId = verifiedResult.batch?.id || params.batchId || `${verifiedResult.tokenId}_${verifiedResult.serialNumber}`;
+      doc.save(`agrodex-certificate-${filenameId}.pdf`);
+
+      toast({
+        title: "PDF Exported",
+        description: "Your verification certificate has been downloaded.",
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to generate PDF.";
+      toast({
+        title: "Export Error",
+        description: message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -450,10 +480,19 @@ export default function BatchVerify() {
                   {/* Only show details if batch was found */}
                   {verifiedResult && (
                     <Card className="border-blue-200 dark:border-blue-950/30 bg-card text-card-foreground shadow-lg">
-                      <CardHeader className="pb-4">
+                      <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0">
                         <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">
                           Verification Details
                         </CardTitle>
+                        <Button
+                          onClick={handleExportPDF}
+                          variant="outline"
+                          size="sm"
+                          className="font-semibold border-rose-200 dark:border-rose-950/30 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/20 flex items-center gap-1.5"
+                        >
+                          <FileText className="h-4 w-4" />
+                          Export PDF
+                        </Button>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
