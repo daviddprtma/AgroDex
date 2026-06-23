@@ -104,6 +104,8 @@ router.get("/dashboard-health", requireAuth, async (_req, res) => {
   res.status(ok ? 200 : 503).json({ ok, status, timestamp: new Date().toISOString() });
 });
 
+
+
 router.post("/register-batch", requireAuth, strictLimiter, validateRegisterBatch, async (req, res) => {
   try {
     const { batchName, location, photoUrl } = req.body;

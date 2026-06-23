@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import {
   Card,
@@ -13,22 +14,22 @@ import {
   Activity,
   Zap,
   Sparkles,
-  AlertTriangle,
   CheckCircle2,
   Loader2,
+  ExternalLink,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import { CopyButton } from "@/components/CopyButton";
 import { useQuery } from "@tanstack/react-query";
-import { getDashboardStats, getDashboardHealth } from "@/lib/api";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { getDashboardStats, getDashboardHealth, getAuditLogs, type AuditLogEntry } from "@/lib/api";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import logoUrl from "@/assets/agritrust-logo.png";
 
@@ -46,6 +47,7 @@ interface AuditLot {
   rationale?: string;
   trustExplanation?: string;
   verified_at?: string;
+  status?: string;
 }
 
 interface DashboardAudit {
@@ -74,6 +76,12 @@ interface AIInsight {
 export default function Dashboard() {
   
   const { t, i18n } = useTranslation();
+  const [page, setPage] = useState(1);
+  const [status, setStatus] = useState<"all" | "approved" | "flagged">("all");
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
   const statsQuery = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: getDashboardStats,
@@ -83,6 +91,12 @@ export default function Dashboard() {
   const healthQuery = useQuery({
     queryKey: ["dashboard-health"],
     queryFn: getDashboardHealth,
+    refetchOnWindowFocus: false,
+  });
+
+  const auditLogsQuery = useQuery({
+    queryKey: ["audit-logs", page, status, search, sortBy, sortOrder],
+    queryFn: () => getAuditLogs({ page, limit: 10, status, search, sortBy, sortOrder }),
     refetchOnWindowFocus: false,
   });
 
@@ -379,113 +393,190 @@ export default function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {statsLoading ? (
-                <div className="text-center py-8 text-gray-500 dark:text-slate-400 flex items-center justify-center gap-2">
-                  <Loader2 className="h-5 w-5 animate-spin text-emerald-500" />
-                  Change in the AI log...
+              {/* Controls */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Search by Token ID..."
+                    value={search}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      setPage(1);
+                    }}
+                    className="w-full bg-slate-50 dark:bg-slate-900 border-gray-200 dark:border-slate-800 text-xs h-9"
+                  />
                 </div>
-              ) : statsError ? (
-                <div className="text-center py-8 text-red-600 dark:text-red-400 font-semibold">
-                  Error: {statsError}
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {/* Approved Lots */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 mb-3 flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4" />
-                      {t('dashboard.audit.approved')}
-                    </h3>
-                    {audit.approvedLots.length === 0 ? (
-                      <p className="text-sm text-gray-500 dark:text-slate-400 italic">
-                        {t('dashboard.audit.noApproved')}
-                      </p>
-                    ) : (
-                      <ul className="space-y-2">
-                        {audit.approvedLots.map((lot, idx) => {
-                          const score = Math.round(lot.score || 0);
-                          return (
-                            <li
-                              key={`${lot.token_id}-${lot.serial_number}-${idx}`}
-                              className="flex items-start gap-2 text-sm p-2 bg-emerald-50 dark:bg-emerald-950/20 rounded border border-emerald-200 dark:border-emerald-900/30"
-                            >
-                              <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
-                              <span className="flex-1 text-gray-800 dark:text-slate-200">
-                                Lot{" "}
-                                <a
-                                  href={`https://hashscan.io/testnet/token/${lot.token_id}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 dark:text-blue-400 hover:underline font-medium inline-flex items-center gap-1"
-                                >
-                                  {lot.token_id}/{lot.serial_number}
-                                </a>{" "}
-                                <CopyButton value={lot.token_id} successMessage="Token ID copied!" size="sm" className="h-5 w-5 inline-flex align-middle" />
-                                 - Score {score}/100
-                                {lot.trustExplanation && (
-                                  <span className="block text-xs text-gray-500 dark:text-slate-400 mt-1">
-                                    {lot.trustExplanation}
-                                  </span>
-                                )}
-                              </span>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
+                <div className="flex flex-wrap gap-2 items-center">
+                  <div className="flex border rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-900 border-gray-200 dark:border-slate-800 h-9">
+                    {(["all", "approved", "flagged"] as const).map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => {
+                          setStatus(s);
+                          setPage(1);
+                        }}
+                        className={`px-3 py-1 text-xs font-semibold capitalize transition-colors ${
+                          status === s
+                            ? "bg-emerald-600 text-white"
+                            : "hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground"
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
                   </div>
 
-                  {/* Flagged Lots */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-orange-700 dark:text-orange-400 mb-3 flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4" />
-                      {t('dashboard.audit.flagged')}
-                    </h3>
-                    {audit.flaggedLots.length === 0 ? (
-                      <p className="text-sm text-gray-500 dark:text-slate-400 italic">
-                        {t('dashboard.audit.noFlagged')}
-                      </p>
-                    ) : (
-                      <TooltipProvider>
-                        <ul className="space-y-2">
-                          {audit.flaggedLots.map((lot, idx) => {
-                            const score = Math.round(lot.score || 0);
-                            return (
-                              <li
-                                key={`${lot.token_id}-${lot.serial_number}-${idx}`}
-                                className="flex items-start gap-2 text-sm p-2 bg-orange-50 dark:bg-orange-950/20 rounded border border-orange-200 dark:border-orange-900/30"
-                              >
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0 cursor-help" />
-                                  </TooltipTrigger>
-                                  <TooltipContent className="max-w-xs bg-popover text-popover-foreground border border-border">
-                                    <p className="text-xs font-semibold mb-1">
-                                      Reason for flagging:
-                                    </p>
-                                    <p className="text-xs">{lot.rationale}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                                <span className="flex-1 text-gray-800 dark:text-slate-200">
-                                  Lot{" "}
+                  <Select
+                    value={`${sortBy}:${sortOrder}`}
+                    onValueChange={(val) => {
+                      const [by, order] = val.split(":");
+                      setSortBy(by);
+                      setSortOrder(order as "asc" | "desc");
+                      setPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="w-[140px] bg-slate-50 dark:bg-slate-900 border-gray-200 dark:border-slate-800 text-xs h-9">
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="created_at:desc">Newest First</SelectItem>
+                      <SelectItem value="created_at:asc">Oldest First</SelectItem>
+                      <SelectItem value="trustScore:desc">Score High-Low</SelectItem>
+                      <SelectItem value="trustScore:asc">Score Low-High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {auditLogsQuery.isLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ) : auditLogsQuery.isError ? (
+                <div className="text-center py-8 text-red-600 dark:text-red-400 font-semibold">
+                  Error loading audit logs: {auditLogsQuery.error instanceof Error ? auditLogsQuery.error.message : "Failed to load"}
+                </div>
+              ) : !auditLogsQuery.data || auditLogsQuery.data.data.length === 0 ? (
+                <div className="text-center py-12 text-gray-500 dark:text-slate-400 italic">
+                  No verification records found.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="overflow-x-auto border border-gray-200 dark:border-slate-800 rounded-lg">
+                    <Table>
+                      <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
+                        <TableRow>
+                          <TableHead className="text-xs font-bold text-gray-600 dark:text-slate-400 py-2">Lot ID</TableHead>
+                          <TableHead className="text-xs font-bold text-gray-600 dark:text-slate-400 py-2 text-center">Score</TableHead>
+                          <TableHead className="text-xs font-bold text-gray-600 dark:text-slate-400 py-2 text-center">Status</TableHead>
+                          <TableHead className="text-xs font-bold text-gray-600 dark:text-slate-400 py-2 text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {auditLogsQuery.data.data.map((lot: AuditLogEntry, idx: number) => {
+                          return (
+                            <TableRow key={`${lot.token_id}-${lot.serial_number}-${idx}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/50">
+                              <TableCell className="py-2.5">
+                                <div className="flex flex-col min-w-[120px]">
+                                  <span className="font-mono text-xs font-bold text-gray-900 dark:text-white truncate" title={lot.token_id}>
+                                    {lot.token_id} (S/N: {lot.serial_number})
+                                  </span>
+                                  {lot.trustExplanation && (
+                                    <span className="text-[10px] text-gray-500 dark:text-slate-400 truncate max-w-[200px] mt-0.5" title={lot.trustExplanation}>
+                                      {lot.trustExplanation}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell className="py-2.5 text-center font-bold text-xs">
+                                <span style={{ color: lot.score >= 80 ? "#10b981" : "#f97316" }}>
+                                  {lot.score}/100
+                                </span>
+                              </TableCell>
+                              <TableCell className="py-2.5 text-center">
+                                <Badge className={lot.status === "approved" ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200" : "bg-orange-100 text-orange-850 dark:bg-orange-950/40 dark:text-orange-400 border-orange-200"} variant="outline">
+                                  {lot.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="py-2.5 text-right">
+                                <div className="inline-flex items-center gap-1">
+                                  <CopyButton
+                                    value={lot.token_id}
+                                    successMessage="Token ID copied!"
+                                    className="h-8 w-8 text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400"
+                                    tooltip="Copy Token ID"
+                                  />
                                   <a
                                     href={`https://hashscan.io/testnet/token/${lot.token_id}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-600 dark:text-blue-400 hover:underline font-medium inline-flex items-center gap-1"
+                                    className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                    title="View on HashScan"
                                   >
-                                    {lot.token_id}/{lot.serial_number}
-                                  </a>{" "}
-                                  <CopyButton value={lot.token_id} successMessage="Token ID copied!" size="sm" className="h-5 w-5 inline-flex align-middle" />
-                                   - Score {score}/100
-                                </span>
-                              </li>
+                                    <ExternalLink className="h-3.5 w-3.5" />
+                                  </a>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {/* Pagination */}
+                  {auditLogsQuery.data.pagination.totalPages > 1 && (
+                    <div className="flex items-center justify-between pt-2 border-t border-border mt-4">
+                      <p className="text-[11px] text-muted-foreground">
+                        Showing page {auditLogsQuery.data.pagination.currentPage} of {auditLogsQuery.data.pagination.totalPages} ({auditLogsQuery.data.pagination.totalRecords} logs)
+                      </p>
+                      <Pagination className="w-auto mx-0">
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious
+                              onClick={() => setPage((p) => Math.max(1, p - 1))}
+                              className={page === 1 ? "pointer-events-none opacity-50 cursor-not-allowed text-xs h-8" : "cursor-pointer text-xs h-8"}
+                            />
+                          </PaginationItem>
+                          {Array.from({ length: auditLogsQuery.data.pagination.totalPages }).map((_, i) => {
+                            const p = i + 1;
+                            const total = auditLogsQuery.data.pagination.totalPages;
+                            if (total > 4 && Math.abs(p - page) > 1 && p !== 1 && p !== total) {
+                              if (p === 2 || p === total - 1) {
+                                return (
+                                  <PaginationItem key={p}>
+                                    <span className="px-1 text-muted-foreground text-xs">...</span>
+                                  </PaginationItem>
+                                );
+                              }
+                              return null;
+                            }
+                            return (
+                              <PaginationItem key={p}>
+                                <PaginationLink
+                                  isActive={page === p}
+                                  onClick={() => setPage(p)}
+                                  className="cursor-pointer text-xs h-8 w-8"
+                                >
+                                  {p}
+                                </PaginationLink>
+                              </PaginationItem>
                             );
                           })}
-                        </ul>
-                      </TooltipProvider>
-                    )}
-                  </div>
+                          <PaginationItem>
+                            <PaginationNext
+                              onClick={() => setPage((p) => Math.min(auditLogsQuery.data.pagination.totalPages, p + 1))}
+                              className={page === auditLogsQuery.data.pagination.totalPages ? "pointer-events-none opacity-50 cursor-not-allowed text-xs h-8" : "cursor-pointer text-xs h-8"}
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
