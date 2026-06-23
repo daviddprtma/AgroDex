@@ -30,6 +30,7 @@ export const HEDERA_TESTNET_PARAMS = {
  * Check if MetaMask or any EIP-1193 provider is installed
  */
 export function isMetaMaskInstalled(): boolean {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
   return typeof window !== "undefined" && typeof (window as Record<string, any>).ethereum !== "undefined";
 }
 
