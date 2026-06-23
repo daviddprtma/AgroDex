@@ -31,7 +31,13 @@ app.use(
 );
 app.use(express.json());
 app.use(logger);
-app.use("/api", generalLimiter);
+app.use("/api", (req, res, next) => {
+  // Exclude all fraud routes from the global generalLimiter
+  if (req.path.startsWith("/fraud")) {
+    return next();
+  }
+  return generalLimiter(req, res, next);
+});
 app.use("/api", healthRoutes);
 app.use("/api", apiRoutes);
 app.use("/api/ai", aiRoutes);

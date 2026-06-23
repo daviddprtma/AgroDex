@@ -680,6 +680,12 @@ export const getFraudByBatch = async (
   try { payload = await response.json(); } catch { /* ignore */ }
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Authentication session is missing or has expired. Please log in again.");
+    }
+    if (response.status === 429) {
+      throw new Error("Too many requests. Please slow down and try again later.");
+    }
     throw new Error(payload?.error ?? `getFraudByBatch failed: HTTP ${response.status}`);
   }
   return payload!;
@@ -704,6 +710,12 @@ export const getFraudByFarmer = async (
   try { payload = await response.json(); } catch { /* ignore */ }
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Authentication session is missing or has expired. Please log in again.");
+    }
+    if (response.status === 429) {
+      throw new Error("Too many requests. Please slow down and try again later.");
+    }
     throw new Error(payload?.error ?? `getFraudByFarmer failed: HTTP ${response.status}`);
   }
   return payload;
@@ -725,6 +737,12 @@ export const getFraudOverview = async (): Promise<{ ok: boolean; data: FraudOver
   try { payload = await response.json(); } catch { /* ignore */ }
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Authentication session is missing or has expired. Please log in again.");
+    }
+    if (response.status === 429) {
+      throw new Error("Too many requests. Please slow down and try again later.");
+    }
     throw new Error(payload?.error ?? `getFraudOverview failed: HTTP ${response.status}`);
   }
   return payload;

@@ -49,8 +49,12 @@ export async function optionalAuth(req, res, next) {
     
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
-      const { data: { user } } = await supabase.auth.getUser(token);
-      req.user = user || null;
+      if (token && token !== 'undefined' && token !== 'null') {
+        const { data } = await supabase.auth.getUser(token);
+        req.user = data?.user || null;
+      } else {
+        req.user = null;
+      }
     } else {
       req.user = null;
     }
