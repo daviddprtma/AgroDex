@@ -109,9 +109,6 @@ router.get("/dashboard-health", requireAuth, async (_req, res) => {
 router.post("/register-batch", requireAuth, strictLimiter, validateRegisterBatch, async (req, res) => {
   try {
     const { batchName, location, photoUrl } = req.body;
-    if (!batchName || !location || !photoUrl) {
-      return res.status(400).json({ error: "Missing required fields: batchName, location, photoUrl" });
-    }
 
     const productType = req.body.productType || batchName;
     const quantity = String(req.body.quantity || '0');
