@@ -8,21 +8,21 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { HelmetProvider } from 'react-helmet-async';
 import { DEMO_VERIFY_URL } from '@/lib/demo';
-import { lazy, Suspense, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { lazy, Suspense } from 'react';
 
-const Index             = lazy(() => import('./pages/Index'));
-const Login             = lazy(() => import('./pages/Login'));
-const AuthLanding       = lazy(() => import('./pages/AuthLanding'));
-const Profile           = lazy(() => import('./pages/Profile'));
-const SessionSettings   = lazy(() => import('./pages/SessionSettings'));
+const Landing = lazy(() => import('./pages/Landing'));
+const Index = lazy(() => import('./pages/Index'));
+const Login = lazy(() => import('./pages/Login'));
+const AuthLanding = lazy(() => import('./pages/AuthLanding'));
+const Profile = lazy(() => import('./pages/Profile'));
+const SessionSettings = lazy(() => import('./pages/SessionSettings'));
 const BatchRegistration = lazy(() => import('./pages/BatchRegistration'));
-const BatchTokenize     = lazy(() => import('./pages/BatchTokenize'));
-const BatchVerify       = lazy(() => import('./pages/BatchVerify'));
-const TestHedera        = lazy(() => import('./pages/TestHedera'));
-const Dashboard         = lazy(() => import('./pages/Dashboard'));
-const RiskIntelligence  = lazy(() => import('./pages/RiskIntelligence'));
-const BatchJourney      = lazy(() => import('./pages/BatchJourney'));
+const BatchTokenize = lazy(() => import('./pages/BatchTokenize'));
+const BatchVerify = lazy(() => import('./pages/BatchVerify'));
+const TestHedera = lazy(() => import('./pages/TestHedera'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const RiskIntelligence = lazy(() => import('./pages/RiskIntelligence'));
+const BatchJourney = lazy(() => import('./pages/BatchJourney'));
 
 const queryClient = new QueryClient();
 
@@ -34,49 +34,43 @@ function PageLoader() {
   );
 }
 
-const App = () => {
-  const { i18n } = useTranslation();
-
-  useEffect(() => {
-    document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
-  }, [i18n.language]);
-
-  return (
-    <HelmetProvider>
-      <ThemeProvider defaultTheme="system" storageKey="agrodex-theme">
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <BrowserRouter>
-              <AuthProvider>
-                <WalletProvider>
-                  <Suspense fallback={<PageLoader />}>
-                    <Routes>
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/welcome" element={<AuthLanding />} />
-                      <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                      <Route path="/session-settings" element={<ProtectedRoute><SessionSettings /></ProtectedRoute>} />
-                      <Route path="/register" element={<ProtectedRoute><BatchRegistration /></ProtectedRoute>} />
-                      <Route path="/tokenize" element={<ProtectedRoute><BatchTokenize /></ProtectedRoute>} />
-                      <Route path="/verify" element={<BatchVerify />} />
-                      <Route path="/verify/:batchId" element={<BatchVerify />} />
-                      <Route path="/verify/:tokenId/:serialNumber" element={<BatchVerify />} />
-                      <Route path="/demo" element={<Navigate to={DEMO_VERIFY_URL} replace />} />
-                      <Route path="/test-hedera" element={<ProtectedRoute><TestHedera /></ProtectedRoute>} />
-                      <Route path="/risk-intelligence" element={<ProtectedRoute><RiskIntelligence /></ProtectedRoute>} />
-                      <Route path="/journey/:batchId" element={<BatchJourney />} />
-                    </Routes>
-                  </Suspense>
-                </WalletProvider>
-              </AuthProvider>
-            </BrowserRouter>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
-    </HelmetProvider>
-  );
-};
+const App = () => (
+  <HelmetProvider>
+    <ThemeProvider defaultTheme="system" storageKey="agrodex-theme">
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <BrowserRouter>
+            <AuthProvider>
+              <WalletProvider>
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/welcome" element={<AuthLanding />} />
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/app" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                    {/* <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} /> */}
+                    <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                    <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                    <Route path="/session-settings" element={<ProtectedRoute><SessionSettings /></ProtectedRoute>} />
+                    <Route path="/register" element={<ProtectedRoute><BatchRegistration /></ProtectedRoute>} />
+                    <Route path="/tokenize" element={<ProtectedRoute><BatchTokenize /></ProtectedRoute>} />
+                    <Route path="/verify" element={<BatchVerify />} />
+                    <Route path="/verify/:batchId" element={<BatchVerify />} />
+                    <Route path="/verify/:tokenId/:serialNumber" element={<BatchVerify />} />
+                    <Route path="/demo" element={<Navigate to={DEMO_VERIFY_URL} replace />} />
+                    <Route path="/test-hedera" element={<ProtectedRoute><TestHedera /></ProtectedRoute>} />
+                    <Route path="/risk-intelligence" element={<ProtectedRoute><RiskIntelligence /></ProtectedRoute>} />
+                    <Route path="/journey/:batchId" element={<BatchJourney />} />
+                  </Routes>
+                </Suspense>
+              </WalletProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
+  </HelmetProvider>
+);
 
 export default App;

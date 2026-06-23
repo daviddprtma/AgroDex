@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
 import { verifyBatch, verifyBatchById } from "@/lib/api";
-import type { VerifyBatchResult, VerifyBatchResponse } from "@/lib/api";
+import type { VerifyBatchResult, VerifyBatchResponse, VerifyBatchDeletedResult } from "@/lib/api";
 import { QRCodeCanvas } from "qrcode.react";
 import { QrScannerModal } from "@/components/QrScannerModal";
 import { Button } from "@/components/ui/button";
@@ -35,12 +35,15 @@ import {
   Calendar,
   Download,
   Camera,
+  FileText,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
+import { CopyButton } from "@/components/CopyButton";
+import { exportVerifyResultToPDF } from "@/utils/pdfExport";
 
 type NotFoundResult = Extract<VerifyBatchResult, { reason: "not_found" }>;
 
@@ -231,6 +234,34 @@ export default function BatchVerify() {
       });
     } finally {
       setQaLoading(false);
+    }
+  };
+
+  const handleExportPDF = () => {
+    if (!verifiedResult) return;
+    try {
+      const canvas = document.getElementById("verify-qr-canvas") as HTMLCanvasElement;
+      const qrCodeDataUrl = canvas?.toDataURL("image/png");
+
+      const doc = exportVerifyResultToPDF(verifiedResult, {
+        qrCodeDataUrl,
+        language,
+      });
+
+      const filenameId = verifiedResult.batch?.id || params.batchId || `${verifiedResult.tokenId}_${verifiedResult.serialNumber}`;
+      doc.save(`agrodex-certificate-${filenameId}.pdf`);
+
+      toast({
+        title: "PDF Exported",
+        description: "Your verification certificate has been downloaded.",
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to generate PDF.";
+      toast({
+        title: "Export Error",
+        description: message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -449,88 +480,106 @@ export default function BatchVerify() {
                   {/* Only show details if batch was found */}
                   {verifiedResult && (
                     <Card className="border-blue-200 dark:border-blue-950/30 bg-card text-card-foreground shadow-lg">
-                      <CardHeader className="pb-4">
+                      <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0">
                         <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">
                           Verification Details
                         </CardTitle>
+                        <Button
+                          onClick={handleExportPDF}
+                          variant="outline"
+                          size="sm"
+                          className="font-semibold border-rose-200 dark:border-rose-950/30 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/20 flex items-center gap-1.5"
+                        >
+                          <FileText className="h-4 w-4" />
+                          Export PDF
+                        </Button>
                       </CardHeader>
                       <CardContent className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                          <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-gray-200 dark:border-slate-800">
-                            <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1">
-                              Token ID
-                            </p>
-                            <p className="font-mono font-bold text-gray-900 dark:text-white truncate" title={verifiedResult.tokenId || ""}>
-                              {verifiedResult.tokenId || "Pending Tokenization (Registered)"}
-                            </p>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                          <div className="lg:col-span-2 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-gray-200 dark:border-slate-800">
+                                <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1">
+                                  Token ID
+                                </p>
+                                <div className="flex items-center gap-2 overflow-hidden">
+                                  <p className="font-mono font-bold text-gray-900 dark:text-white truncate" title={verifiedResult.tokenId || ""}>
+                                    {verifiedResult.tokenId || "Pending Tokenization (Registered)"}
+                                  </p>
+                                  {verifiedResult.tokenId && (
+                                    <CopyButton value={verifiedResult.tokenId} successMessage="Token ID copied!" />
+                                  )}
+                                </div>
+                              </div>
+                              <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-gray-200 dark:border-slate-800">
+                                <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1">
+                                  Serial Number
+                                </p>
+                                <p className="font-mono font-bold text-gray-900 dark:text-white">
+                                  {verifiedResult.serialNumber || "N/A"}
+                                </p>
+                              </div>
+                              <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-gray-200 dark:border-slate-800">
+                                <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1">
+                                  Status
+                                </p>
+                                <Badge className={verifiedResult.status === "verified" ? "bg-emerald-600 text-white font-semibold" : "bg-blue-600 text-white font-semibold"}>
+                                  {verifiedResult.status || "Registered"}
+                                </Badge>
+                              </div>
+                              <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-gray-200 dark:border-slate-800">
+                                <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1 flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
+                                  {verifiedResult.status === "verified" ? "Verified on" : "Registered on"}
+                                </p>
+                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                  {new Date(
+                                    verifiedResult.verifiedAt,
+                                  ).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
                           </div>
-                          <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-gray-200 dark:border-slate-800">
-                            <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1">
-                              Serial Number
-                            </p>
-                            <p className="font-mono font-bold text-gray-900 dark:text-white">
-                              {verifiedResult.serialNumber || "N/A"}
-                            </p>
-                          </div>
-                          <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-gray-200 dark:border-slate-800">
-                            <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1">
-                              Status
-                            </p>
-                            <Badge className={verifiedResult.status === "verified" ? "bg-emerald-600 text-white font-semibold" : "bg-blue-600 text-white font-semibold"}>
-                              {verifiedResult.status || "Registered"}
-                            </Badge>
-                          </div>
-                          <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-gray-200 dark:border-slate-800">
-                            <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1 flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {verifiedResult.status === "verified" ? "Verified on" : "Registered on"}
-                            </p>
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                              {new Date(
-                                verifiedResult.verifiedAt,
-                              ).toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
 
-                        {/* QR code display */}
-                        <div className="flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm">
-                          <QRCodeCanvas
-                            id="verify-qr-canvas"
-                            value={JSON.stringify({
-                              batchId: verifiedResult.batch?.id || params.batchId || "",
-                              verificationUrl: verifiedResult.batch?.id 
-                                ? `${window.location.origin}/verify/${verifiedResult.batch.id}`
-                                : `${window.location.origin}/verify/${verifiedResult.tokenId}/${verifiedResult.serialNumber}`
-                            })}
-                            size={130}
-                            level="H"
-                            includeMargin={true}
-                            className="border border-gray-150 dark:border-slate-805 rounded bg-white"
-                          />
-                          <p className="mt-2 text-xs font-bold text-gray-600 dark:text-slate-400 text-center">
-                            Batch Verification QR
-                          </p>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              const canvas = document.getElementById("verify-qr-canvas") as HTMLCanvasElement;
-                              if (canvas) {
-                                const url = canvas.toDataURL("image/png");
-                                const link = document.createElement("a");
-                                const id = verifiedResult.batch?.id || params.batchId || `${verifiedResult.tokenId}_${verifiedResult.serialNumber}`;
-                                link.download = `agrodex-verify-${id}.png`;
-                                link.href = url;
-                                link.click();
-                              }
-                            }}
-                            className="mt-3 w-full text-xs font-semibold border-gray-300 dark:border-slate-800 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300"
-                          >
-                            <Download className="h-3.5 w-3.5 mr-1" />
-                            Download QR
-                          </Button>
+                          {/* QR code display */}
+                          <div className="flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm">
+                            <QRCodeCanvas
+                              id="verify-qr-canvas"
+                              value={JSON.stringify({
+                                batchId: verifiedResult.batch?.id || params.batchId || "",
+                                verificationUrl: verifiedResult.batch?.id 
+                                  ? `${window.location.origin}/verify/${verifiedResult.batch.id}`
+                                  : `${window.location.origin}/verify/${verifiedResult.tokenId}/${verifiedResult.serialNumber}`
+                              })}
+                              size={130}
+                              level="H"
+                              includeMargin={true}
+                              className="border border-gray-150 dark:border-slate-805 rounded bg-white"
+                            />
+                            <p className="mt-2 text-xs font-bold text-gray-600 dark:text-slate-400 text-center">
+                              Batch Verification QR
+                            </p>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                const canvas = document.getElementById("verify-qr-canvas") as HTMLCanvasElement;
+                                if (canvas) {
+                                  const url = canvas.toDataURL("image/png");
+                                  const link = document.createElement("a");
+                                  const id = verifiedResult.batch?.id || params.batchId || `${verifiedResult.tokenId}_${verifiedResult.serialNumber}`;
+                                  link.download = `agrodex-verify-${id}.png`;
+                                  link.href = url;
+                                  link.click();
+                                }
+                              }}
+                              className="mt-3 w-full text-xs font-semibold border-gray-300 dark:border-slate-800 hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300"
+                            >
+                              <Download className="h-3.5 w-3.5 mr-1" />
+                              Download QR
+                            </Button>
+                          </div>
                         </div>
 
                         <div className="border-t border-gray-200 dark:border-slate-800 pt-4">
@@ -546,15 +595,17 @@ export default function BatchVerify() {
                             )}
                             {verifiedResult.hcsTransactionIds.map(
                               (txId: string, idx: number) => (
-                                <a
-                                  key={idx}
-                                  href={`https://hashscan.io/testnet/transaction/${txId}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-mono flex items-center gap-1 hover:underline"
-                                >
-                                  {txId} <ExternalLink className="h-3 w-3" />
-                                </a>
+                                <div key={idx} className="flex items-center gap-2">
+                                  <a
+                                    href={`https://hashscan.io/testnet/transaction/${txId}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-mono flex items-center gap-1 hover:underline"
+                                  >
+                                    {txId} <ExternalLink className="h-3 w-3" />
+                                  </a>
+                                  <CopyButton value={txId} successMessage="Transaction ID copied!" />
+                                </div>
                               ),
                             )}
                           </div>
@@ -641,15 +692,18 @@ export default function BatchVerify() {
                                                 item.timestamp,
                                               ).toLocaleString()}
                                             </div>
-                                            <a
-                                              href={`https://hashscan.io/testnet/transaction/${item.txId}`}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-mono flex items-center gap-1 mt-2 hover:underline"
-                                            >
-                                              {item.txId}{" "}
-                                              <ExternalLink className="h-3 w-3" />
-                                            </a>
+                                            <div className="flex items-center gap-2 mt-2">
+                                              <a
+                                                href={`https://hashscan.io/testnet/transaction/${item.txId}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-mono flex items-center gap-1 hover:underline"
+                                              >
+                                                {item.txId}{" "}
+                                                <ExternalLink className="h-3 w-3" />
+                                              </a>
+                                              <CopyButton value={item.txId} successMessage="Transaction ID copied!" size="sm" className="h-6 w-6" />
+                                            </div>
                                           </div>
                                         </div>
                                       ),
@@ -708,16 +762,18 @@ export default function BatchVerify() {
                                           <div className="flex flex-wrap gap-2">
                                             {qaResponse.evidenceTxIds.map(
                                               (txId: string, idx: number) => (
-                                                <a
-                                                  key={idx}
-                                                  href={`https://hashscan.io/testnet/transaction/${txId}`}
-                                                  target="_blank"
-                                                  rel="noopener noreferrer"
-                                                  className="text-xs bg-white dark:bg-slate-900 text-gray-800 dark:text-slate-350 px-2 py-1 rounded border border-blue-300 dark:border-blue-900/30 hover:bg-blue-105 hover:dark:bg-slate-800 flex items-center gap-1"
-                                                >
-                                                  {txId.substring(0, 20)}...{" "}
-                                                  <ExternalLink className="h-3 w-3" />
-                                                </a>
+                                                <div key={idx} className="flex items-center gap-1.5 bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-blue-300 dark:border-blue-900/30 hover:bg-blue-105 hover:dark:bg-slate-800">
+                                                  <a
+                                                    href={`https://hashscan.io/testnet/transaction/${txId}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-xs text-gray-800 dark:text-slate-350 font-mono flex items-center gap-1"
+                                                  >
+                                                    {txId.substring(0, 20)}...{" "}
+                                                    <ExternalLink className="h-3 w-3" />
+                                                  </a>
+                                                  <CopyButton value={txId} successMessage="Transaction ID copied!" size="sm" className="h-5 w-5 p-0" />
+                                                </div>
                                               ),
                                             )}
                                           </div>
