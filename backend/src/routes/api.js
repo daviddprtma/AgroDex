@@ -4,7 +4,7 @@ import QRCode from "qrcode";
 import { submitBatchData, fetchHCSMessage } from "../hcs.js";
 import { createBatchNFT, fetchNFTMetadata } from "../hts.js";
 import { supabase, insertBatch, insertToken, upsertVerification, getVerification, getToken } from "../db.js";
-import { env } from "../utils/config.js";
+import { env, isMockMode } from "../utils/config.js";
 import { requireAuth } from "../middleware/auth.js";
 import {
   analyzeBatch,
@@ -68,6 +68,18 @@ router.get("/dashboard-stats", requireAuth, async (_req, res) => {
 });
 
 router.get("/dashboard-health", requireAuth, async (_req, res) => {
+  if (isMockMode) {
+    return res.status(200).json({
+      ok: true,
+      status: {
+        supabase: { ok: true, ms: 5 },
+        hedera: { ok: true, ms: 12 },
+        gemini: { ok: true, ms: 8, model: "gemini-3.5-flash-mock" }
+      },
+      timestamp: new Date().toISOString()
+    });
+  }
+
   const supabaseStatus = { ok: false, ms: 0 };
   const hederaStatus = { ok: false, ms: 0 };
   const geminiStatus = { ok: false, ms: 0 };

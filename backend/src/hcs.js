@@ -1,6 +1,6 @@
 import { TopicMessageSubmitTransaction, TopicId } from '@hashgraph/sdk';
 import { getHederaClient } from './hederaClient.js';
-import { env } from './utils/config.js';
+import { env, isMockMode } from './utils/config.js';
 
 /**
  * Submit batch data to Hedera Consensus Service (HCS)
@@ -8,6 +8,17 @@ import { env } from './utils/config.js';
  * @returns {Promise<{transactionId: string, receipt: Object}>}
  */
 export async function submitBatchData(batchData) {
+  if (isMockMode) {
+    const mockTxId = `0.0.12345@${Math.floor(Date.now() / 1000)}-${Math.floor(Math.random() * 1000000000)}`;
+    return {
+      transactionId: mockTxId,
+      receipt: {
+        status: "SUCCESS",
+        topicSequenceNumber: String(Math.floor(Math.random() * 1000) + 1)
+      }
+    };
+  }
+
   try {
     const client = getHederaClient();
     const topicId = TopicId.fromString(env.HEDERA_TOPIC_ID);

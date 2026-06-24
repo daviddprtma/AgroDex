@@ -1,8 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-import { env } from '../utils/config.js';
-
-// Create Supabase client for auth verification
-const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
+import { supabase } from '../db.js';
 
 /**
  * Middleware to verify Supabase JWT token

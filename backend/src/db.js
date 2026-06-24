@@ -1,17 +1,132 @@
 import { createClient } from '@supabase/supabase-js';
-import { env } from './utils/config.js';
+import { env, isMockMode } from './utils/config.js';
 
-// Initialize Supabase client with service role key for server-side trusted operations
-// ✅ Uses SUPABASE_SERVICE_ROLE_KEY (not anon key) for all backend writes
-export const supabase = createClient(
-  env.SUPABASE_URL,
-  env.SUPABASE_SERVICE_ROLE_KEY,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
+const createMockSupabase = () => {
+  console.warn("⚠️ Using Mock Supabase client in backend because Supabase URL or Service Role Key is a placeholder.");
+  
+  const mockDbBuilder = {
+    select: () => mockDbBuilder,
+    insert: (data) => {
+      const inserted = Array.isArray(data) ? data[0] : data;
+      const builder = {
+        select: () => ({
+          single: async () => ({ id: "mock-inserted-id", ...inserted })
+        }),
+        then: (resolve) => resolve({ data: [{ id: "mock-inserted-id", ...inserted }], error: null })
+      };
+      return builder;
+    },
+    upsert: (data) => {
+      const upserted = Array.isArray(data) ? data[0] : data;
+      const builder = {
+        select: () => ({
+          single: async () => ({ id: "mock-upserted-id", ...upserted })
+        }),
+        then: (resolve) => resolve({ data: [{ id: "mock-upserted-id", ...upserted }], error: null })
+      };
+      return builder;
+    },
+    update: (data) => {
+      const builder = {
+        eq: () => ({
+          then: (resolve) => resolve({ data: [data], error: null })
+        }),
+        then: (resolve) => resolve({ data: [data], error: null })
+      };
+      return builder;
+    },
+    delete: () => {
+      const builder = {
+        eq: () => builder,
+        then: (resolve) => resolve({ error: null })
+      };
+      return builder;
+    },
+    eq: () => mockDbBuilder,
+    not: () => mockDbBuilder,
+    gte: () => mockDbBuilder,
+    lte: () => mockDbBuilder,
+    lt: () => mockDbBuilder,
+    order: () => mockDbBuilder,
+    limit: () => mockDbBuilder,
+    single: async () => ({
+      data: {
+        id: "mock-user-uuid-1234-5678",
+        username: "mock_producer",
+        full_name: "Mock Producer",
+        hedera_account_id: "0.0.12345",
+        auth_method: "hybrid",
+        created_at: new Date().toISOString()
+      },
+      error: null
+    }),
+    maybeSingle: async () => ({
+      data: {
+        id: "mock-user-uuid-1234-5678",
+        username: "mock_producer",
+        full_name: "Mock Producer",
+        hedera_account_id: "0.0.12345",
+        auth_method: "hybrid",
+        created_at: new Date().toISOString()
+      },
+      error: null
+    }),
+    then: (resolve) => {
+      resolve({
+        data: [
+          {
+            id: "mock-user-uuid-1234-5678",
+            username: "mock_producer",
+            full_name: "Mock Producer",
+            hedera_account_id: "0.0.12345",
+            auth_method: "hybrid",
+            created_at: new Date().toISOString()
+          }
+        ],
+        error: null
+      });
     }
-  }
+  };
+
+  return {
+    auth: {
+      getUser: async (token) => ({
+        data: {
+          user: {
+            id: "mock-user-uuid-1234-5678",
+            email: "producer@agrodex.com",
+            user_metadata: {
+              address: "0x1234567890123456789012345678901234567890"
+            }
+          }
+        },
+        error: null
+      }),
+      admin: {
+        deleteUser: async (userId) => ({ error: null })
+      }
+    },
+    from: (table) => {
+      return mockDbBuilder;
+    }
+  };
+};
+
+// Initialize Supabase client
+// Uses mock client if env.isMockMode is true
+export const supabase = (
+  isMockMode
+    ? createMockSupabase()
+    : createClient(
+        env.SUPABASE_URL,
+        env.SUPABASE_SERVICE_ROLE_KEY,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        }
+      )
 );
 
 /**
