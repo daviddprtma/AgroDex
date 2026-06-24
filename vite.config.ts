@@ -13,6 +13,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: { enabled: true },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 10000000, // Set to 10 MB
+      },
       manifest: {
         name: 'AgroDex',
         short_name: 'AgroDex',

@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Mail, Lock, CheckCircle } from "lucide-react";
+import { AlertCircle, Mail, Lock, CheckCircle, Eye, EyeOff } from "lucide-react";
 import WalletButton from "@/components/WalletButton";
+import MetaMaskButton from "@/components/MetaMaskButton";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { Helmet } from "react-helmet-async";
 import logoUrl from "@/assets/agritrust-logo.png";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -23,6 +25,7 @@ export default function AuthLanding() {
   const [authLoading, setAuthLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
 
@@ -247,9 +250,28 @@ export default function AuthLanding() {
                             </span>
                           </div>
                         </div>
+                        <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider text-center">
+                          EVM Wallet
+                        </h3>
+                        <ErrorBoundary>
+                          <MetaMaskButton />
+                        </ErrorBoundary>
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-200 dark:border-slate-800"></div>
+                          </div>
+                          <div className="relative flex justify-center text-xs">
+                            <span className="bg-white dark:bg-slate-900 px-2 text-gray-500 dark:text-slate-400">
+                              or
+                            </span>
+                          </div>
+                        </div>
+                        <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider text-center">
+                          Hedera Native
+                        </h3>
                         <WalletButton />
                         <p className="mt-2 text-xs text-gray-500 dark:text-slate-400 text-center">
-                          Your identity stays secure — HashPack Wallet.
+                          Your identity stays secure with either wallet.
                         </p>
                       </div>
                     ) : (
@@ -288,13 +310,21 @@ export default function AuthLanding() {
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <Input
                               id="password"
-                              type="password"
+                              type={showPassword ? "text" : "password"}
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
-                              className="pl-10 dark:bg-slate-950 dark:border-slate-800 dark:text-white text-sm"
+                              className="pl-10 pr-10 dark:bg-slate-950 dark:border-slate-800 dark:text-white text-sm"
                               placeholder="••••••••"
                               required
                             />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword((prev) => !prev)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
+                              aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
                           </div>
                         </div>
                         <Button
