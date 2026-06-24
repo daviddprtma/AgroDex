@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWallet } from "@/hooks/useWallet";
+import { useCoreWallet } from "@/hooks/useCoreWallet";
 import { supabase } from "@/lib/supabaseClient";
 import {
   Card,
@@ -20,6 +21,7 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
+  Zap,
   Globe,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -31,6 +33,7 @@ interface UserProfile {
   username: string | null;
   full_name: string | null;
   hedera_account_id: string | null;
+  core_wallet_address: string | null;
   auth_method: string;
   created_at: string;
 }
@@ -39,9 +42,11 @@ export default function Profile() {
   const navigate = useNavigate();
   const { user, linkHederaWallet, isMetaMaskConnected, metaMaskAddress } = useAuth();
   const { accountId, isConnected, connect, network } = useWallet();
+  const { address: coreAddress, isConnected: isCoreConnected, connect: coreConnect } = useCoreWallet();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [linking, setLinking] = useState(false);
+  const [linkingCore, setLinkingCore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -74,25 +79,18 @@ export default function Profile() {
     }
   };
 
-  /**
-   * Link the currently connected HashPack wallet to the user's Supabase profile.
-   * Uses the new useWallet() hook to get the connected account ID.
-   */
   const handleLinkWallet = async () => {
     setError(null);
     setSuccess(null);
     setLinking(true);
 
     try {
-      // If wallet is not connected, trigger connection first
       if (!isConnected || !accountId) {
         await connect();
-        // Wait for wallet state to update (the connect flow is async via modal)
         setLinking(false);
         return;
       }
 
-      // Link the wallet account to the Supabase profile
       await linkHederaWallet(accountId);
       setSuccess(`Successfully linked Hedera wallet: ${accountId}`);
       await loadProfile();
@@ -102,6 +100,39 @@ export default function Profile() {
       setError(err.message || "Failed to link wallet");
     } finally {
       setLinking(false);
+    }
+  };
+
+  const handleLinkCoreWallet = async () => {
+    setError(null);
+    setSuccess(null);
+    setLinkingCore(true);
+
+    try {
+      if (!isCoreConnected || !coreAddress) {
+        await coreConnect();
+        setLinkingCore(false);
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({
+          core_wallet_address: coreAddress,
+          auth_method: "core_wallet",
+        })
+        .eq("id", user.id);
+
+      if (updateError) throw updateError;
+
+      setSuccess(`Successfully linked Core wallet: ${coreAddress}`);
+      await loadProfile();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      console.error("Core wallet linking error:", err);
+      setError(err.message || "Failed to link Core wallet");
+    } finally {
+      setLinkingCore(false);
     }
   };
 
@@ -122,16 +153,16 @@ export default function Profile() {
         <title>Profile | AgroDex</title>
       </Helmet>
       <Navbar />
-      
+
       <div className="container mx-auto max-w-2xl py-8 px-4">
         <Card className="bg-card text-card-foreground dark:border-slate-800">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">User Profile</CardTitle>
             <CardDescription className="text-slate-500 dark:text-slate-400">
-              Manage your account and linked Hedera wallet
+              Manage your account and linked wallets
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent className="space-y-6">
             {error && (
               <Alert variant="destructive">
@@ -191,63 +222,100 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* Hedera Wallet */}
+              {/* Linked Wallets */}
               <div>
                 <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
-                  Hedera Wallet
+                  Linked Wallets
                 </label>
-                
-                {profile?.hedera_account_id ? (
-                  <div className="flex items-center gap-2 mt-1">
-                    <Wallet className="h-4 w-4 text-green-600 dark:text-green-400" />
-                    <span className="text-gray-900 dark:text-white font-mono text-sm">
-                      {profile.hedera_account_id}
-                    </span>
-                    <Badge
-                      variant="outline"
-                      className="text-green-605 border-green-600 dark:text-green-400 dark:border-green-400"
-                    >
-                      Linked
-                    </Badge>
+
+                <div className="mt-2 space-y-4">
+                  {/* HashPack */}
+                  <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                      <Wallet className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">HashPack</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400">Hedera</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {profile?.hedera_account_id ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono text-gray-600 dark:text-slate-400">
+                            {profile.hedera_account_id}
+                          </span>
+                          <Badge variant="outline" className="text-green-600 border-green-600 dark:text-green-400 dark:border-green-400 text-xs">
+                            Linked
+                          </Badge>
+                        </div>
+                      ) : (
+                        <Button
+                          onClick={handleLinkWallet}
+                          disabled={linking}
+                          variant="outline"
+                          size="sm"
+                          className="text-xs border-gray-300 dark:border-slate-700"
+                        >
+                          {linking ? "Linking..." : "Link"}
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                ) : (
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500 dark:text-slate-400 mb-2">
-                      No wallet linked. Connect your HashPack wallet to enable
-                      hybrid authentication.
-                    </p>
-                    <Button
-                      onClick={handleLinkWallet}
-                      disabled={linking}
-                      variant="outline"
-                      className="border-gray-300 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800"
-                    >
-                      <LinkIcon className="mr-2 h-4 w-4" />
-                      {linking ? "Linking..." : "Link Hedera Wallet"}
-                    </Button>
+
+                  {/* Core */}
+                  <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                      <Zap className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">Core</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400">Avalanche</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {profile?.core_wallet_address ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono text-gray-600 dark:text-slate-400 truncate max-w-[120px]">
+                            {profile.core_wallet_address}
+                          </span>
+                          <Badge variant="outline" className="text-purple-600 border-purple-600 dark:text-purple-400 dark:border-purple-400 text-xs">
+                            Linked
+                          </Badge>
+                        </div>
+                      ) : (
+                        <Button
+                          onClick={handleLinkCoreWallet}
+                          disabled={linkingCore}
+                          variant="outline"
+                          size="sm"
+                          className="text-xs border-gray-300 dark:border-slate-700"
+                        >
+                          {linkingCore ? "Connecting..." : "Link"}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Active sessions */}
+                {isConnected && accountId && (
+                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-900/50">
+                    <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1">Active HashPack Session</p>
+                    <div className="flex items-center gap-2">
+                      <Wallet className="h-3.5 w-3.5 text-blue-600" />
+                      <span className="font-mono text-sm text-blue-800 dark:text-blue-300">{accountId}</span>
+                      <span className={`ml-auto px-2 py-0.5 text-xs rounded-full font-semibold ${network === "testnet" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300" : "bg-green-100 text-green-700"}`}>
+                        {network}
+                      </span>
+                    </div>
                   </div>
                 )}
 
-                {/* Show currently connected wallet session (live status) */}
-                {isConnected && accountId && (
-                  <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-xs font-semibold text-blue-700 mb-1">
-                      Active Wallet Session
-                    </p>
+                {isCoreConnected && coreAddress && (
+                  <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-900/50">
+                    <p className="text-xs font-semibold text-purple-700 dark:text-purple-300 mb-1">Active Core Session</p>
                     <div className="flex items-center gap-2">
-                      <Wallet className="h-3.5 w-3.5 text-blue-600" />
-                      <span className="font-mono text-sm text-blue-800">
-                        {accountId}
-                      </span>
-                      <span
-                        className={`ml-auto px-2 py-0.5 text-xs rounded-full font-semibold ${
-                          network === "testnet"
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-green-100 text-green-700"
-                        }`}
-                      >
-                        {network}
-                      </span>
+                      <Zap className="h-3.5 w-3.5 text-purple-600" />
+                      <span className="font-mono text-sm text-purple-800 dark:text-purple-300 truncate">{coreAddress}</span>
                     </div>
                   </div>
                 )}
@@ -297,7 +365,7 @@ export default function Profile() {
                   <Clock className="mr-2 h-4 w-4" />
                   Manage session duration
                 </Button>
-                
+
                 <h3 className="text-sm font-medium text-red-600 dark:text-red-400 mb-2">Danger Zone</h3>
                 <DeleteProfileModal />
               </div>
