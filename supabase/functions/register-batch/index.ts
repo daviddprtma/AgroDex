@@ -575,6 +575,21 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
+    // Extract farmer_id from authorization header if present
+    const authHeader = req.headers.get('Authorization')
+    let farmerId: string | null = null
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.substring(7)
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+        if (!authError && user) {
+          farmerId = user.id
+        }
+      } catch (authErr) {
+        console.warn(`[${requestId}] Failed to resolve user from auth header:`, authErr.message)
+      }
+    }
+
     let batchRecord
     try {
       const { data, error: dbError } = await withTimeout(
@@ -589,7 +604,8 @@ Deno.serve(async (req) => {
               harvest_date: harvestDateISO,
               photo_url: imageData,
               hcs_tx_id: hcsResult.transactionId,
-              ai_analysis: aiAnalysis
+              ai_analysis: aiAnalysis,
+              farmer_id: farmerId
             }])
             .select()
             .single()

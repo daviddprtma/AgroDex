@@ -849,3 +849,94 @@ export const deleteAccount = async (): Promise<{ ok: boolean; message: string }>
     throw new Error('deleteAccount failed: network error');
   }
 };
+
+export interface ProducerTrustResponse {
+  ok: boolean;
+  data: {
+    trustScore: number;
+    hasTrustedBadge: boolean;
+    trustedThreshold: number;
+    verificationAnalytics: {
+      totalVerifications: number;
+      successfulVerifications: number;
+      failedVerifications: number;
+      successRate: number;
+    };
+    certificationHistory: Array<{
+      id: string;
+      farmer_id: string;
+      name: string;
+      issue_date: string;
+      expiry_date: string;
+      status: 'Active' | 'Expired';
+      created_at: string;
+    }>;
+    complianceSummary: {
+      averageRiskScore: number;
+      totalBatches: number;
+      safeBatchesCount: number;
+      complianceLevel: string;
+    };
+  };
+}
+
+export const getProducerTrust = async (farmerId: string): Promise<ProducerTrustResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/trust/producer/${farmerId}`, {
+    method: 'GET',
+    headers: { 'Accept': 'application/json' },
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let payload: any = null;
+  try { payload = await response.json(); } catch { /* ignore */ }
+
+  if (!response.ok) {
+    throw new Error(payload?.error ?? `getProducerTrust failed: HTTP ${response.status}`);
+  }
+  return payload;
+};
+
+export const addProducerCertification = async (
+  farmerId: string,
+  cert: { name: string; issue_date: string; expiry_date: string }
+): Promise<{ ok: boolean; data: any }> => {
+  const headers = await buildAuthHeaders();
+  headers['Content-Type'] = 'application/json';
+
+  const response = await fetch(`${API_BASE_URL}/api/trust/producer/${farmerId}/certifications`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(cert),
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let payload: any = null;
+  try { payload = await response.json(); } catch { /* ignore */ }
+
+  if (!response.ok) {
+    throw new Error(payload?.error ?? `addProducerCertification failed: HTTP ${response.status}`);
+  }
+  return payload;
+};
+
+export const deleteProducerCertification = async (
+  farmerId: string,
+  certId: string
+): Promise<{ ok: boolean }> => {
+  const headers = await buildAuthHeaders();
+
+  const response = await fetch(`${API_BASE_URL}/api/trust/producer/${farmerId}/certifications/${certId}`, {
+    method: 'DELETE',
+    headers,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let payload: any = null;
+  try { payload = await response.json(); } catch { /* ignore */ }
+
+  if (!response.ok) {
+    throw new Error(payload?.error ?? `deleteProducerCertification failed: HTTP ${response.status}`);
+  }
+  return payload;
+};
+

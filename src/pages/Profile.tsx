@@ -13,6 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Wallet,
   Mail,
@@ -21,11 +23,20 @@ import {
   CheckCircle,
   Clock,
   Globe,
+  Award,
+  ShieldCheck,
+  Trash2,
+  Plus,
+  Activity,
+  FileText,
+  CheckCircle2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import { DeleteProfileModal } from "@/components/DeleteProfileModal";
+import { useToast } from "@/hooks/use-toast";
+import { getProducerTrust, addProducerCertification, deleteProducerCertification } from "@/lib/api";
 
 interface UserProfile {
   username: string | null;
@@ -44,6 +55,86 @@ export default function Profile() {
   const [linking, setLinking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const { toast } = useToast();
+  const [trustData, setTrustData] = useState<any>(null);
+  const [loadingTrust, setLoadingTrust] = useState(false);
+  
+  // States for adding a new certification
+  const [certName, setCertName] = useState("");
+  const [certIssueDate, setCertIssueDate] = useState("");
+  const [certExpiryDate, setCertExpiryDate] = useState("");
+  const [addingCert, setAddingCert] = useState(false);
+  const [certError, setCertError] = useState<string | null>(null);
+
+  const loadTrustData = async (userId: string) => {
+    setLoadingTrust(true);
+    try {
+      const data = await getProducerTrust(userId);
+      if (data.ok) {
+        setTrustData(data.data);
+      }
+    } catch (err: any) {
+      console.error("Error loading trust score details:", err);
+    } finally {
+      setLoadingTrust(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      loadTrustData(user.id);
+    }
+  }, [user]);
+
+  const handleAddCertification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    setCertError(null);
+    setAddingCert(true);
+
+    try {
+      const res = await addProducerCertification(user.id, {
+        name: certName,
+        issue_date: certIssueDate,
+        expiry_date: certExpiryDate
+      });
+
+      if (res.ok) {
+        setCertName("");
+        setCertIssueDate("");
+        setCertExpiryDate("");
+        toast({
+          title: "Certification added",
+          description: "Your certification has been added successfully."
+        });
+        await loadTrustData(user.id);
+      }
+    } catch (err: any) {
+      setCertError(err.message || "Failed to add certification");
+    } finally {
+      setAddingCert(false);
+    }
+  };
+
+  const handleDeleteCertification = async (certId: string) => {
+    if (!user) return;
+    try {
+      const res = await deleteProducerCertification(user.id, certId);
+      if (res.ok) {
+        toast({
+          title: "Certification deleted",
+          description: "Certification removed successfully."
+        });
+        await loadTrustData(user.id);
+      }
+    } catch (err: any) {
+      toast({
+        title: "Delete failed",
+        description: err.message,
+        variant: "destructive"
+      });
+    }
+  };
 
   useEffect(() => {
     loadProfile();
@@ -303,6 +394,210 @@ export default function Profile() {
               </div>
 
             </div> {/* Closes space-y-4 */}
+          </CardContent>
+        </Card>
+
+        {/* Trust Dashboard Section */}
+        <Card className="mt-8 bg-card text-card-foreground dark:border-slate-800 shadow-lg">
+          <CardHeader className="border-b border-gray-150 dark:border-slate-800 pb-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl flex items-center gap-2 text-gray-900 dark:text-white font-bold">
+                <ShieldCheck className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                Producer Trust Dashboard
+              </CardTitle>
+              {trustData?.hasTrustedBadge && (
+                <Badge className="bg-amber-500 hover:bg-amber-600 text-white font-extrabold flex items-center gap-1 py-1 px-3 shadow-md animate-pulse">
+                  <Award className="h-4 w-4" />
+                  TRUSTED PRODUCER
+                </Badge>
+              )}
+            </div>
+            <CardDescription className="text-slate-500 dark:text-slate-400 mt-1">
+              Real-time trust score, certification management, and compliance statistics
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="pt-6 space-y-8">
+            {loadingTrust ? (
+              <div className="text-center py-6">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto"></div>
+                <p className="mt-2 text-sm text-slate-500">Loading trust analytics...</p>
+              </div>
+            ) : trustData ? (
+              <>
+                {/* Trust Score & Badging Summary */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-950/20 dark:to-blue-950/20 p-5 rounded-xl border border-emerald-100 dark:border-emerald-900/30 flex items-center gap-4">
+                    <div className="relative flex items-center justify-center h-16 w-16 rounded-full bg-white dark:bg-slate-900 border-4 border-emerald-500 text-2xl font-black text-emerald-700 dark:text-emerald-400 shadow-md">
+                      {trustData.trustScore}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 dark:text-white">Trust Score</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Threshold for Trusted status is {trustData.trustedThreshold}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 p-5 rounded-xl border border-purple-100 dark:border-purple-900/30 flex items-center gap-4">
+                    <div className="flex items-center justify-center h-16 w-16 rounded-full bg-white dark:bg-slate-900 border-4 border-purple-500 text-2xl font-black text-purple-700 dark:text-purple-400 shadow-md">
+                      {trustData.verificationAnalytics.successRate}%
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 dark:text-white">Verification Success</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        {trustData.verificationAnalytics.successfulVerifications} of {trustData.verificationAnalytics.totalVerifications} verified lots
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Verification Analytics Detail */}
+                <div className="space-y-3">
+                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-350 flex items-center gap-1.5">
+                    <Activity className="h-4 w-4 text-blue-500" />
+                    Verification Analytics
+                  </h4>
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="bg-gray-50 dark:bg-slate-900/50 p-3 rounded-lg border border-border">
+                      <p className="text-lg font-bold text-gray-900 dark:text-white">{trustData.verificationAnalytics.totalVerifications}</p>
+                      <p className="text-[10px] uppercase font-bold text-slate-500">Total checked</p>
+                    </div>
+                    <div className="bg-emerald-50/50 dark:bg-emerald-950/10 p-3 rounded-lg border border-emerald-100 dark:border-emerald-900/20">
+                      <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{trustData.verificationAnalytics.successfulVerifications}</p>
+                      <p className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">Successful</p>
+                    </div>
+                    <div className="bg-red-50/50 dark:bg-red-950/10 p-3 rounded-lg border border-red-100 dark:border-red-900/20">
+                      <p className="text-lg font-bold text-red-650 dark:text-red-400">{trustData.verificationAnalytics.failedVerifications}</p>
+                      <p className="text-[10px] uppercase font-bold text-red-650 dark:text-red-400">Failed / Flagged</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Compliance Summary */}
+                <div className="space-y-3">
+                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-350 flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                    Compliance & Fraud Engine Summary
+                  </h4>
+                  <div className="p-4 bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-border space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Average Batch Risk Score:</span>
+                      <span className="font-semibold text-gray-900 dark:text-white">{trustData.complianceSummary.averageRiskScore}/100</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Compliance Status:</span>
+                      <span className="font-semibold text-gray-900 dark:text-white">{trustData.complianceSummary.complianceLevel}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Total Registered Batches:</span>
+                      <span className="font-semibold text-gray-900 dark:text-white">{trustData.complianceSummary.totalBatches}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Certification History Manager */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-350 flex items-center gap-1.5">
+                    <FileText className="h-4 w-4 text-purple-500" />
+                    Certification History
+                  </h4>
+                  
+                  {trustData.certificationHistory.length === 0 ? (
+                    <p className="text-sm text-slate-500 dark:text-slate-400 italic bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-dashed border-border text-center">
+                      No certifications registered. Add your active agricultural certificates below.
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {trustData.certificationHistory.map((cert: any) => (
+                        <div key={cert.id} className="flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-lg border border-border shadow-sm">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-sm text-gray-900 dark:text-white truncate">{cert.name}</p>
+                              <Badge className={cert.status === 'Active' ? 'bg-emerald-500 hover:bg-emerald-600 text-white text-[10px]' : 'bg-red-500 hover:bg-red-650 text-white text-[10px]'}>
+                                {cert.status}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-slate-500 mt-1">
+                              Issued: {new Date(cert.issue_date).toLocaleDateString()} · Expires: {new Date(cert.expiry_date).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <Button
+                            onClick={() => handleDeleteCertification(cert.id)}
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-550 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Add Certification Form */}
+                  <form onSubmit={handleAddCertification} className="p-4 bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-border space-y-4">
+                    <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">Add Certification</p>
+                    
+                    {certError && (
+                      <Alert variant="destructive" className="py-2 text-xs">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{certError}</AlertDescription>
+                      </Alert>
+                    )}
+
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="certName" className="text-xs font-semibold">Name</Label>
+                        <Input
+                          id="certName"
+                          placeholder="e.g. Organic Certificate, IndoGAP"
+                          value={certName}
+                          onChange={(e) => setCertName(e.target.value)}
+                          className="h-9 text-sm mt-1"
+                          required
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="certIssueDate" className="text-xs font-semibold">Issue Date</Label>
+                          <Input
+                            id="certIssueDate"
+                            type="date"
+                            value={certIssueDate}
+                            onChange={(e) => setCertIssueDate(e.target.value)}
+                            className="h-9 text-sm mt-1"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="certExpiryDate" className="text-xs font-semibold">Expiry Date</Label>
+                          <Input
+                            id="certExpiryDate"
+                            type="date"
+                            value={certExpiryDate}
+                            onChange={(e) => setCertExpiryDate(e.target.value)}
+                            className="h-9 text-sm mt-1"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={addingCert}
+                      className="w-full h-9 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-1"
+                    >
+                      <Plus className="h-4 w-4" />
+                      {addingCert ? "Adding..." : "Add Certification"}
+                    </Button>
+                  </form>
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-slate-500 italic text-center">Unable to load trust scores.</p>
+            )}
           </CardContent>
         </Card>
       </div>

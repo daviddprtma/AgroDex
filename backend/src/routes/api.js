@@ -140,7 +140,7 @@ router.post("/register-batch", requireAuth, strictLimiter, validateRegisterBatch
       photo_url: photoUrl,
       hcs_tx_id: hcsResult.transactionId,
       ai_analysis: aiAnalysis,
-      farmer_id: req.user?.id || null,
+      farmer_id: req.user.id,
       product_type: productType,
       quantity: quantity,
       harvest_date: harvestDate
