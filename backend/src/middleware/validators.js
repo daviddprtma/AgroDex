@@ -16,25 +16,99 @@ export const validate = (req, res, next) => {
 };
 
 
+export function daysInMonth(year, month) {
+  return new Date(year, month, 0).getDate();
+}
+
+export function normalizeDate(input) {
+  if (!input) return new Date().toISOString().split('T')[0];
+  // ISO format: YYYY-MM-DD
+  const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input);
+  if (isoMatch) {
+    const [, yyyy, mm, dd] = isoMatch;
+    const year = parseInt(yyyy, 10);
+    const month = parseInt(mm, 10);
+    const day = parseInt(dd, 10);
+    
+    if (month < 1 || month > 12) {
+      throw new Error(`Invalid month in ISO date: ${input}`);
+    }
+    if (day < 1 || day > daysInMonth(year, month)) {
+      throw new Error(`Invalid day in ISO date: ${input}`);
+    }
+    return input;
+  }
+  
+  // DMY format: DD-MM-YYYY
+  const dmyMatch = /^(\d{2})-(\d{2})-(\d{4})$/.exec(input);
+  if (dmyMatch) {
+    const [, dd, mm, yyyy] = dmyMatch;
+    const day = parseInt(dd, 10);
+    const month = parseInt(mm, 10);
+    const year = parseInt(yyyy, 10);
+    
+    if (month < 1 || month > 12) {
+      throw new Error(`Invalid month in DMY date: ${input}. Expected DD-MM-YYYY or YYYY-MM-DD`);
+    }
+    if (day < 1 || day > daysInMonth(year, month)) {
+      throw new Error(`Invalid day in DMY date: ${input}. Expected DD-MM-YYYY or YYYY-MM-DD`);
+    }
+    
+    return `${yyyy}-${mm.toString().padStart(2, '0')}-${dd.toString().padStart(2, '0')}`;
+  }
+  
+  // Detect potential MM-DD-YYYY format
+  if (/^\d{2}-\d{2}-\d{4}$/.test(input)) {
+    throw new Error(`Unsupported date format (looks like MM-DD-YYYY): ${input}. Use DD-MM-YYYY or YYYY-MM-DD`);
+  }
+  
+  throw new Error(`Unsupported date format: ${input}. Expected DD-MM-YYYY or YYYY-MM-DD`);
+}
+
 export const validateRegisterBatch = [
-  body("farmerName")
+  body("batchName")
     .trim()
-    .notEmpty().withMessage("Farmer name is required")
-    .isLength({ max: 100 }).withMessage("Farmer name must be under 100 characters")
+    .notEmpty().withMessage("Batch name is required")
+    .isLength({ max: 100 }).withMessage("Batch name must be under 100 characters")
     .escape(),
-  body("cropType")
-    .trim()
-    .notEmpty().withMessage("Crop type is required")
-    .isLength({ max: 100 }).withMessage("Crop type must be under 100 characters")
-    .escape(),
-  body("quantity")
-    .notEmpty().withMessage("Quantity is required")
-    .isFloat({ min: 0.01 }).withMessage("Quantity must be a positive number"),
   body("location")
     .trim()
     .notEmpty().withMessage("Location is required")
     .isLength({ max: 200 }).withMessage("Location must be under 200 characters")
     .escape(),
+  body("photoUrl")
+    .trim()
+    .notEmpty().withMessage("Photo URL is required")
+    .isLength({ max: 2000 }).withMessage("Photo URL must be under 2000 characters"),
+  body("productType")
+    .optional()
+    .trim()
+    .isLength({ max: 100 }).withMessage("Product type must be under 100 characters")
+    .escape(),
+  body("quantity")
+    .optional()
+    .custom((value) => {
+      if (value !== undefined && value !== null && value !== "") {
+        const parsed = parseFloat(value);
+        if (isNaN(parsed) || parsed < 0) {
+          throw new Error("Quantity must be a positive number");
+        }
+      }
+      return true;
+    }),
+  body("harvestDate")
+    .optional()
+    .trim()
+    .custom((value) => {
+      if (value) {
+        try {
+          normalizeDate(value);
+        } catch (err) {
+          throw new Error(err.message);
+        }
+      }
+      return true;
+    }),
   validate,
 ];
 

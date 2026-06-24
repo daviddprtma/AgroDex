@@ -13,7 +13,7 @@ import {
   healthCheck as geminiHealthCheck,
 } from "../ai/gemini.js";
 import { strictLimiter } from "../middleware/rateLimiter.js";
-import { validateRegisterBatch, validateTokenizeBatch, validateVerifyBatch } from "../middleware/validators.js";
+import { validateRegisterBatch, validateTokenizeBatch, validateVerifyBatch, normalizeDate } from "../middleware/validators.js";
 
 // Suppress unused import warning for fetchHCSMessage (used for future HCS message retrieval)
 void fetchHCSMessage;
@@ -109,9 +109,11 @@ router.get("/dashboard-health", requireAuth, async (_req, res) => {
 router.post("/register-batch", requireAuth, strictLimiter, validateRegisterBatch, async (req, res) => {
   try {
     const { batchName, location, photoUrl } = req.body;
-    if (!batchName || !location || !photoUrl) {
-      return res.status(400).json({ error: "Missing required fields: batchName, location, photoUrl" });
-    }
+
+    const productType = req.body.productType || batchName;
+    const quantity = String(req.body.quantity || '0');
+    const harvestDateRaw = req.body.harvestDate || new Date().toISOString().split('T')[0];
+    const harvestDate = normalizeDate(harvestDateRaw);
 
     // AI batch metadata analysis using Gemini Flash Lite (optional, non-blocking)
     // If pre-computed AI verification is passed from frontend, use it. Otherwise call Gemini.
@@ -119,10 +121,10 @@ router.post("/register-batch", requireAuth, strictLimiter, validateRegisterBatch
     if (!aiAnalysis) {
       try {
         const geminiResult = await analyzeBatch({
-          productType: batchName,
-          quantity: req.body.quantity || '0',
+          productType,
+          quantity,
           location,
-          harvestDate: req.body.harvestDate || new Date().toISOString().split('T')[0],
+          harvestDate,
         });
         if (!geminiResult.error) {
           aiAnalysis = { caption: geminiResult.caption, anomalies: geminiResult.anomalies, confidence: geminiResult.confidence, tags: geminiResult.tags, generatedAt: new Date().toISOString(), ms: geminiResult.ms };
@@ -132,7 +134,17 @@ router.post("/register-batch", requireAuth, strictLimiter, validateRegisterBatch
       }
     }
     const hcsResult = await submitBatchData({ batchName, location, photoUrl, aiAnalysis });
-    const batchRecord = await insertBatch({ batch_name: batchName, location, photo_url: photoUrl, hcs_tx_id: hcsResult.transactionId, ai_analysis: aiAnalysis });
+    const batchRecord = await insertBatch({
+      batch_name: batchName,
+      location,
+      photo_url: photoUrl,
+      hcs_tx_id: hcsResult.transactionId,
+      ai_analysis: aiAnalysis,
+      farmer_id: req.user?.id || null,
+      product_type: productType,
+      quantity: quantity,
+      harvest_date: harvestDate
+    });
     res.json({ success: true, hcsTransactionId: hcsResult.transactionId, batchId: batchRecord.id, ai_analysis: aiAnalysis, message: "Batch registered successfully on Hedera HCS" });
   } catch (error) {
     console.error("Register batch error:", error);
@@ -367,7 +379,9 @@ router.get("/batches/:batchId", async (req, res) => {
       let aiSummary = null;
       if (batch.ai_provenance_summary) {
         try {
-          aiSummary = JSON.parse(batch.ai_provenance_summary);
+          aiSummary = typeof batch.ai_provenance_summary === "string"
+            ? JSON.parse(batch.ai_provenance_summary)
+            : batch.ai_provenance_summary;
         } catch {
           aiSummary = { summary_en: batch.ai_provenance_summary, summary_fr: batch.ai_provenance_summary, trustScore: 70, trustExplanation: "Restored from batch provenance" };
         }
