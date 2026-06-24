@@ -40,6 +40,9 @@ app.use("/api", (req, res, next) => {
   }
   return generalLimiter(req, res, next);
 });
+app.get('/api/dashboard-health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 app.use("/api", healthRoutes);
 app.use("/api", apiRoutes);
 app.use("/api/ai", aiRoutes);

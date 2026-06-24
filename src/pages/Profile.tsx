@@ -58,6 +58,7 @@ export default function Profile() {
   const { toast } = useToast();
   const [trustData, setTrustData] = useState<any>(null);
   const [loadingTrust, setLoadingTrust] = useState(false);
+  const [trustError, setTrustError] = useState<string | null>(null);
   
   // States for adding a new certification
   const [certName, setCertName] = useState("");
@@ -66,15 +67,32 @@ export default function Profile() {
   const [addingCert, setAddingCert] = useState(false);
   const [certError, setCertError] = useState<string | null>(null);
 
-  const loadTrustData = async (userId: string) => {
+  const loadTrustData = async (producerId: string) => {
+    if (!producerId) return;
     setLoadingTrust(true);
+    setTrustError(null);
     try {
-      const data = await getProducerTrust(userId);
-      if (data.ok) {
-        setTrustData(data.data);
+      const API = import.meta.env.VITE_API_URL || "http://localhost:4000";
+      const response = await fetch(`${API}/api/trust/producer/${producerId}`);
+      if (response.status === 404) {
+        setTrustError("No trust data available");
+        setTrustData(null);
+        return;
       }
+      if (response.status === 503) {
+        setTrustError("Server unavailable");
+        setTrustData(null);
+        return;
+      }
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      setTrustData(data);
     } catch (err: any) {
       console.error("Error loading trust score details:", err);
+      setTrustError("No trust data available");
+      setTrustData(null);
     } finally {
       setLoadingTrust(false);
     }
@@ -423,6 +441,10 @@ export default function Profile() {
                 <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto"></div>
                 <p className="mt-2 text-sm text-slate-500">Loading trust analytics...</p>
               </div>
+            ) : trustError ? (
+              <div className="text-center py-6">
+                <p className="text-red-500 font-semibold">{trustError}</p>
+              </div>
             ) : trustData ? (
               <>
                 {/* Trust Score & Badging Summary */}
@@ -434,64 +456,20 @@ export default function Profile() {
                     <div>
                       <h4 className="font-bold text-gray-900 dark:text-white">Trust Score</h4>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        Threshold for Trusted status is {trustData.trustedThreshold}
+                        Dynamic AgroDex Trust Score
                       </p>
                     </div>
                   </div>
                   
                   <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 p-5 rounded-xl border border-purple-100 dark:border-purple-900/30 flex items-center gap-4">
-                    <div className="flex items-center justify-center h-16 w-16 rounded-full bg-white dark:bg-slate-900 border-4 border-purple-500 text-2xl font-black text-purple-700 dark:text-purple-400 shadow-md">
-                      {trustData.verificationAnalytics.successRate}%
+                    <div className="flex items-center justify-center h-16 w-16 rounded-full bg-white dark:bg-slate-900 border-4 border-purple-500 text-sm font-black text-purple-700 dark:text-purple-400 shadow-md text-center p-1 uppercase">
+                      {trustData.compliance?.status || "N/A"}
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900 dark:text-white">Verification Success</h4>
+                      <h4 className="font-bold text-gray-900 dark:text-white">Compliance Status</h4>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        {trustData.verificationAnalytics.successfulVerifications} of {trustData.verificationAnalytics.totalVerifications} verified lots
+                        Compliance Engine Status
                       </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Verification Analytics Detail */}
-                <div className="space-y-3">
-                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-350 flex items-center gap-1.5">
-                    <Activity className="h-4 w-4 text-blue-500" />
-                    Verification Analytics
-                  </h4>
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="bg-gray-50 dark:bg-slate-900/50 p-3 rounded-lg border border-border">
-                      <p className="text-lg font-bold text-gray-900 dark:text-white">{trustData.verificationAnalytics.totalVerifications}</p>
-                      <p className="text-[10px] uppercase font-bold text-slate-500">Total checked</p>
-                    </div>
-                    <div className="bg-emerald-50/50 dark:bg-emerald-950/10 p-3 rounded-lg border border-emerald-100 dark:border-emerald-900/20">
-                      <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{trustData.verificationAnalytics.successfulVerifications}</p>
-                      <p className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">Successful</p>
-                    </div>
-                    <div className="bg-red-50/50 dark:bg-red-950/10 p-3 rounded-lg border border-red-100 dark:border-red-900/20">
-                      <p className="text-lg font-bold text-red-650 dark:text-red-400">{trustData.verificationAnalytics.failedVerifications}</p>
-                      <p className="text-[10px] uppercase font-bold text-red-650 dark:text-red-400">Failed / Flagged</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Compliance Summary */}
-                <div className="space-y-3">
-                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-350 flex items-center gap-1.5">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    Compliance & Fraud Engine Summary
-                  </h4>
-                  <div className="p-4 bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-border space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-500">Average Batch Risk Score:</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">{trustData.complianceSummary.averageRiskScore}/100</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-500">Compliance Status:</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">{trustData.complianceSummary.complianceLevel}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-500">Total Registered Batches:</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">{trustData.complianceSummary.totalBatches}</span>
                     </div>
                   </div>
                 </div>
@@ -503,33 +481,22 @@ export default function Profile() {
                     Certification History
                   </h4>
                   
-                  {trustData.certificationHistory.length === 0 ? (
+                  {!trustData.certifications || trustData.certifications.length === 0 ? (
                     <p className="text-sm text-slate-500 dark:text-slate-400 italic bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-dashed border-border text-center">
                       No certifications registered. Add your active agricultural certificates below.
                     </p>
                   ) : (
                     <div className="space-y-2">
-                      {trustData.certificationHistory.map((cert: any) => (
-                        <div key={cert.id} className="flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-lg border border-border shadow-sm">
+                      {trustData.certifications.map((certName: string, index: number) => (
+                        <div key={index} className="flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-lg border border-border shadow-sm">
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <p className="font-bold text-sm text-gray-900 dark:text-white truncate">{cert.name}</p>
-                              <Badge className={cert.status === 'Active' ? 'bg-emerald-500 hover:bg-emerald-600 text-white text-[10px]' : 'bg-red-500 hover:bg-red-650 text-white text-[10px]'}>
-                                {cert.status}
+                              <p className="font-bold text-sm text-gray-900 dark:text-white truncate">{certName}</p>
+                              <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px]">
+                                Active
                               </Badge>
                             </div>
-                            <p className="text-xs text-slate-500 mt-1">
-                              Issued: {new Date(cert.issue_date).toLocaleDateString()} · Expires: {new Date(cert.expiry_date).toLocaleDateString()}
-                            </p>
                           </div>
-                          <Button
-                            onClick={() => handleDeleteCertification(cert.id)}
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-550 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
                         </div>
                       ))}
                     </div>
