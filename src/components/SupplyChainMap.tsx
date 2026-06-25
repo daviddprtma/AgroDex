@@ -48,7 +48,7 @@ interface SupplyChainMapProps {
 }
 
 function getCoordinates(locationStr: string): [number, number] {
-  if (!locationStr) return REGION_COORDINATES['Default'];
+  if (!locationStr || typeof locationStr !== 'string') return REGION_COORDINATES['Default'];
   
   const loc = locationStr.toLowerCase();
   for (const [region, coords] of Object.entries(REGION_COORDINATES)) {
@@ -85,7 +85,7 @@ export function SupplyChainMap({ batches }: SupplyChainMapProps) {
         
         {batches.map((batch) => {
           const position = getCoordinates(batch.location);
-          const riskLevel = batch.ai_analysis?.riskLevel || 'Unknown';
+          const riskLevel = String(batch.ai_analysis?.riskLevel || 'Unknown');
           
           let riskColor = 'bg-gray-500';
           if (riskLevel.toLowerCase() === 'low') riskColor = 'bg-emerald-500';
@@ -106,8 +106,8 @@ export function SupplyChainMap({ batches }: SupplyChainMapProps) {
                   <div className="text-sm text-muted-foreground mt-2">
                     <p><strong>Location:</strong> {batch.location || 'Unknown'}</p>
                     <p><strong>Quantity:</strong> {batch.quantity} kg</p>
-                    <p><strong>Harvest:</strong> {batch.harvest_date ? format(new Date(batch.harvest_date), 'MMM d, yyyy') : 'N/A'}</p>
-                    <p><strong>Farmer ID:</strong> {batch.farmer_id.substring(0, 8)}...</p>
+                    <p><strong>Harvest:</strong> {batch.harvest_date && !isNaN(new Date(batch.harvest_date).getTime()) ? format(new Date(batch.harvest_date), 'MMM d, yyyy') : 'N/A'}</p>
+                    <p><strong>Farmer ID:</strong> {batch.farmer_id ? batch.farmer_id.substring(0, 8) + '...' : 'Unknown'}</p>
                   </div>
                   {batch.hcs_tx_id && (
                     <a 
