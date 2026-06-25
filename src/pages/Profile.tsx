@@ -25,18 +25,15 @@ import {
   Globe,
   Award,
   ShieldCheck,
-  Trash2,
   Plus,
-  Activity,
   FileText,
-  CheckCircle2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import { DeleteProfileModal } from "@/components/DeleteProfileModal";
 import { useToast } from "@/hooks/use-toast";
-import { getProducerTrust, addProducerCertification, deleteProducerCertification } from "@/lib/api";
+import { addProducerCertification, deleteProducerCertification } from "@/lib/api";
 
 interface UserProfile {
   username: string | null;
@@ -134,7 +131,7 @@ export default function Profile() {
     }
   };
 
-  const handleDeleteCertification = async (certId: string) => {
+  const onDeleteCertification = async (certId: string) => {
     if (!user) return;
     try {
       const res = await deleteProducerCertification(user.id, certId);
@@ -481,24 +478,38 @@ export default function Profile() {
                     Certification History
                   </h4>
                   
-                  {!trustData.certifications || trustData.certifications.length === 0 ? (
+                  {!Array.isArray(trustData.certifications) || trustData.certifications.length === 0 ? (
                     <p className="text-sm text-slate-500 dark:text-slate-400 italic bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-dashed border-border text-center">
                       No certifications registered. Add your active agricultural certificates below.
                     </p>
                   ) : (
                     <div className="space-y-2">
-                      {trustData.certifications.map((certName: string, index: number) => (
-                        <div key={index} className="flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-lg border border-border shadow-sm">
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className="font-bold text-sm text-gray-900 dark:text-white truncate">{certName}</p>
-                              <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px]">
-                                Active
-                              </Badge>
+                      {trustData.certifications.map((cert: any, index: number) => {
+                        const certLabel = typeof cert === 'string' ? cert : (cert?.name || 'Unknown Certificate');
+                        const certId = typeof cert === 'object' ? cert?.id : null;
+                        const certStatus = typeof cert === 'object' && cert?.status ? cert.status : 'Active';
+                        return (
+                          <div key={certId || index} className="flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-lg border border-border shadow-sm">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="font-bold text-sm text-gray-900 dark:text-white truncate">{certLabel}</p>
+                                <Badge className={`${certStatus === 'Expired' ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-500 hover:bg-emerald-600'} text-white text-[10px]`}>
+                                  {certStatus}
+                                </Badge>
+                              </div>
                             </div>
+                            {certId && (
+                              <button
+                                type="button"
+                                onClick={() => onDeleteCertification(certId)}
+                                className="text-xs text-red-500 hover:text-red-700 font-medium ml-2 shrink-0"
+                              >
+                                Remove
+                              </button>
+                            )}
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
 

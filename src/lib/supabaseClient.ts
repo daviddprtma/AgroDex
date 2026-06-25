@@ -49,6 +49,7 @@ const createMockSupabase = () => {
       getSession: async () => ({
         data: {
           session: {
+            access_token: "mock-access-token-for-local-dev",
             user: {
               id: "mock-user-uuid-1234-5678",
               email: "producer@agrodex.com",
@@ -125,11 +126,29 @@ const createMockSupabase = () => {
         error: null
       })
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     from: (table: string) => {
       return mockDbBuilder;
     },
     functions: {
       invoke: async (name: string) => {
+        if (name.startsWith('audit-logs')) {
+          return {
+            data: {
+              ok: true,
+              data: [
+                { token_id: "0.0.100001", serial_number: "1", score: 92, trustExplanation: "High quality organic batch", rationale: "Passed all checks", verified_at: new Date().toISOString(), status: "approved" },
+                { token_id: "0.0.100002", serial_number: "1", score: 88, trustExplanation: "Fair trade certified", rationale: "Passed all checks", verified_at: new Date().toISOString(), status: "approved" },
+                { token_id: "0.0.100003", serial_number: "1", score: 45, trustExplanation: null, rationale: "Inconsistent harvest dates", verified_at: new Date().toISOString(), status: "flagged" },
+              ],
+              pagination: { totalRecords: 3, totalPages: 1, currentPage: 1, limit: 10 }
+            },
+            error: null
+          };
+        }
+        if (name === 'health') {
+          return { data: { ok: true, services: { hedera: { ok: true }, ai: { ok: true } } }, error: null };
+        }
         return { data: { success: true, message: `Mock invoked ${name}` }, error: null };
       }
     }
