@@ -35,3 +35,15 @@ export const aiLimiter = rateLimit({
     message: "AI request limit exceeded. Please slow down.",
   },
 });
+
+// Relaxed limit for fraud/risk dashboard endpoints (overview/batch)
+export const fraudLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300, // max 300 requests per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: "Too many requests",
+    message: "Dashboard request limit exceeded. Please try again later.",
+  },
+});

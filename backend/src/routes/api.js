@@ -3,14 +3,20 @@ import axios from "axios";
 import QRCode from "qrcode";
 import { submitBatchData, fetchHCSMessage } from "../hcs.js";
 import { createBatchNFT, fetchNFTMetadata } from "../hts.js";
-import { analyzeBatch } from "../ai.js";
-import { insertBatch, insertToken, upsertVerification, getVerification, getToken } from "../db.js";
+import { supabase, insertBatch, insertToken, upsertVerification, getVerification, getToken } from "../db.js";
 import { env } from "../utils/config.js";
 import { requireAuth } from "../middleware/auth.js";
-import { analyzeImage, summarizeProvenance, dashboardInsight, healthCheck as geminiHealthCheck } from "../ai/gemini.js";
-import { supabase } from "../db.js";
+import {
+  analyzeBatch,
+  summarizeProvenance,
+  dashboardInsight,
+  healthCheck as geminiHealthCheck,
+} from "../ai/gemini.js";
 import { strictLimiter } from "../middleware/rateLimiter.js";
-import { validateRegisterBatch, validateTokenizeBatch, validateVerifyBatch } from "../middleware/validators.js";
+import { validateRegisterBatch, validateTokenizeBatch, validateVerifyBatch, normalizeDate } from "../middleware/validators.js";
+
+// Suppress unused import warning for fetchHCSMessage (used for future HCS message retrieval)
+void fetchHCSMessage;
 
 const router = express.Router();
 
@@ -98,23 +104,47 @@ router.get("/dashboard-health", requireAuth, async (_req, res) => {
   res.status(ok ? 200 : 503).json({ ok, status, timestamp: new Date().toISOString() });
 });
 
+
+
 router.post("/register-batch", requireAuth, strictLimiter, validateRegisterBatch, async (req, res) => {
   try {
     const { batchName, location, photoUrl } = req.body;
-    if (!batchName || !location || !photoUrl) {
-      return res.status(400).json({ error: "Missing required fields: batchName, location, photoUrl" });
-    }
-    let aiAnalysis = null;
-    try {
-      const geminiResult = await analyzeImage(photoUrl);
-      if (!geminiResult.error) {
-        aiAnalysis = { caption: geminiResult.caption, anomalies: geminiResult.anomalies, confidence: geminiResult.confidence, tags: geminiResult.tags, generatedAt: new Date().toISOString(), ms: geminiResult.ms };
+
+    const productType = req.body.productType || batchName;
+    const quantity = String(req.body.quantity || '0');
+    const harvestDateRaw = req.body.harvestDate || new Date().toISOString().split('T')[0];
+    const harvestDate = normalizeDate(harvestDateRaw);
+
+    // AI batch metadata analysis using Gemini Flash Lite (optional, non-blocking)
+    // If pre-computed AI verification is passed from frontend, use it. Otherwise call Gemini.
+    let aiAnalysis = req.body.aiVerification || null;
+    if (!aiAnalysis) {
+      try {
+        const geminiResult = await analyzeBatch({
+          productType,
+          quantity,
+          location,
+          harvestDate,
+        });
+        if (!geminiResult.error) {
+          aiAnalysis = { caption: geminiResult.caption, anomalies: geminiResult.anomalies, confidence: geminiResult.confidence, tags: geminiResult.tags, generatedAt: new Date().toISOString(), ms: geminiResult.ms };
+        }
+      } catch (error) {
+        console.warn("AI batch analysis failed, continuing without it:", error.message);
       }
-    } catch (error) {
-      console.warn("AI analysis failed, continuing without it:", error.message);
     }
     const hcsResult = await submitBatchData({ batchName, location, photoUrl, aiAnalysis });
-    const batchRecord = await insertBatch({ batch_name: batchName, location, photo_url: photoUrl, hcs_tx_id: hcsResult.transactionId, ai_analysis: aiAnalysis });
+    const batchRecord = await insertBatch({
+      batch_name: batchName,
+      location,
+      photo_url: photoUrl,
+      hcs_tx_id: hcsResult.transactionId,
+      ai_analysis: aiAnalysis,
+      farmer_id: req.user?.id || null,
+      product_type: productType,
+      quantity: quantity,
+      harvest_date: harvestDate
+    });
     res.json({ success: true, hcsTransactionId: hcsResult.transactionId, batchId: batchRecord.id, ai_analysis: aiAnalysis, message: "Batch registered successfully on Hedera HCS" });
   } catch (error) {
     console.error("Register batch error:", error);
@@ -201,6 +231,7 @@ router.post("/tokenize-batch", requireAuth, strictLimiter, validateTokenizeBatch
     }
 
     const tokenRecord = await insertToken({ token_id: nftResult.tokenId, serial_number: nftResult.serialNumber, hcs_tx_ids: hcsTransactionIds });
+    void tokenRecord; // suppress unused warning
     
     if (aiSummary) {
       await upsertVerification({ token_id: nftResult.tokenId, serial_number: nftResult.serialNumber, trace: { ai: aiSummary, hcsTimeline } });
@@ -348,7 +379,9 @@ router.get("/batches/:batchId", async (req, res) => {
       let aiSummary = null;
       if (batch.ai_provenance_summary) {
         try {
-          aiSummary = JSON.parse(batch.ai_provenance_summary);
+          aiSummary = typeof batch.ai_provenance_summary === "string"
+            ? JSON.parse(batch.ai_provenance_summary)
+            : batch.ai_provenance_summary;
         } catch {
           aiSummary = { summary_en: batch.ai_provenance_summary, summary_fr: batch.ai_provenance_summary, trustScore: 70, trustExplanation: "Restored from batch provenance" };
         }

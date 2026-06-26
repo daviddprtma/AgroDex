@@ -22,9 +22,7 @@ export function normalizeDate(input: string): string {
 
     // Validate ranges to reject ambiguous US format (MM-DD-YYYY)
     if (dayNum < 1 || dayNum > 31) {
-      throw new Error(
-        `Invalid date format: Invalid day: ${dd}. Expected DD-MM-YYYY or YYYY-MM-DD`,
-      );
+      throw new Error(`Invalid date format: Invalid day: ${dd}. Expected DD-MM-YYYY or YYYY-MM-DD`);
     }
 
     if (monthNum < 1 || monthNum > 12) {
@@ -48,6 +46,46 @@ export interface RegisterBatchRequest {
   location: string;
   imageData: string;
   harvestDate: string;
+  aiVerification?: unknown;
+}
+
+export interface VerifyRegistrationRequest {
+  productName: string;
+  harvestBatch: string;
+  quantity: string;
+  unit: string;
+  location: string;
+  harvestDate: string;
+  metadata?: string;
+}
+
+export interface VerifyRegistrationResponse {
+  ok: boolean;
+  data: {
+    productSummary: string;
+    verificationSummary: {
+      quantity: string;
+      harvestBatch: string;
+      location: string;
+      harvestDate: string;
+    };
+    warnings: string[];
+    consistencyChecks: string[];
+    cooperativeReadiness: {
+      status: string;
+      notes: string[];
+    };
+    statistics: {
+      batchNumber: string;
+      quantity: string;
+      location: string;
+      harvestDate: string;
+    };
+    fallback?: boolean;
+    warningMessage?: string;
+    ms?: number;
+    error?: string;
+  };
 }
 
 export interface RegisterBatchResponse {
@@ -205,6 +243,129 @@ export const registerBatch = async (
   }
 
   return result;
+};
+
+export function generateLocalFallbackVerification(data: VerifyRegistrationRequest) {
+  const { productName, harvestBatch, quantity, unit, location, harvestDate } = data;
+  const cleanQty = quantity ? String(quantity).trim() : '';
+  const cleanUnit = unit ? String(unit).trim() : '';
+  const qtyStr = cleanQty ? `${cleanQty} ${cleanUnit}` : '';
+  
+  const productSummary = `You are about to register ${qtyStr || 'an unspecified quantity of'} ${productName || 'product'} from ${location || 'an unspecified location'} under Harvest Batch ${harvestBatch || 'N/A'} harvested on ${harvestDate || 'an unspecified date'}.`;
+  
+  const warnings: string[] = [];
+  const consistencyChecks: string[] = [];
+  const notes: string[] = [];
+  
+  if (!productName || productName.trim().length < 3) {
+    warnings.push("Product name is missing or too short");
+    notes.push("Product name verification failed");
+  } else {
+    notes.push("Product name verified locally");
+  }
+
+  if (!harvestBatch || harvestBatch.trim() === '') {
+    warnings.push("Harvest batch not specified");
+    notes.push("Harvest batch missing");
+  } else {
+    notes.push("Harvest batch info complete");
+  }
+
+  if (!cleanQty) {
+    warnings.push("Quantity not specified");
+    notes.push("Quantity verification failed");
+  } else {
+    const parsedQty = parseFloat(cleanQty);
+    if (isNaN(parsedQty) || parsedQty <= 0) {
+      warnings.push("Quantity must be a positive number");
+      notes.push("Quantity invalid");
+    } else if (parsedQty > 1000000) {
+      consistencyChecks.push("Quantity appears unusually large");
+      notes.push("Quantity is unusually large");
+    } else {
+      notes.push("Quantity verified");
+    }
+  }
+
+  if (!location || location.trim().length < 3) {
+    warnings.push("Harvest location missing or too vague");
+    notes.push("Location verification failed");
+  } else {
+    notes.push("Location provided");
+  }
+
+  if (!harvestDate) {
+    warnings.push("Harvest date not specified");
+    notes.push("Harvest date missing");
+  } else {
+    try {
+      const todayISO = new Date().toISOString().split('T')[0];
+      if (harvestDate > todayISO) {
+        consistencyChecks.push("Future harvest date detected");
+        notes.push("Harvest date is in the future");
+      } else {
+        notes.push("Harvest date verified");
+      }
+    } catch {
+      notes.push("Harvest date checked");
+    }
+  }
+
+  const status = warnings.length > 0 || consistencyChecks.length > 0 ? "Review Required" : "Ready";
+
+  return {
+    productSummary,
+    verificationSummary: {
+      quantity: cleanQty ? `Provided: ${qtyStr}` : "Quantity not specified",
+      harvestBatch: harvestBatch ? `Provided: ${harvestBatch}` : "Harvest batch not specified",
+      location: location ? `Provided: ${location}` : "Location not specified",
+      harvestDate: harvestDate ? `Provided: ${harvestDate}` : "Harvest date not specified"
+    },
+    warnings,
+    consistencyChecks,
+    cooperativeReadiness: {
+      status,
+      notes
+    },
+    statistics: {
+      batchNumber: harvestBatch || "N/A",
+      quantity: qtyStr || "N/A",
+      location: location || "N/A",
+      harvestDate: harvestDate || "N/A"
+    },
+    fallback: true,
+    warningMessage: "AI verification unavailable. Manual review recommended."
+  };
+}
+
+export const verifyRegistration = async (
+  data: VerifyRegistrationRequest,
+): Promise<VerifyRegistrationResponse> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/ai/verify-registration`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("Response was not JSON");
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.warn("Express AI verification unavailable, falling back to local verification:", error);
+    return {
+      ok: true,
+      data: generateLocalFallbackVerification(data)
+    };
+  }
 };
 
 export const tokenizeBatch = async (
@@ -519,6 +680,12 @@ export const getFraudByBatch = async (
   try { payload = await response.json(); } catch { /* ignore */ }
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Authentication session is missing or has expired. Please log in again.");
+    }
+    if (response.status === 429) {
+      throw new Error("Too many requests. Please slow down and try again later.");
+    }
     throw new Error(payload?.error ?? `getFraudByBatch failed: HTTP ${response.status}`);
   }
   return payload!;
@@ -543,6 +710,12 @@ export const getFraudByFarmer = async (
   try { payload = await response.json(); } catch { /* ignore */ }
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Authentication session is missing or has expired. Please log in again.");
+    }
+    if (response.status === 429) {
+      throw new Error("Too many requests. Please slow down and try again later.");
+    }
     throw new Error(payload?.error ?? `getFraudByFarmer failed: HTTP ${response.status}`);
   }
   return payload;
@@ -564,7 +737,160 @@ export const getFraudOverview = async (): Promise<{ ok: boolean; data: FraudOver
   try { payload = await response.json(); } catch { /* ignore */ }
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Authentication session is missing or has expired. Please log in again.");
+    }
+    if (response.status === 429) {
+      throw new Error("Too many requests. Please slow down and try again later.");
+    }
     throw new Error(payload?.error ?? `getFraudOverview failed: HTTP ${response.status}`);
   }
   return payload;
 };
+
+export interface AuditLogEntry {
+  token_id: string;
+  serial_number: string;
+  score: number;
+  trustExplanation: string | null;
+  rationale: string;
+  verified_at: string;
+  status: "approved" | "flagged";
+}
+
+export interface AuditLogsPagination {
+  totalRecords: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+}
+
+export interface AuditLogsResponse {
+  ok: boolean;
+  data: AuditLogEntry[];
+  pagination: AuditLogsPagination;
+}
+
+export const getAuditLogs = async (params: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: string;
+  status?: string;
+  search?: string;
+}): Promise<AuditLogsResponse> => {
+  const { page = 1, limit = 10, sortBy = "created_at", sortOrder = "desc", status = "all", search = "" } = params;
+  
+  const headers = await buildAuthHeaders();
+  
+  const query = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    sortBy,
+    sortOrder,
+    status,
+    search,
+  }).toString();
+
+  const { data: result, error } = await supabase.functions.invoke(
+    `audit-logs?${query}`,
+    {
+      method: "GET",
+      headers,
+    }
+  );
+
+  if (error) {
+    throw new Error(error.message || "Failed to fetch audit logs");
+  }
+
+  return result as AuditLogsResponse;
+};
+
+
+/**
+ * Hard-deletes the authenticated user's account via the backend.
+ *
+ * CRITICAL — call order matters:
+ * This MUST run before signOut(). The backend authenticates via the
+ * session's access_token. Once signOut() runs the token is gone → 401.
+ *
+ * Requirements: 2.1
+ */
+export const deleteAccount = async (): Promise<{ ok: boolean; message: string }> => {
+  const headers = await buildAuthHeaders();
+
+  if (!headers['Authorization']) {
+    throw new Error('No active session');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let payload: any = null;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/account`, {
+      method: 'DELETE',
+      headers,
+    });
+
+    try { payload = await response.json(); } catch { /* ignore */ }
+
+    if (!response.ok) {
+      throw new Error(
+        payload?.error ||
+        payload?.message ||
+        `deleteAccount failed: HTTP ${response.status}`
+      );
+    }
+
+    return payload;
+  } catch (err) {
+    if (err instanceof Error) throw err;
+    throw new Error('deleteAccount failed: network error');
+  }
+};
+
+/**
+ * Updates the authenticated user's profile details (username/email) via the backend.
+ */
+export const updateProfile = async (
+  data: { username?: string; email?: string }
+): Promise<{ ok: boolean; message: string; profile: any }> => {
+  const headers = await buildAuthHeaders();
+  headers["Content-Type"] = "application/json";
+
+  if (!headers["Authorization"]) {
+    throw new Error("No active session");
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let payload: any = null;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/account`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(data),
+    });
+
+    try {
+      payload = await response.json();
+    } catch {
+      // ignore
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        payload?.error ||
+        payload?.message ||
+        `updateProfile failed: HTTP ${response.status}`
+      );
+    }
+
+    return payload;
+  } catch (err) {
+    if (err instanceof Error) throw err;
+    throw new Error("updateProfile failed: network error");
+  }
+};
+

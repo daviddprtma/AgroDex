@@ -11,7 +11,7 @@
 
 import express from 'express';
 import { optionalAuth, requireAuth } from '../middleware/auth.js';
-import { generalLimiter } from '../middleware/rateLimiter.js';
+import { fraudLimiter } from '../middleware/rateLimiter.js';
 import {
   analyzeBatchFraud,
   getFarmerFraudScores,
@@ -21,8 +21,8 @@ import { getRegionalAnalytics } from '../services/regional-analyzer.service.js';
 
 const router = express.Router();
 
-// Apply general rate limiting to all fraud routes
-router.use(generalLimiter);
+// Apply fraud rate limiting to all fraud routes
+router.use(fraudLimiter);
 
 /**
  * GET /api/fraud/batch/:batchId

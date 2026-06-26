@@ -2,6 +2,7 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig } from "vitest/config";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
+import { VitePWA } from 'vite-plugin-pwa';
 import componentTagger from "./plugins/component-tagger";
 
 export default defineConfig({
@@ -9,6 +10,31 @@ export default defineConfig({
     react(),
     componentTagger(),
     nodePolyfills(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      devOptions: { enabled: true },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 10000000, // Set to 10 MB
+      },
+      manifest: {
+        name: 'AgroDex',
+        short_name: 'AgroDex',
+        description: 'Securing Indonesia with Real-time Food Auditing',
+        theme_color: '#ffffff',
+        icons: [
+          {
+            src: '/favicon.ico',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/favicon.ico',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    }),
   ],
   resolve: {
     alias: {
@@ -16,25 +42,10 @@ export default defineConfig({
     },
   },
   build: {
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (
-              id.includes("@hashgraph") ||
-              id.includes("hashconnect") ||
-              id.includes("@walletconnect")
-            ) {
-              return "vendor-hedera";
-            }
-            if (id.includes("recharts")) {
-              return "vendor-charts";
-            }
-            if (id.includes("framer-motion")) {
-              return "vendor-motion";
-            }
-          }
-        },
+        manualChunks: undefined,
       },
     },
   },
@@ -42,6 +53,7 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: "./src/lib/__tests__/setup.ts",
+    exclude: ["**/node_modules/**", "backend/**", "e2e/**"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

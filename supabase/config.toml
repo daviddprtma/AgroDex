@@ -1,5 +1,5 @@
 
-project_id = "mrbfrwtymikayrbrzgmp"
+project_id = "udnpbqtvbnepicwyubnm"
 
 # Edge Functions Configuration
 # verify_jwt controls whether functions require user authentication
@@ -20,6 +20,10 @@ verify_jwt = false
 # Set to false to allow public verification without authentication
 [functions.verify-batch]
 verify_jwt = false
+
+# Audit Logs - Authenticated access only
+[functions.audit-logs]
+verify_jwt = true
 
 # Note: Even with verify_jwt = false, the apikey header is ALWAYS required
 # verify_jwt = true requires BOTH apikey AND Authorization: Bearer <user_access_token>

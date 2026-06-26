@@ -1,17 +1,21 @@
 /**
  * =============================================================================
- * Login Page — Email + HashPack Wallet Authentication
+ * Login Page — Email + HashPack Wallet + MetaMask Wallet Authentication
  * =============================================================================
  *
- * Supports two login methods:
+ * Supports three login methods:
  *  1. Email/Password via Supabase (existing, unchanged)
- *  2. HashPack Wallet via HashConnect v3 (updated from old WalletConnect)
+ *  2. HashPack Wallet via HashConnect v3 (existing)
+ *  3. MetaMask Wallet via Supabase Web3 Auth (EIP-4361)
  *
- * The wallet tab now uses the new WalletButton component with HashConnect v3.
+ * The wallet tab now shows both HashPack and MetaMask options.
  */
 
+
+
+
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWallet } from "@/hooks/useWallet";
@@ -29,8 +33,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Mail, Lock, Shield, Sparkles, Globe, CheckCircle } from "lucide-react";
+import { AlertCircle, Mail, Lock, Shield, Sparkles, Globe, CheckCircle, Eye, EyeOff } from "lucide-react";
 import WalletButton from "@/components/WalletButton";
+import MetaMaskButton from "@/components/MetaMaskButton";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import logoUrl from "@/assets/agritrust-logo.png";
@@ -38,6 +44,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, loading } = useAuth();
   const { isConnected } = useWallet();
   const [authError, setAuthError] = useState<string | null>(null);
@@ -46,12 +53,26 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
+  const [deletionMessage, setDeletionMessage] = useState<string | null>(null);
   const { t } = useTranslation();
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  
+  // Check for deletion success message from navigation state
+  useEffect(() => {
+    const message = location.state?.message;
+    if (message) {
+      setDeletionMessage(message);
+      // Clear the message from history to prevent it showing on refresh/back navigation
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // Auto-redirect if authenticated via either method
   useEffect(() => {
     if (!loading && (user || isConnected)) {
-      navigate("/");
+      navigate("/dashboard");
     }
   }, [user, loading, isConnected, navigate]);
 
@@ -78,7 +99,7 @@ export default function Login() {
           setAuthSuccess("Please check your email and verify your account before signing in.");
           setIsSignUp(false);
         } else {
-          navigate("/");
+          navigate("/dashboard");
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -86,7 +107,7 @@ export default function Login() {
           password,
         });
         if (error) throw error;
-        navigate("/");
+        navigate("/dashboard");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -195,7 +216,7 @@ export default function Login() {
                 <Sparkles className="h-7 w-7 text-blue-200" />
               </div>
               <div className="text-sm text-blue-100 font-semibold">
-                Gemini AI 2.5
+                Gemini 3.1 Flash Lite
               </div>
             </motion.div>
 
@@ -260,6 +281,22 @@ export default function Login() {
               </p>
             </motion.div>
           </div>
+
+          {/* Account Deletion Success Message */}
+          {deletionMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6"
+            >
+              <Alert className="border-2 border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl">
+                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                <AlertDescription className="font-body text-base ml-2 text-emerald-700 dark:text-emerald-300">
+                  {deletionMessage}
+                </AlertDescription>
+              </Alert>
+            </motion.div>
+          )}
 
           <Tabs defaultValue="email" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100 dark:bg-slate-800 p-1 rounded-xl">
@@ -328,13 +365,21 @@ export default function Login() {
                           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                           <Input
                             id="password"
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="pl-12 h-14 border-2 border-gray-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white rounded-xl font-body text-base focus:border-emerald-500 focus:ring-emerald-500 transition-colors"
+                            className="pl-12 pr-12 h-14 border-2 border-gray-200 dark:border-slate-700 dark:bg-slate-950 dark:text-white rounded-xl font-body text-base focus:border-emerald-500 focus:ring-emerald-500 transition-colors"
                             required
                           />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                          >
+                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                          </button>
                         </div>
                       </div>
 
@@ -410,24 +455,54 @@ export default function Login() {
               </motion.div>
             </TabsContent>
 
-            {/* ===== WALLET TAB (updated: uses new WalletButton with HashConnect v3) ===== */}
+            {/* ===== WALLET TAB (HashPack + MetaMask) ===== */}
             <TabsContent value="wallet">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
+                className="space-y-4"
               >
+                {/* MetaMask Option */}
                 <Card className="border-2 border-gray-200 dark:border-slate-800 dark:bg-slate-900 shadow-2xl rounded-2xl overflow-hidden">
-                  <CardHeader className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 pb-8">
-                    <CardTitle className="text-3xl font-extrabold text-gray-900 dark:text-white">
-                      Wallet Login
+                  <CardHeader className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 pb-6">
+                    <CardTitle className="text-2xl font-extrabold text-gray-900 dark:text-white">
+                      MetaMask
                     </CardTitle>
                     <CardDescription className="font-body text-base text-gray-600 dark:text-slate-400">
-                      Connect your HashPack wallet to continue
+                      Connect with your MetaMask wallet (Hedera EVM)
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="pt-8">
-                    {/* New WalletButton replaces the old WalletLogin component */}
+                  <CardContent>
+                    <ErrorBoundary>
+                      <MetaMaskButton />
+                    </ErrorBoundary>
+                  </CardContent>
+                </Card>
+
+                {/* Divider */}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-200 dark:border-slate-700"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-white dark:bg-slate-900 px-2 text-gray-500 dark:text-slate-400 font-semibold">
+                      OR
+                    </span>
+                  </div>
+                </div>
+
+                {/* HashPack Option */}
+                <Card className="border-2 border-gray-200 dark:border-slate-800 dark:bg-slate-900 shadow-2xl rounded-2xl overflow-hidden">
+                  <CardHeader className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 pb-6">
+                    <CardTitle className="text-2xl font-extrabold text-gray-900 dark:text-white">
+                      HashPack
+                    </CardTitle>
+                    <CardDescription className="font-body text-base text-gray-600 dark:text-slate-400">
+                      Connect with your HashPack wallet (Hedera native)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
                     <WalletButton />
                   </CardContent>
                 </Card>
