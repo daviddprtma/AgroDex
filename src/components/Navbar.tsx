@@ -19,6 +19,7 @@ import {
   LogOut,
   Menu,
   BarChart3,
+  BrainCircuit,
   Wallet,
   Info,
 } from "lucide-react";
@@ -51,6 +52,7 @@ export default function Navbar() {
 
   const navLinks = [
     { to: "/dashboard", label: t('nav.dashboard'), icon: BarChart3 },
+    { to: "/risk-intelligence", label: "Risk AI", icon: BrainCircuit },
     { to: "/register", label: t('nav.register'), icon: FileText },
     { to: "/tokenize", label: t('nav.tokenize'), icon: Coins },
     { to: "/verify", label: t('nav.verify'), icon: ShieldCheck },
