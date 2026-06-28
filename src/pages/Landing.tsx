@@ -9,7 +9,7 @@ import {
 import logoUrl from "@/assets/agritrust-logo.png";
 import { Github, Mail, Globe, ExternalLink } from "lucide-react";
 import heroImage from "@/assets/Petani_padi.jpg";
-import { motion } from "framer-motion";
+
 
 export default function Landing() {
     const [isBottom, setIsBottom] = useState(false);
