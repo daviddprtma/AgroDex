@@ -26,14 +26,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const metaMaskAddress = user?.user_metadata?.address || user?.user_metadata?.sub || undefined;
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -54,7 +52,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error("Caught error during sign out:", err);
     } finally {
-      // Always forcefully clear local storage tokens to prevent getting stuck
       if (typeof window !== "undefined") {
         for (let i = localStorage.length - 1; i >= 0; i--) {
           const key = localStorage.key(i);
@@ -63,7 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
       }
-      // Forcefully update local React state
       setSession(null);
       setUser(null);
     }

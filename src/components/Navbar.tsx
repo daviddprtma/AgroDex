@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWallet } from "@/hooks/useWallet";
+import { useCoreWallet } from "@/hooks/useCoreWallet";
 import { useState } from "react";
 import { useServiceStatus } from "@/hooks/useServiceStatus";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -32,7 +33,9 @@ import logoUrl from "@/assets/agritrust-logo.png";
 export default function Navbar() {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
-  const { accountId, isConnected, network, disconnect } = useWallet();
+  const { accountId, isConnected: isHPConnected, network, disconnect: hpDisconnect } = useWallet();
+  const { address: coreAddress, isConnected: isCoreConnected, disconnect: coreDisconnect } = useCoreWallet();
+  const isConnected = isHPConnected || isCoreConnected;
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isPublicJourney = location.pathname.startsWith("/journey");
@@ -63,10 +66,11 @@ export default function Navbar() {
 
   const accountLabel = user ? "Account" : isConnected ? "Wallet" : "User";
 
-  // Handle logout: sign out from Supabase AND disconnect wallet
+  // Handle logout: sign out from Supabase AND disconnect wallets
   const handleLogout = async () => {
     if (user) await signOut();
-    if (isConnected) await disconnect();
+    if (isHPConnected) await hpDisconnect();
+    if (isCoreConnected) await coreDisconnect();
   };
 
   return (
@@ -113,7 +117,7 @@ export default function Navbar() {
           {/* Desktop User Menu */}
           <div className="hidden lg:flex items-center gap-3">
             {/* Wallet indicator (shown when connected via wallet) */}
-            {isConnected && accountId && (
+            {isHPConnected && accountId && (
               <div className="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-950/30 px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800/50">
                 <Wallet className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                 <span className="text-xs font-mono text-blue-700 dark:text-blue-300">
@@ -125,6 +129,14 @@ export default function Navbar() {
                   }`}
                   title={network}
                 />
+              </div>
+            )}
+            {isCoreConnected && coreAddress && (
+              <div className="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-950/30 px-3 py-1.5 rounded-lg border border-purple-200 dark:border-purple-800/50">
+                <Wallet className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+                <span className="text-xs font-mono text-purple-700 dark:text-purple-300 truncate max-w-[100px]">
+                  {coreAddress.slice(0, 6)}...{coreAddress.slice(-4)}
+                </span>
               </div>
             )}
             <LanguageSelector />
@@ -180,7 +192,7 @@ export default function Navbar() {
                   </div>
 
                   {/* Wallet info (mobile) */}
-                  {isConnected && accountId && (
+                  {isHPConnected && accountId && (
                     <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-950/30 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-800/50">
                       <Wallet className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       <span className="text-xs font-mono text-blue-700 dark:text-blue-300 truncate">
@@ -194,6 +206,14 @@ export default function Navbar() {
                         }`}
                       >
                         {network}
+                      </span>
+                    </div>
+                  )}
+                  {isCoreConnected && coreAddress && (
+                    <div className="flex items-center gap-2 bg-purple-50 dark:bg-purple-950/30 px-4 py-2 rounded-lg border border-purple-200 dark:border-purple-800/50">
+                      <Wallet className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      <span className="text-xs font-mono text-purple-700 dark:text-purple-300 truncate">
+                        {coreAddress.slice(0, 6)}...{coreAddress.slice(-4)}
                       </span>
                     </div>
                   )}
