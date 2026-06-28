@@ -12,7 +12,7 @@ export default defineConfig({
     nodePolyfills(),
     VitePWA({
       registerType: 'autoUpdate',
-      devOptions: { enabled: true },
+      devOptions: { enabled: false },
       workbox: {
         maximumFileSizeToCacheInBytes: 10000000, // Set to 10 MB
       },

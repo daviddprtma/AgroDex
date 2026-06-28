@@ -64,7 +64,7 @@ const App = () => (
                     <Route path="/verify/:tokenId/:serialNumber" element={<BatchVerify />} />
                     <Route path="/demo" element={<Navigate to={DEMO_VERIFY_URL} replace />} />
                     <Route path="/test-hedera" element={<ProtectedRoute><TestHedera /></ProtectedRoute>} />
-                    <Route path="/risk-intelligence" element={<ProtectedRoute><RiskIntelligence /></ProtectedRoute>} />
+                    <Route path="/risk-intelligence" element={<RiskIntelligence />} />
                     <Route path="/journey/:batchId" element={<BatchJourney />} />
                   </Routes>
                   <ChatbotWidget />
