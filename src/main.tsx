@@ -21,6 +21,22 @@ const AppWithErrorOverlay = withErrorOverlay(App);
 //   });
 // }
 
+if ("serviceWorker" in navigator && import.meta.env.DEV) {
+  navigator.serviceWorker
+    .getRegistrations()
+    .then((registrations) =>
+      Promise.all(registrations.map((registration) => registration.unregister())),
+    )
+    .catch(() => undefined);
+}
+
+if ("caches" in window && import.meta.env.DEV) {
+  caches
+    .keys()
+    .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+    .catch(() => undefined);
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppWithErrorOverlay />

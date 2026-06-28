@@ -19,6 +19,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWallet } from "@/hooks/useWallet";
+import { useCoreWallet } from "@/hooks/useCoreWallet";
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import {
@@ -37,6 +38,7 @@ import { AlertCircle, Mail, Lock, Shield, Sparkles, Globe, CheckCircle, Eye, Eye
 import WalletButton from "@/components/WalletButton";
 import MetaMaskButton from "@/components/MetaMaskButton";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import CoreWalletButton from "@/components/CoreWalletButton";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import logoUrl from "@/assets/agritrust-logo.png";
@@ -46,7 +48,9 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, loading } = useAuth();
-  const { isConnected } = useWallet();
+  const { isConnected: isHashPackConnected } = useWallet();
+  const { isConnected: isCoreConnected } = useCoreWallet();
+  const isConnected = isHashPackConnected || isCoreConnected;
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
@@ -109,7 +113,6 @@ export default function Login() {
         if (error) throw error;
         navigate("/dashboard");
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setAuthError(error.message || "Authentication failed");
     } finally {
@@ -455,13 +458,13 @@ export default function Login() {
               </motion.div>
             </TabsContent>
 
-            {/* ===== WALLET TAB (HashPack + MetaMask) ===== */}
+            {/* ===== WALLET TAB (HashPack + MetaMask + Core) ===== */}
             <TabsContent value="wallet">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="space-y-4"
+                className="space-y-6"
               >
                 {/* MetaMask Option */}
                 <Card className="border-2 border-gray-200 dark:border-slate-800 dark:bg-slate-900 shadow-2xl rounded-2xl overflow-hidden">
@@ -504,6 +507,33 @@ export default function Login() {
                   </CardHeader>
                   <CardContent>
                     <WalletButton />
+                  </CardContent>
+                </Card>
+
+                {/* Divider */}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-200 dark:border-slate-700"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-white dark:bg-slate-900 px-2 text-gray-500 dark:text-slate-400 font-semibold">
+                      OR
+                    </span>
+                  </div>
+                </div>
+
+                {/* Core Option */}
+                <Card className="border-2 border-gray-200 dark:border-slate-800 dark:bg-slate-900 shadow-2xl rounded-2xl overflow-hidden">
+                  <CardHeader className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 pb-6">
+                    <CardTitle className="text-2xl font-extrabold text-gray-900 dark:text-white">
+                      Core
+                    </CardTitle>
+                    <CardDescription className="font-body text-base text-gray-600 dark:text-slate-400">
+                      Connect with your Core wallet (Hedera EVM)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <CoreWalletButton />
                   </CardContent>
                 </Card>
               </motion.div>
