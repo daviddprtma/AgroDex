@@ -13,20 +13,19 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWallet } from '@/hooks/useWallet';
+import { useCoreWallet } from '@/hooks/useCoreWallet';
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
-  const { isConnected, isInitialized } = useWallet();
+  const { isConnected: isHashPackConnected, isInitialized } = useWallet();
+  const { isConnected: isCoreConnected } = useCoreWallet();
 
-  // If Supabase auth has resolved and user is already logged in via email,
-  // don't block on wallet initialization at all.
+  const isConnected = isHashPackConnected || isCoreConnected;
+
   if (!authLoading && user) {
     return <>{children}</>;
   }
 
-  // Wait while either auth system is still initializing.
-  // Wallet init is capped at 8 seconds by the service layer, so this
-  // will never hang the app indefinitely.
   if (authLoading || !isInitialized) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -38,7 +37,6 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     );
   }
 
-  // Both auth systems have resolved — check if either is authenticated
   if (!user && !isConnected) {
     return <Navigate to="/login" replace />;
   }

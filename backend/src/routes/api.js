@@ -20,7 +20,7 @@ void fetchHCSMessage;
 
 const router = express.Router();
 
-router.get("/dashboard-stats", requireAuth, async (_req, res) => {
+router.get("/dashboard-stats", optionalAuth, async (_req, res) => {
   try {
     const [batchCountResult, tokenCountResult, verificationCountResult, aiVerifiedCountResult, approvedLotsResult, flaggedLotsResult] = await Promise.all([
       supabase.from("batches").select("*", { head: true, count: "exact" }),
