@@ -2,22 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/map_screen.dart';
 
-// PLACEHOLDER CREDENTIALS - to be replaced once provided by maintainer
-const supabaseUrl = 'https://your-project-id.supabase.co';
-const supabaseAnonKey = 'your-anon-key';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
-  );
+  try {
+    await dotenv.load(fileName: ".env");
+    final supabaseUrl = dotenv.env['SUPABASE_URL'];
+    final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+    
+    if (supabaseUrl != null && supabaseAnonKey != null) {
+      await Supabase.initialize(
+        url: supabaseUrl,
+        anonKey: supabaseAnonKey,
+      );
+    } else {
+      debugPrint('Missing Supabase credentials in .env');
+    }
+  } catch (e) {
+    debugPrint('Supabase init failed: $e');
+  }
 
   runApp(const AgroDexMobileApp());
 }
