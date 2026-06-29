@@ -7,6 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/map_screen.dart';
+import 'screens/batches_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +46,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/map',
       builder: (context, state) => const MapScreen(),
+    ),
+    GoRoute(
+      path: '/batches',
+      builder: (context, state) => const BatchesScreen(),
     ),
   ],
 );

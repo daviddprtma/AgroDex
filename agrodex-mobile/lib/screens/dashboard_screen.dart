@@ -48,11 +48,7 @@ class DashboardScreen extends StatelessWidget {
             context,
             icon: Icons.inventory,
             title: 'My Batches',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Batches coming soon')),
-              );
-            },
+            onTap: () => context.push('/batches'),
           ),
           _buildCard(
             context,
