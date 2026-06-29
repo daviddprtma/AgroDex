@@ -50,13 +50,13 @@ type NotFoundResult = Extract<VerifyBatchResult, { reason: "not_found" }>;
 const isNotFoundResult = (
   result: VerifyBatchResult | undefined | null,
 ): result is NotFoundResult =>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   Boolean(result && (result as any).reason === "not_found");
 
 const isVerifiedResponse = (
   result: VerifyBatchResult | undefined | null,
 ): result is VerifyBatchResponse =>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   Boolean(result && (result as any).success === true);
 
 export default function BatchVerify() {
@@ -66,7 +66,7 @@ export default function BatchVerify() {
   const [serialNumber, setSerialNumber] = useState("");
   const [question, setQuestion] = useState("");
   const [isScannerOpen, setIsScannerOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const [qaResponse, setQaResponse] = useState<any>(null);
   const [qaLoading, setQaLoading] = useState(false);
   const [language, setLanguage] = useState<"en" | "fr">("en");
@@ -243,7 +243,7 @@ export default function BatchVerify() {
       });
 
       setQaResponse(response.data.data);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
     } catch (error: any) {
       toast({
         title: "Question unavailable",
@@ -859,7 +859,7 @@ export default function BatchVerify() {
                   <AlertCircle className="h-5 w-5 text-red-600" />
                   <AlertDescription className="text-red-900 dark:text-red-300 font-semibold">
                     {" "}
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}{" "}
+                    { }{" "}
                     {(mutation.error as any)?.response?.data?.details ||
                       mutation.error.message}
                   </AlertDescription>

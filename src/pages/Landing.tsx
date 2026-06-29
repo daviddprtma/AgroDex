@@ -11,19 +11,19 @@ import { Github, Mail, Globe, ExternalLink } from "lucide-react";
 import heroImage from "@/assets/Petani_padi.jpg";
 
 
+const sections = [
+    { id: "hero", label: "Home" },
+    { id: "problem", label: "Problem" },
+    { id: "solution", label: "Solution" },
+    { id: "how", label: "Process" },
+    { id: "fraud", label: "AI Risk" },
+    { id: "impact", label: "Impact" },
+    { id: "cta", label: "Join" },
+];
+
 export default function Landing() {
     const [isBottom, setIsBottom] = useState(false);
     const [activeSection, setActiveSection] = useState("hero");
-
-    const sections = [
-        { id: "hero", label: "Home" },
-        { id: "problem", label: "Problem" },
-        { id: "solution", label: "Solution" },
-        { id: "how", label: "Process" },
-        { id: "fraud", label: "AI Risk" },
-        { id: "impact", label: "Impact" },
-        { id: "cta", label: "Join" },
-    ];
 
     /* ================= SCROLL DETECTION ================= */
     useEffect(() => {

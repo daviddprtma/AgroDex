@@ -20,7 +20,7 @@ import { updateProfile } from "@/lib/api";
 import {
   Wallet,
   Mail,
-  Link as LinkIcon,
+
   AlertCircle,
   CheckCircle,
   Clock,
@@ -283,7 +283,7 @@ export default function Profile() {
 
       if (error) throw error;
       setProfile(data);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
     } catch (err: any) {
       console.error("Error loading profile:", err);
       setError(err.message);
@@ -307,7 +307,7 @@ export default function Profile() {
       await linkHederaWallet(accountId);
       setSuccess(`Successfully linked Hedera wallet: ${accountId}`);
       await loadProfile();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
     } catch (err: any) {
       console.error("Wallet linking error:", err);
       setError(err.message || "Failed to link wallet");
@@ -340,7 +340,7 @@ export default function Profile() {
 
       setSuccess(`Successfully linked Core wallet: ${coreAddress}`);
       await loadProfile();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
     } catch (err: any) {
       console.error("Core wallet linking error:", err);
       setError(err.message || "Failed to link Core wallet");

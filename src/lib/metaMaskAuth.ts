@@ -7,7 +7,7 @@ export interface EIP6963ProviderDetail {
     icon: string;
     rdns: string;
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   provider: any;
 }
 
@@ -31,7 +31,7 @@ export const HEDERA_TESTNET_PARAMS = {
  * When multiple wallets are installed, window.ethereum may not be MetaMask's
  * provider (e.g. Core Wallet may have injected itself there instead).
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 function findMetaMaskProvider(): Promise<any> {
   return new Promise((resolve) => {
     // If window.ethereum is MetaMask's own provider, use it directly
@@ -42,7 +42,7 @@ function findMetaMaskProvider(): Promise<any> {
     }
 
     // Otherwise discover via EIP-6963
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const handler = (event: any) => {
       const p = event.detail?.provider;
       if (p?.isMetaMask) {
@@ -68,14 +68,14 @@ function findMetaMaskProvider(): Promise<any> {
  * Check if MetaMask or any EIP-1193 provider is installed
  */
 export function isMetaMaskInstalled(): boolean {
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
   return typeof window !== "undefined" && typeof (window as Record<string, any>).ethereum !== "undefined";
 }
 
 /**
  * Request network switch to Hedera Testnet
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export async function switchToHederaTestnet(provider: any = (window as Record<string, any>).ethereum): Promise<boolean> {
   if (!provider) return false;
 
@@ -133,7 +133,7 @@ export async function signInWithMetaMask(statement?: string): Promise<{ data: un
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const provider = await findMetaMaskProvider();
 
   try {
@@ -194,7 +194,7 @@ export async function signInWithMetaMask(statement?: string): Promise<{ data: un
 export function discoverWallets(callback: (providers: EIP6963ProviderDetail[]) => void): () => void {
   const providers: EIP6963ProviderDetail[] = [];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const handleAnnounce = (event: any) => {
     if (providers.some((p) => p.info.uuid === event.detail.info.uuid)) return;
     providers.push(event.detail);
