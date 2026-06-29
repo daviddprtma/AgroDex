@@ -51,7 +51,7 @@ function inIframe() {
 }
 
 function detectExtension(): boolean {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const anyWin = window as any;
   return !!(
     anyWin.hashpack ||
@@ -149,7 +149,7 @@ export const wallet = {
           });
         }
       }, 8000);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
     } catch (e: any) {
       emit({
         status: "error",

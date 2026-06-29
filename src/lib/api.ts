@@ -1,7 +1,7 @@
 import { supabase } from "./supabaseClient";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://agro-dex-nine.vercel.app";
+  import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "https://agro-dex-nine.vercel.app";
 
 /**
  * Normalize date from DD-MM-YYYY to YYYY-MM-DD (ISO date-only format)
@@ -135,10 +135,10 @@ export interface VerifyBatchResponse {
   cached: boolean;
   tokenId: string;
   serialNumber: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   nftMetadata: any;
   hcsTransactionIds: string[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   hcsMessages: any[];
   ai_summary?: {
     summary_en: string;
@@ -223,7 +223,7 @@ export const registerBatch = async (
 
   if (error) {
     // Try to extract structured error from Edge Function response
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     let serverError: any = null;
     try {
       serverError = JSON.parse(error.message);
@@ -432,7 +432,7 @@ export const verifyBatch = async (
     },
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let json: any = null;
   try {
     json = await res.json();
@@ -460,7 +460,7 @@ export const verifyBatchById = async (
     headers: { "Content-Type": "application/json" },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let json: any = null;
   try {
     json = await res.json();
@@ -511,7 +511,7 @@ export const getDashboardStats = async () => {
     headers,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let payload: any = null;
   try {
     payload = await response.json();
@@ -547,7 +547,7 @@ export const getDashboardHealth = async () => {
     headers,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let payload: any = null;
   try {
     payload = await response.json();
@@ -705,7 +705,7 @@ export const getFraudByFarmer = async (
     { method: 'GET', headers },
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let payload: any = null;
   try { payload = await response.json(); } catch { /* ignore */ }
 
@@ -732,7 +732,7 @@ export const getFraudOverview = async (): Promise<{ ok: boolean; data: FraudOver
     headers,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let payload: any = null;
   try { payload = await response.json(); } catch { /* ignore */ }
 
@@ -824,7 +824,7 @@ export const deleteAccount = async (): Promise<{ ok: boolean; message: string }>
     throw new Error('No active session');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let payload: any = null;
 
   try {
@@ -850,6 +850,96 @@ export const deleteAccount = async (): Promise<{ ok: boolean; message: string }>
   }
 };
 
+export interface ProducerTrustResponse {
+  ok: boolean;
+  data: {
+    trustScore: number;
+    hasTrustedBadge: boolean;
+    trustedThreshold: number;
+    verificationAnalytics: {
+      totalVerifications: number;
+      successfulVerifications: number;
+      failedVerifications: number;
+      successRate: number;
+    };
+    certificationHistory: Array<{
+      id: string;
+      farmer_id: string;
+      name: string;
+      issue_date: string;
+      expiry_date: string;
+      status: 'Active' | 'Expired';
+      created_at: string;
+    }>;
+    complianceSummary: {
+      averageRiskScore: number;
+      totalBatches: number;
+      safeBatchesCount: number;
+      complianceLevel: string;
+    };
+  };
+}
+
+export const getProducerTrust = async (farmerId: string): Promise<ProducerTrustResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/trust/producer/${farmerId}`, {
+    method: 'GET',
+    headers: { 'Accept': 'application/json' },
+  });
+
+   
+  let payload: any = null;
+  try { payload = await response.json(); } catch { /* ignore */ }
+
+  if (!response.ok) {
+    throw new Error(payload?.error ?? `getProducerTrust failed: HTTP ${response.status}`);
+  }
+  return payload;
+};
+
+export const addProducerCertification = async (
+  farmerId: string,
+  cert: { name: string; issue_date: string; expiry_date: string }
+): Promise<{ ok: boolean; data: any }> => {
+  const headers = await buildAuthHeaders();
+  headers['Content-Type'] = 'application/json';
+
+  const response = await fetch(`${API_BASE_URL}/api/trust/producer/${farmerId}/certifications`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(cert),
+  });
+
+   
+  let payload: any = null;
+  try { payload = await response.json(); } catch { /* ignore */ }
+
+  if (!response.ok) {
+    throw new Error(payload?.error ?? `addProducerCertification failed: HTTP ${response.status}`);
+  }
+  return payload;
+};
+
+export const deleteProducerCertification = async (
+  farmerId: string,
+  certId: string
+): Promise<{ ok: boolean }> => {
+  const headers = await buildAuthHeaders();
+
+  const response = await fetch(`${API_BASE_URL}/api/trust/producer/${farmerId}/certifications/${certId}`, {
+    method: 'DELETE',
+    headers,
+  });
+
+   
+  let payload: any = null;
+  try { payload = await response.json(); } catch { /* ignore */ }
+
+  if (!response.ok) {
+    throw new Error(payload?.error ?? `deleteProducerCertification failed: HTTP ${response.status}`);
+  }
+  return payload;
+};
+
 /**
  * Updates the authenticated user's profile details (username/email) via the backend.
  */
@@ -863,7 +953,7 @@ export const updateProfile = async (
     throw new Error("No active session");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let payload: any = null;
 
   try {

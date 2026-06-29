@@ -14,11 +14,31 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { updateProfile } from "@/lib/api";
+import {
+  Wallet,
+  Mail,
+
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Pencil,
+  Save,
+  X,
+  Globe,
+  Award,
+  ShieldCheck,
+  Plus,
+  FileText,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import { DeleteProfileModal } from "@/components/DeleteProfileModal";
-import { Pencil, Mail, Wallet, Zap, Clock } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
+import { addProducerCertification, deleteProducerCertification } from "@/lib/api";
 
 
 interface UserProfile {
@@ -41,6 +61,104 @@ export default function Profile() {
   const [linkingCore, setLinkingCore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const { toast } = useToast();
+  const [trustData, setTrustData] = useState<any>(null);
+  const [loadingTrust, setLoadingTrust] = useState(false);
+  const [trustError, setTrustError] = useState<string | null>(null);
+  
+  // States for adding a new certification
+  const [certName, setCertName] = useState("");
+  const [certIssueDate, setCertIssueDate] = useState("");
+  const [certExpiryDate, setCertExpiryDate] = useState("");
+  const [addingCert, setAddingCert] = useState(false);
+  const [certError, setCertError] = useState<string | null>(null);
+
+  const loadTrustData = async (producerId: string) => {
+    if (!producerId) return;
+    setLoadingTrust(true);
+    setTrustError(null);
+    try {
+      const API = import.meta.env.VITE_API_URL || "http://localhost:4000";
+      const response = await fetch(`${API}/api/trust/producer/${producerId}`);
+      if (response.status === 404) {
+        setTrustError("No trust data available");
+        setTrustData(null);
+        return;
+      }
+      if (response.status === 503) {
+        setTrustError("Server unavailable");
+        setTrustData(null);
+        return;
+      }
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      setTrustData(data);
+    } catch (err: any) {
+      console.error("Error loading trust score details:", err);
+      setTrustError("No trust data available");
+      setTrustData(null);
+    } finally {
+      setLoadingTrust(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      loadTrustData(user.id);
+    }
+  }, [user]);
+
+  const handleAddCertification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    setCertError(null);
+    setAddingCert(true);
+
+    try {
+      const res = await addProducerCertification(user.id, {
+        name: certName,
+        issue_date: certIssueDate,
+        expiry_date: certExpiryDate
+      });
+
+      if (res.ok) {
+        setCertName("");
+        setCertIssueDate("");
+        setCertExpiryDate("");
+        toast({
+          title: "Certification added",
+          description: "Your certification has been added successfully."
+        });
+        await loadTrustData(user.id);
+      }
+    } catch (err: any) {
+      setCertError(err.message || "Failed to add certification");
+    } finally {
+      setAddingCert(false);
+    }
+  };
+
+  const onDeleteCertification = async (certId: string) => {
+    if (!user) return;
+    try {
+      const res = await deleteProducerCertification(user.id, certId);
+      if (res.ok) {
+        toast({
+          title: "Certification deleted",
+          description: "Certification removed successfully."
+        });
+        await loadTrustData(user.id);
+      }
+    } catch (err: any) {
+      toast({
+        title: "Delete failed",
+        description: err.message,
+        variant: "destructive"
+      });
+    }
+  };
 
   const [isEditing, setIsEditing] = useState(false);
   const [editUsername, setEditUsername] = useState("");
@@ -165,7 +283,7 @@ export default function Profile() {
 
       if (error) throw error;
       setProfile(data);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
     } catch (err: any) {
       console.error("Error loading profile:", err);
       setError(err.message);
@@ -189,7 +307,7 @@ export default function Profile() {
       await linkHederaWallet(accountId);
       setSuccess(`Successfully linked Hedera wallet: ${accountId}`);
       await loadProfile();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
     } catch (err: any) {
       console.error("Wallet linking error:", err);
       setError(err.message || "Failed to link wallet");
@@ -222,7 +340,7 @@ export default function Profile() {
 
       setSuccess(`Successfully linked Core wallet: ${coreAddress}`);
       await loadProfile();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
     } catch (err: any) {
       console.error("Core wallet linking error:", err);
       setError(err.message || "Failed to link Core wallet");
@@ -567,6 +685,173 @@ export default function Profile() {
               </div>
 
             </div> {/* Closes space-y-4 */}
+          </CardContent>
+        </Card>
+
+        {/* Trust Dashboard Section */}
+        <Card className="mt-8 bg-card text-card-foreground dark:border-slate-800 shadow-lg">
+          <CardHeader className="border-b border-gray-150 dark:border-slate-800 pb-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl flex items-center gap-2 text-gray-900 dark:text-white font-bold">
+                <ShieldCheck className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                Producer Trust Dashboard
+              </CardTitle>
+              {trustData?.hasTrustedBadge && (
+                <Badge className="bg-amber-500 hover:bg-amber-600 text-white font-extrabold flex items-center gap-1 py-1 px-3 shadow-md animate-pulse">
+                  <Award className="h-4 w-4" />
+                  TRUSTED PRODUCER
+                </Badge>
+              )}
+            </div>
+            <CardDescription className="text-slate-500 dark:text-slate-400 mt-1">
+              Real-time trust score, certification management, and compliance statistics
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="pt-6 space-y-8">
+            {loadingTrust ? (
+              <div className="text-center py-6">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto"></div>
+                <p className="mt-2 text-sm text-slate-500">Loading trust analytics...</p>
+              </div>
+            ) : trustError ? (
+              <div className="text-center py-6">
+                <p className="text-red-500 font-semibold">{trustError}</p>
+              </div>
+            ) : trustData ? (
+              <>
+                {/* Trust Score & Badging Summary */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-950/20 dark:to-blue-950/20 p-5 rounded-xl border border-emerald-100 dark:border-emerald-900/30 flex items-center gap-4">
+                    <div className="relative flex items-center justify-center h-16 w-16 rounded-full bg-white dark:bg-slate-900 border-4 border-emerald-500 text-2xl font-black text-emerald-700 dark:text-emerald-400 shadow-md">
+                      {trustData.trustScore}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 dark:text-white">Trust Score</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Dynamic AgroDex Trust Score
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/20 dark:to-indigo-950/20 p-5 rounded-xl border border-purple-100 dark:border-purple-900/30 flex items-center gap-4">
+                    <div className="flex items-center justify-center h-16 w-16 rounded-full bg-white dark:bg-slate-900 border-4 border-purple-500 text-sm font-black text-purple-700 dark:text-purple-400 shadow-md text-center p-1 uppercase">
+                      {trustData.compliance?.status || "N/A"}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 dark:text-white">Compliance Status</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Compliance Engine Status
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Certification History Manager */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-350 flex items-center gap-1.5">
+                    <FileText className="h-4 w-4 text-purple-500" />
+                    Certification History
+                  </h4>
+                  
+                  {!Array.isArray(trustData.certifications) || trustData.certifications.length === 0 ? (
+                    <p className="text-sm text-slate-500 dark:text-slate-400 italic bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-dashed border-border text-center">
+                      No certifications registered. Add your active agricultural certificates below.
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {trustData.certifications.map((cert: any, index: number) => {
+                        const certLabel = typeof cert === 'string' ? cert : (cert?.name || 'Unknown Certificate');
+                        const certId = typeof cert === 'object' ? cert?.id : null;
+                        const certStatus = typeof cert === 'object' && cert?.status ? cert.status : 'Active';
+                        return (
+                          <div key={certId || index} className="flex items-center justify-between p-3.5 bg-white dark:bg-slate-900 rounded-lg border border-border shadow-sm">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="font-bold text-sm text-gray-900 dark:text-white truncate">{certLabel}</p>
+                                <Badge className={`${certStatus === 'Expired' ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-500 hover:bg-emerald-600'} text-white text-[10px]`}>
+                                  {certStatus}
+                                </Badge>
+                              </div>
+                            </div>
+                            {certId && (
+                              <button
+                                type="button"
+                                onClick={() => onDeleteCertification(certId)}
+                                className="text-xs text-red-500 hover:text-red-700 font-medium ml-2 shrink-0"
+                              >
+                                Remove
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Add Certification Form */}
+                  <form onSubmit={handleAddCertification} className="p-4 bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-border space-y-4">
+                    <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">Add Certification</p>
+                    
+                    {certError && (
+                      <Alert variant="destructive" className="py-2 text-xs">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{certError}</AlertDescription>
+                      </Alert>
+                    )}
+
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="certName" className="text-xs font-semibold">Name</Label>
+                        <Input
+                          id="certName"
+                          placeholder="e.g. Organic Certificate, IndoGAP"
+                          value={certName}
+                          onChange={(e) => setCertName(e.target.value)}
+                          className="h-9 text-sm mt-1"
+                          required
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="certIssueDate" className="text-xs font-semibold">Issue Date</Label>
+                          <Input
+                            id="certIssueDate"
+                            type="date"
+                            value={certIssueDate}
+                            onChange={(e) => setCertIssueDate(e.target.value)}
+                            className="h-9 text-sm mt-1"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="certExpiryDate" className="text-xs font-semibold">Expiry Date</Label>
+                          <Input
+                            id="certExpiryDate"
+                            type="date"
+                            value={certExpiryDate}
+                            onChange={(e) => setCertExpiryDate(e.target.value)}
+                            className="h-9 text-sm mt-1"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={addingCert}
+                      className="w-full h-9 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-1"
+                    >
+                      <Plus className="h-4 w-4" />
+                      {addingCert ? "Adding..." : "Add Certification"}
+                    </Button>
+                  </form>
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-slate-500 italic text-center">Unable to load trust scores.</p>
+            )}
           </CardContent>
         </Card>
       </div>

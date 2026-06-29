@@ -1,5 +1,5 @@
 import { Client, AccountId, PrivateKey } from '@hashgraph/sdk';
-import { env } from './utils/config.js';
+import { env, isMockMode } from './utils/config.js';
 
 let client = null;
 
@@ -74,6 +74,16 @@ export function makeHederaClient(operatorId, operatorKey) {
  */
 export function getHederaClient() {
   if (client) {
+    return client;
+  }
+
+  if (isMockMode) {
+    console.warn("⚠️ Using Mock Hedera client in mock mode");
+    client = {
+      operatorAccountId: AccountId.fromString("0.0.12345"),
+      // Add stub freeze/sign/execute calls if needed, though we will also mock hcs.js / hts.js
+      close: async () => {}
+    };
     return client;
   }
 

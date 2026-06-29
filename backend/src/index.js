@@ -6,6 +6,7 @@ import apiRoutes from "./routes/api.js";
 import healthRoutes from "./routes/health.js";
 import aiRoutes from "./routes/ai.js";
 import fraudRoutes from "./routes/fraud.js";
+import trustRoutes from "./routes/trust.js";
 import accountRoutes from "./routes/account.js";
 import { getHederaClient } from "./hederaClient.js";
 import { generalLimiter } from "./middleware/rateLimiter.js";
@@ -39,10 +40,14 @@ app.use("/api", (req, res, next) => {
   }
   return generalLimiter(req, res, next);
 });
+app.get('/api/dashboard-health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 app.use("/api", healthRoutes);
 app.use("/api", apiRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/fraud", fraudRoutes);
+app.use("/api/trust", trustRoutes);
 app.use("/api/account", accountRoutes);
 
 app.get("/", (req, res) => {

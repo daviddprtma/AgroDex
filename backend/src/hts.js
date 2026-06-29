@@ -6,7 +6,7 @@ import {
   PrivateKey
 } from '@hashgraph/sdk';
 import { getHederaClient } from './hederaClient.js';
-import { env } from './utils/config.js';
+import { env, isMockMode } from './utils/config.js';
 
 /**
  * Create NFT for batch with HCS transaction IDs as metadata
@@ -14,6 +14,14 @@ import { env } from './utils/config.js';
  * @returns {Promise<{tokenId: string, serialNumber: string}>}
  */
 export async function createBatchNFT(hcsTransactionIds) {
+  if (isMockMode) {
+    const randomSuffix = Math.floor(100000 + Math.random() * 900000);
+    return {
+      tokenId: `0.0.${randomSuffix}`,
+      serialNumber: "1"
+    };
+  }
+
   try {
     const client = getHederaClient();
     const treasuryKey = PrivateKey.fromString(env.HEDERA_OPERATOR_KEY);

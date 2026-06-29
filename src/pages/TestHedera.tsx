@@ -13,7 +13,7 @@ import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 
 export default function TestHedera() {
   const [testing, setTesting] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +39,7 @@ export default function TestHedera() {
       } else {
         setResult(data);
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
     } catch (err: any) {
       setError(err.message || "Failed to test credentials");
     } finally {

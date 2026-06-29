@@ -42,9 +42,13 @@ process.env.OPERATOR_ID = env.HEDERA_OPERATOR_ID;
 process.env.OPERATOR_KEY = env.HEDERA_OPERATOR_KEY;
 
 // Extra guard: ensure real Service Role Secret (JWT)
+const isPlaceholder = (val) => !val || val.includes("YOUR_") || val.includes("your_");
+const isSupabasePlaceholder = isPlaceholder(env.SUPABASE_SERVICE_ROLE_KEY);
+
 if (
-  env.SUPABASE_SERVICE_ROLE_KEY.length < 100 ||
-  !env.SUPABASE_SERVICE_ROLE_KEY.startsWith("eyJ")
+  !isSupabasePlaceholder &&
+  (env.SUPABASE_SERVICE_ROLE_KEY.length < 100 ||
+  !env.SUPABASE_SERVICE_ROLE_KEY.startsWith("eyJ"))
 ) {
   throw new Error(
     'Invalid SUPABASE_SERVICE_ROLE_KEY: expected long JWT (starts with "eyJ", length >= 100). ' +
@@ -52,7 +56,16 @@ if (
   );
 }
 
-console.log("✅ Environment validation passed");
-console.log(
-  `   Service Role Key length: ${env.SUPABASE_SERVICE_ROLE_KEY.length} chars`
-);
+export const isMockMode = isSupabasePlaceholder || 
+  isPlaceholder(env.HEDERA_OPERATOR_ID) || 
+  isPlaceholder(env.HEDERA_OPERATOR_KEY) ||
+  isPlaceholder(env.GEMINI_API_KEY);
+
+if (isMockMode) {
+  console.warn("⚠️ Running in Mock/Demo Mode because one or more environment variables are placeholder values.");
+} else {
+  console.log("✅ Environment validation passed");
+  console.log(
+    `   Service Role Key length: ${env.SUPABASE_SERVICE_ROLE_KEY.length} chars`
+  );
+}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
-import { verifyBatch, verifyBatchById } from "@/lib/api";
+import { verifyBatch, verifyBatchById, getProducerTrust } from "@/lib/api";
 import type { VerifyBatchResult, VerifyBatchResponse, VerifyBatchDeletedResult } from "@/lib/api";
 import { QRCodeCanvas } from "qrcode.react";
 import { QrScannerModal } from "@/components/QrScannerModal";
@@ -50,13 +50,13 @@ type NotFoundResult = Extract<VerifyBatchResult, { reason: "not_found" }>;
 const isNotFoundResult = (
   result: VerifyBatchResult | undefined | null,
 ): result is NotFoundResult =>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   Boolean(result && (result as any).reason === "not_found");
 
 const isVerifiedResponse = (
   result: VerifyBatchResult | undefined | null,
 ): result is VerifyBatchResponse =>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   Boolean(result && (result as any).success === true);
 
 export default function BatchVerify() {
@@ -66,7 +66,7 @@ export default function BatchVerify() {
   const [serialNumber, setSerialNumber] = useState("");
   const [question, setQuestion] = useState("");
   const [isScannerOpen, setIsScannerOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const [qaResponse, setQaResponse] = useState<any>(null);
   const [qaLoading, setQaLoading] = useState(false);
   const [language, setLanguage] = useState<"en" | "fr">("en");
@@ -140,6 +140,24 @@ export default function BatchVerify() {
   const verifiedResult = isVerifiedResponse(verificationResult)
     ? verificationResult
     : null;
+
+  const [producerTrust, setProducerTrust] = useState<{ hasTrustedBadge: boolean; trustScore: number } | null>(null);
+
+  useEffect(() => {
+    if (verifiedResult?.batch?.farmer_id) {
+      getProducerTrust(verifiedResult.batch.farmer_id)
+        .then((res) => {
+          if (res.ok) {
+            setProducerTrust(res.data);
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to load producer trust score:", err);
+        });
+    } else {
+      setProducerTrust(null);
+    }
+  }, [verifiedResult?.batch?.farmer_id]);
 
   const validateQrPayload = (text: string) => {
     try {
@@ -225,7 +243,7 @@ export default function BatchVerify() {
       });
 
       setQaResponse(response.data.data);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
     } catch (error: any) {
       toast({
         title: "Question unavailable",
@@ -497,7 +515,7 @@ export default function BatchVerify() {
                       <CardContent className="space-y-6">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                           <div className="lg:col-span-2 space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className={`grid grid-cols-1 md:grid-cols-2 ${producerTrust ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-4`}>
                               <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-gray-200 dark:border-slate-800">
                                 <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1">
                                   Token ID
@@ -538,6 +556,32 @@ export default function BatchVerify() {
                                   ).toLocaleString()}
                                 </p>
                               </div>
+                              {producerTrust && (
+                                <div className={`p-4 rounded-lg border flex items-center gap-3 ${
+                                  producerTrust.hasTrustedBadge
+                                    ? "bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 border-amber-250 dark:border-amber-900/30"
+                                    : "bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-800"
+                                }`}>
+                                  <Award className={`h-8 w-8 shrink-0 ${
+                                    producerTrust.hasTrustedBadge ? "text-amber-500 animate-pulse" : "text-gray-400"
+                                  }`} />
+                                  <div className="min-w-0">
+                                    <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 flex items-center gap-1">
+                                      Producer
+                                    </p>
+                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                      <span className="text-sm font-bold text-gray-900 dark:text-white">
+                                        Score: {producerTrust.trustScore}
+                                      </span>
+                                      {producerTrust.hasTrustedBadge && (
+                                        <Badge className="bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-[9px] px-1 py-0 select-none shrink-0">
+                                          TRUSTED
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
 
@@ -815,7 +859,7 @@ export default function BatchVerify() {
                   <AlertCircle className="h-5 w-5 text-red-600" />
                   <AlertDescription className="text-red-900 dark:text-red-300 font-semibold">
                     {" "}
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}{" "}
+                    { }{" "}
                     {(mutation.error as any)?.response?.data?.details ||
                       mutation.error.message}
                   </AlertDescription>
