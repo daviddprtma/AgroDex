@@ -61,7 +61,7 @@ export default function BatchTokenize() {
         description: `Token ID: ${data.tokenId} | Serial: ${data.serialNumber}`,
       });
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     onError: (error: any) => {
       toast({
         title: "Tokenization Failed",
@@ -379,7 +379,7 @@ export default function BatchTokenize() {
               <Alert className="mt-6 border-red-200 bg-red-50 dark:bg-red-950/20 shadow-md">
                 <AlertCircle className="h-5 w-5 text-red-600" />
                 <AlertDescription className="text-red-900 dark:text-red-300 font-semibold">
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  { }
                   {(mutation.error as any)?.response?.data?.details ||
                     mutation.error.message}
                 </AlertDescription>

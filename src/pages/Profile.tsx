@@ -164,7 +164,7 @@ export default function Profile() {
 
       if (error) throw error;
       setProfile(data);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
     } catch (err: any) {
       console.error("Error loading profile:", err);
       setError(err.message);
@@ -188,7 +188,7 @@ export default function Profile() {
       await linkHederaWallet(accountId);
       setSuccess(`Successfully linked Hedera wallet: ${accountId}`);
       await loadProfile();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
     } catch (err: any) {
       console.error("Wallet linking error:", err);
       setError(err.message || "Failed to link wallet");

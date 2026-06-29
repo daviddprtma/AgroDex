@@ -57,7 +57,7 @@ export default function BatchRegistration() {
   const [harvestBatch, setHarvestBatch] = useState("");
   const [metadata, setMetadata] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const [verificationResult, setVerificationResult] = useState<any>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -84,7 +84,7 @@ export default function BatchRegistration() {
       setMetadata("");
       setVerificationResult(null);
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     onError: (error: any) => {
       console.error("Registration error:", error);
 
@@ -535,7 +535,7 @@ export default function BatchRegistration() {
               <Alert className="mt-6 border-red-200 bg-red-50 shadow-md">
                 <AlertCircle className="h-5 w-5 text-red-600" />
                 <AlertDescription className="text-red-900 font-semibold">
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  { }
                   {(mutation.error as any)?.response?.data?.details ||
                     mutation.error.message}
                 </AlertDescription>

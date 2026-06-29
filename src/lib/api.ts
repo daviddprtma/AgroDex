@@ -135,10 +135,10 @@ export interface VerifyBatchResponse {
   cached: boolean;
   tokenId: string;
   serialNumber: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   nftMetadata: any;
   hcsTransactionIds: string[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   hcsMessages: any[];
   ai_summary?: {
     summary_en: string;
@@ -223,7 +223,7 @@ export const registerBatch = async (
 
   if (error) {
     // Try to extract structured error from Edge Function response
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     let serverError: any = null;
     try {
       serverError = JSON.parse(error.message);
@@ -432,7 +432,7 @@ export const verifyBatch = async (
     },
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let json: any = null;
   try {
     json = await res.json();
@@ -460,7 +460,7 @@ export const verifyBatchById = async (
     headers: { "Content-Type": "application/json" },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let json: any = null;
   try {
     json = await res.json();
@@ -511,7 +511,7 @@ export const getDashboardStats = async () => {
     headers,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let payload: any = null;
   try {
     payload = await response.json();
@@ -547,7 +547,7 @@ export const getDashboardHealth = async () => {
     headers,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let payload: any = null;
   try {
     payload = await response.json();
@@ -705,7 +705,7 @@ export const getFraudByFarmer = async (
     { method: 'GET', headers },
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let payload: any = null;
   try { payload = await response.json(); } catch { /* ignore */ }
 
@@ -732,7 +732,7 @@ export const getFraudOverview = async (): Promise<{ ok: boolean; data: FraudOver
     headers,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let payload: any = null;
   try { payload = await response.json(); } catch { /* ignore */ }
 
@@ -824,7 +824,7 @@ export const deleteAccount = async (): Promise<{ ok: boolean; message: string }>
     throw new Error('No active session');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let payload: any = null;
 
   try {
@@ -863,7 +863,7 @@ export const updateProfile = async (
     throw new Error("No active session");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let payload: any = null;
 
   try {

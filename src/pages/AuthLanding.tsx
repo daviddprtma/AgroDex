@@ -68,7 +68,7 @@ export default function AuthLanding() {
         navigate("/");
       }
     } 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     catch (error: any) {
       setAuthError(error.message || "Authentication failed");
     } finally {
