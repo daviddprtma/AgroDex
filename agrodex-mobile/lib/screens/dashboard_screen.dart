@@ -38,11 +38,7 @@ class DashboardScreen extends StatelessWidget {
             context,
             icon: Icons.qr_code_scanner,
             title: 'Scan QR',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('QR Scanner coming soon')),
-              );
-            },
+            onTap: () => context.push('/scan'),
           ),
           _buildCard(
             context,
