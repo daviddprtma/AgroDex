@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { WalletProvider } from '@/context/WalletContext';
+import { CoreWalletProvider } from '@/context/CoreWalletContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { HelmetProvider } from 'react-helmet-async';
@@ -46,6 +47,7 @@ const App = () => (
           <BrowserRouter>
             <AuthProvider>
               <WalletProvider>
+                <CoreWalletProvider>
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
                     <Route path="/login" element={<Login />} />
@@ -63,13 +65,14 @@ const App = () => (
                     <Route path="/verify/:tokenId/:serialNumber" element={<BatchVerify />} />
                     <Route path="/demo" element={<Navigate to={DEMO_VERIFY_URL} replace />} />
                     <Route path="/test-hedera" element={<ProtectedRoute><TestHedera /></ProtectedRoute>} />
-                    <Route path="/risk-intelligence" element={<ProtectedRoute><RiskIntelligence /></ProtectedRoute>} />
+                    <Route path="/risk-intelligence" element={<RiskIntelligence />} />
                     <Route path="/map" element={<ProtectedRoute><MapExplore /></ProtectedRoute>} />
                     <Route path="/journey/:batchId" element={<BatchJourney />} />
                   </Routes>
                   <ChatbotWidget />
                   <ScrollToTopButton />
                 </Suspense>
+              </CoreWalletProvider>
               </WalletProvider>
             </AuthProvider>
           </BrowserRouter>
