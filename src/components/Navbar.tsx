@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LanguageSelector } from '@/components/LanguageSelector';
-import { useTranslation } from 'react-i18next';
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,8 +14,6 @@ import {
   FileText,
   Coins,
   ShieldCheck,
-  ShieldAlert,
-  MapPin,
   User,
   Settings,
   LogOut,
@@ -36,8 +34,17 @@ import logoUrl from "@/assets/agritrust-logo.png";
 export default function Navbar() {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
-  const { accountId, isConnected: isHPConnected, network, disconnect: hpDisconnect } = useWallet();
-  const { address: coreAddress, isConnected: isCoreConnected, disconnect: coreDisconnect } = useCoreWallet();
+  const {
+    accountId,
+    isConnected: isHPConnected,
+    network,
+    disconnect: hpDisconnect,
+  } = useWallet();
+  const {
+    address: coreAddress,
+    isConnected: isCoreConnected,
+    disconnect: coreDisconnect,
+  } = useCoreWallet();
   const isConnected = isHPConnected || isCoreConnected;
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -56,14 +63,12 @@ export default function Navbar() {
   }
 
   const navLinks = [
-    { to: "/dashboard", label: t('nav.dashboard'), icon: BarChart3 },
+    { to: "/dashboard", label: t("nav.dashboard"), icon: BarChart3 },
     { to: "/risk-intelligence", label: "Risk AI", icon: BrainCircuit },
-    { to: "/register", label: t('nav.register'), icon: FileText },
-    { to: "/tokenize", label: t('nav.tokenize'), icon: Coins },
-    { to: "/verify", label: t('nav.verify'), icon: ShieldCheck },
-    { to: "/risk-intelligence", label: "Risk Intelligence", icon: ShieldAlert },
-    { to: "/map", label: "Explore Map", icon: MapPin },
-    { to: "/about", label: t('nav.about'), icon: Info },
+    { to: "/register", label: t("nav.register"), icon: FileText },
+    { to: "/tokenize", label: t("nav.tokenize"), icon: Coins },
+    { to: "/verify", label: t("nav.verify"), icon: ShieldCheck },
+    { to: "/about", label: t("nav.about"), icon: Info },
   ];
 
   const isActive = (path: string) =>
@@ -149,7 +154,11 @@ export default function Navbar() {
             <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Open settings menu">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Open settings menu"
+                >
                   <Settings className="h-5 w-5 text-gray-600 dark:text-slate-400" />
                 </Button>
               </DropdownMenuTrigger>
@@ -157,13 +166,13 @@ export default function Navbar() {
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="cursor-pointer">
                     <User className="h-4 w-4 mr-2" />
-                    {t('nav.profile')}
+                    {t("nav.profile")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/session-settings" className="cursor-pointer">
                     <Settings className="h-4 w-4 mr-2" />
-                    {t('nav.settings')}
+                    {t("nav.settings")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -172,7 +181,7 @@ export default function Navbar() {
                   className="cursor-pointer text-red-600"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  {t('nav.logout')}
+                  {t("nav.logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -183,11 +192,18 @@ export default function Navbar() {
             <ThemeToggle />
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Open navigation menu">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Open navigation menu"
+                >
                   <Menu className="h-6 w-6 text-gray-700 dark:text-slate-300" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px] sm:w-[320px] dark:bg-slate-950 dark:border-slate-800">
+              <SheetContent
+                side="right"
+                className="w-[280px] sm:w-[320px] dark:bg-slate-950 dark:border-slate-800"
+              >
                 <div className="flex flex-col gap-6 mt-8">
                   {/* User Info */}
                   <div className="flex items-center gap-3 bg-gray-50 dark:bg-slate-900 px-4 py-3 rounded-lg border border-gray-100 dark:border-slate-800">
@@ -252,13 +268,16 @@ export default function Navbar() {
 
                   {/* User Actions */}
                   <div className="flex flex-col gap-2">
-                    <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                    <Link
+                      to="/profile"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
                       <Button
                         variant="ghost"
                         className="w-full justify-start text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
                       >
                         <User className="h-4 w-4 mr-2" />
-                        {t('nav.profile')}
+                        {t("nav.profile")}
                       </Button>
                     </Link>
                     <Link
@@ -270,7 +289,7 @@ export default function Navbar() {
                         className="w-full justify-start text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
                       >
                         <Settings className="h-4 w-4 mr-2" />
-                        {t('nav.settings')}
+                        {t("nav.settings")}
                       </Button>
                     </Link>
                     <Button
@@ -282,7 +301,7 @@ export default function Navbar() {
                       }}
                     >
                       <LogOut className="h-4 w-4 mr-2" />
-                      {t('nav.logout')}
+                      {t("nav.logout")}
                     </Button>
                   </div>
                 </div>
