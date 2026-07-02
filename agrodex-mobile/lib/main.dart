@@ -9,6 +9,7 @@ import 'screens/dashboard_screen.dart';
 import 'screens/map_screen.dart';
 import 'screens/batches_screen.dart';
 import 'screens/qr_scanner_screen.dart';
+import 'screens/tokenize_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,6 +56,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/scan',
       builder: (context, state) => const QRScannerScreen(),
+    ),
+    GoRoute(
+      path: '/tokenize',
+      builder: (context, state) => const TokenizeScreen(),
     ),
   ],
 );

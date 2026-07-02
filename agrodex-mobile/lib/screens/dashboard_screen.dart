@@ -50,11 +50,7 @@ class DashboardScreen extends StatelessWidget {
             context,
             icon: Icons.precision_manufacturing,
             title: 'Tokenize',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Tokenization coming soon')),
-              );
-            },
+            onTap: () => context.push('/tokenize'),
           ),
         ],
       ),
