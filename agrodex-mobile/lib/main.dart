@@ -10,6 +10,9 @@ import 'screens/map_screen.dart';
 import 'screens/batches_screen.dart';
 import 'screens/qr_scanner_screen.dart';
 import 'screens/tokenize_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/verify_screen.dart';
+import 'screens/risk_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,6 +63,21 @@ final _router = GoRouter(
     GoRoute(
       path: '/tokenize',
       builder: (context, state) => const TokenizeScreen(),
+    ),
+    GoRoute(
+      path: '/register',
+      builder: (context, state) => const RegisterScreen(),
+    ),
+    GoRoute(
+      path: '/verify',
+      builder: (context, state) {
+        final code = state.extra as String? ?? '';
+        return VerifyScreen(batchIdOrCode: code);
+      },
+    ),
+    GoRoute(
+      path: '/risk',
+      builder: (context, state) => const RiskScreen(),
     ),
   ],
 );

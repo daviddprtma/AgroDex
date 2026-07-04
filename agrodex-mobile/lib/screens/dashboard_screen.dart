@@ -52,6 +52,18 @@ class DashboardScreen extends StatelessWidget {
             title: 'Tokenize',
             onTap: () => context.push('/tokenize'),
           ),
+          _buildCard(
+            context,
+            icon: Icons.app_registration,
+            title: 'Register Batch',
+            onTap: () => context.push('/register'),
+          ),
+          _buildCard(
+            context,
+            icon: Icons.security,
+            title: 'Risk Intel',
+            onTap: () => context.push('/risk'),
+          ),
         ],
       ),
     );

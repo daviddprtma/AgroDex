@@ -23,23 +23,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           _isProcessing = true;
         });
 
-        // Show result and pop back
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('QR Code Scanned'),
-            content: Text('Content:\n$code'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // close dialog
-                  context.pop(); // go back to dashboard
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
+        context.push('/verify', extra: code);
       }
     }
   }
