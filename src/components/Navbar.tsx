@@ -129,35 +129,50 @@ export default function Navbar() {
             )}
             <LanguageSelector />
             <ThemeToggle />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Open settings menu">
-                  <Settings className="h-5 w-5 text-gray-600 dark:text-slate-400" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem asChild>
-                  <Link to="/profile" className="cursor-pointer">
-                    <User className="h-4 w-4 mr-2" />
-                    {t('nav.profile')}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/session-settings" className="cursor-pointer">
-                    <Settings className="h-4 w-4 mr-2" />
-                    {t('nav.settings')}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="cursor-pointer text-red-600"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  {t('nav.logout')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label="Open settings menu">
+                    <Settings className="h-5 w-5 text-gray-600 dark:text-slate-400" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer">
+                      <User className="h-4 w-4 mr-2" />
+                      {t('nav.profile')}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/session-settings" className="cursor-pointer">
+                      <Settings className="h-4 w-4 mr-2" />
+                      {t('nav.settings')}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer text-red-600"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    {t('nav.logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link to="/login">
+                  <Button variant="outline" className="text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950">
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/auth-landing">
+                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu */}
@@ -172,12 +187,14 @@ export default function Navbar() {
               <SheetContent side="right" className="w-[280px] sm:w-[320px] dark:bg-slate-950 dark:border-slate-800">
                 <div className="flex flex-col gap-6 mt-8">
                   {/* User Info */}
-                  <div className="flex items-center gap-3 bg-gray-50 dark:bg-slate-900 px-4 py-3 rounded-lg border border-gray-100 dark:border-slate-800">
-                    <User className="h-5 w-5 text-gray-600 dark:text-slate-400" />
-                    <span className="text-sm font-body text-gray-700 dark:text-slate-300 truncate">
-                      {accountLabel}
-                    </span>
-                  </div>
+                  {user && (
+                    <div className="flex items-center gap-3 bg-gray-50 dark:bg-slate-900 px-4 py-3 rounded-lg border border-gray-100 dark:border-slate-800">
+                      <User className="h-5 w-5 text-gray-600 dark:text-slate-400" />
+                      <span className="text-sm font-body text-gray-700 dark:text-slate-300 truncate">
+                        {accountLabel}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Wallet info (mobile) */}
                   {isConnected && accountId && (
@@ -226,38 +243,60 @@ export default function Navbar() {
 
                   {/* User Actions */}
                   <div className="flex flex-col gap-2">
-                    <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-                      >
-                        <User className="h-4 w-4 mr-2" />
-                        {t('nav.profile')}
-                      </Button>
-                    </Link>
-                    <Link
-                      to="/session-settings"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-                      >
-                        <Settings className="h-4 w-4 mr-2" />
-                        {t('nav.settings')}
-                      </Button>
-                    </Link>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        handleLogout();
-                      }}
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      {t('nav.logout')}
-                    </Button>
+                    {user ? (
+                      <>
+                        <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                          >
+                            <User className="h-4 w-4 mr-2" />
+                            {t('nav.profile')}
+                          </Button>
+                        </Link>
+                        <Link
+                          to="/session-settings"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                          >
+                            <Settings className="h-4 w-4 mr-2" />
+                            {t('nav.settings')}
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            handleLogout();
+                          }}
+                        >
+                          <LogOut className="h-4 w-4 mr-2" />
+                          {t('nav.logout')}
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950"
+                          >
+                            Login
+                          </Button>
+                        </Link>
+                        <Link to="/auth-landing" onClick={() => setMobileMenuOpen(false)}>
+                          <Button
+                            className="w-full justify-start bg-emerald-600 hover:bg-emerald-700 text-white"
+                          >
+                            Sign Up
+                          </Button>
+                        </Link>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>
