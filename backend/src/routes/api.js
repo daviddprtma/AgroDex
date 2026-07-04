@@ -5,7 +5,7 @@ import { submitBatchData, fetchHCSMessage } from "../hcs.js";
 import { createBatchNFT, fetchNFTMetadata } from "../hts.js";
 import { supabase, insertBatch, insertToken, upsertVerification, getVerification, getToken } from "../db.js";
 import { env, isMockMode } from "../utils/config.js";
-import { requireAuth } from "../middleware/auth.js";
+import { requireAuth, optionalAuth } from "../middleware/auth.js";
 import {
   analyzeBatch,
   summarizeProvenance,
