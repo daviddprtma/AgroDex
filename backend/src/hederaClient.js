@@ -1,4 +1,4 @@
-const { Client } = require("@hashgraph/sdk");
+import { Client } from '@hashgraph/sdk';
 require("dotenv").config();
 
 let client = null;
