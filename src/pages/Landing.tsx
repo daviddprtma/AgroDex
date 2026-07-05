@@ -12,7 +12,7 @@ import heroImage from "@/assets/Petani_padi.jpg";
 
 
 export default function Landing() {
-    const [isBottom, setIsBottom] = useState(false);
+    
     const [activeSection, setActiveSection] = useState("hero");
 
     const sections = [
