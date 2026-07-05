@@ -87,23 +87,26 @@ export default function Landing() {
                             </button>
                         ))}
                     </div>
-                    <Link to="/login">
-                    <button className="text-sm font-semibold text-gray-400 hover:text-gray-200 transition-colors duration-200 mr-4">
-                    Login
-                    </button>
-                    </Link>
+                    </div>
+        <div className="flex items-center gap-4">
+          <Link to="/login">
+            <button className="text-sm font-semibold text-gray-400 hover:text-gray-200">
+              Login
+            </button>
+          </Link>
 
-                    <Link to="/register">
-                        <Button
-                            className={`text-sm font-semibold text-black transition-all duration-300 ${isBottom
-                                ? "bg-emerald-400 shadow-[0_0_20px_#10b981] animate-pulse"
-                                : "bg-emerald-500 hover:bg-emerald-400"
-                                }`}
-                        >
-                            Sign Up <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                    </Link>
-                </div>
+          <Link to="/register">
+            <Button
+              className={`text-sm font-semibold text-black transition-all duration-300 ${
+                activeSection === "join"
+                  ? "bg-emerald-400 shadow-[0_0_20px_#10b981] animate-pulse"
+                  : "bg-emerald-500 hover:bg-emerald-400"
+              }`}
+            >
+              Sign Up <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
             </div>
             {/* ================= HERO ================= */}
 
