@@ -402,7 +402,7 @@ export default function Landing() {
       </section>
 
       {/* ================= FRAUD ================= */}
-      <section id="fraud" className="py-24 container mx-auto px-4">
+      <section id="ai-risk" className="py-24 container mx-auto px-4">
         <h2 className="text-4xl font-bold text-center mb-4">
           AI Risk Intelligence Engine
         </h2>
