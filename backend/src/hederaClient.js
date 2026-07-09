@@ -1,5 +1,5 @@
 import { Client } from '@hashgraph/sdk';
-require("dotenv").config();
+import 'dotenv/config';
 
 let client = null;
 
