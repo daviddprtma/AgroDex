@@ -90,7 +90,9 @@ try {
   process.exit(1);
 }
 
-startCronJobs();
+if (process.env.ENABLE_CRON_JOBS === 'true') {
+  startCronJobs();
+}
 
 const PORT = env.PORT || 4000;
 const server = app.listen(PORT, "0.0.0.0", () => {

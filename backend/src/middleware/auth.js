@@ -32,7 +32,7 @@ export async function requireAuth(req, res, next) {
     // Attach user to request object
     req.user = user;
 
-    dbClient
+    void dbClient
       .from('profiles')
       .update({ last_active_at: new Date().toISOString() })
       .eq('id', user.id)
@@ -40,6 +40,9 @@ export async function requireAuth(req, res, next) {
         if (updateErr) {
           console.error('[auth] last_active_at update failed:', updateErr.message);
         }
+      })
+      .catch(err => {
+        console.error('[auth] last_active_at update error:', err?.message ?? String(err));
       });
 
     next();
