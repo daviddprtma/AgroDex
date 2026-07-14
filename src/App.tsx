@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { WalletProvider } from "@/context/WalletContext";
 import { CoreWalletProvider } from "@/context/CoreWalletContext";
@@ -13,6 +13,7 @@ import { lazy, Suspense } from "react";
 import { ChatbotWidget } from "@/components/chat/ChatbotWidget";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import About from "./pages/About";
+import NotFound from "./pages/NotFound";
 
 const Landing = lazy(() => import("./pages/Landing"));
 const Index = lazy(() => import("./pages/Index"));
@@ -39,6 +40,16 @@ function PageLoader() {
   );
 }
 
+function WithChat() {
+  return (
+    <>
+      <Outlet />
+      <ChatbotWidget />
+      <ScrollToTopButton />
+    </>
+  );
+}
+
 const App = () => (
   <HelmetProvider>
     <ThemeProvider defaultTheme="system" storageKey="agrodex-theme">
@@ -51,99 +62,100 @@ const App = () => (
                 <CoreWalletProvider>
                   <Suspense fallback={<PageLoader />}>
                     <Routes>
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/welcome" element={<AuthLanding />} />
-                      <Route path="/" element={<Landing />} />
-                      <Route
-                        path="/app"
-                        element={
-                          <ProtectedRoute>
-                            <Index />
-                          </ProtectedRoute>
-                        }
-                      />
-                      {/* <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} /> */}
-                      <Route
-                        path="/dashboard"
-                        element={
-                          <ProtectedRoute>
-                            <Dashboard />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/profile"
-                        element={
-                          <ProtectedRoute>
-                            <Profile />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/session-settings"
-                        element={
-                          <ProtectedRoute>
-                            <SessionSettings />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/register"
-                        element={
-                          <ProtectedRoute>
-                            <BatchRegistration />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/tokenize"
-                        element={
-                          <ProtectedRoute>
-                            <BatchTokenize />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route path="/verify" element={<BatchVerify />} />
-                      <Route
-                        path="/verify/:batchId"
-                        element={<BatchVerify />}
-                      />
-                      <Route
-                        path="/verify/:tokenId/:serialNumber"
-                        element={<BatchVerify />}
-                      />
-                      <Route
-                        path="/demo"
-                        element={<Navigate to={DEMO_VERIFY_URL} replace />}
-                      />
-                      <Route
-                        path="/test-hedera"
-                        element={
-                          <ProtectedRoute>
-                            <TestHedera />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/risk-intelligence"
-                        element={<RiskIntelligence />}
-                      />
-                      <Route
-                        path="/map"
-                        element={
-                          <ProtectedRoute>
-                            <MapExplore />
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route path="/about" element={<About />} />
-                      <Route
-                        path="/journey/:batchId"
-                        element={<BatchJourney />}
-                      />
+                      <Route element={<WithChat />}>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/welcome" element={<AuthLanding />} />
+                        <Route path="/" element={<Landing />} />
+                        <Route
+                          path="/app"
+                          element={
+                            <ProtectedRoute>
+                              <Index />
+                            </ProtectedRoute>
+                          }
+                        />
+                        {/* <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} /> */}
+                        <Route
+                          path="/dashboard"
+                          element={
+                            <ProtectedRoute>
+                              <Dashboard />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/profile"
+                          element={
+                            <ProtectedRoute>
+                              <Profile />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/session-settings"
+                          element={
+                            <ProtectedRoute>
+                              <SessionSettings />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/register"
+                          element={
+                            <ProtectedRoute>
+                              <BatchRegistration />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/tokenize"
+                          element={
+                            <ProtectedRoute>
+                              <BatchTokenize />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route path="/verify" element={<BatchVerify />} />
+                        <Route
+                          path="/verify/:batchId"
+                          element={<BatchVerify />}
+                        />
+                        <Route
+                          path="/verify/:tokenId/:serialNumber"
+                          element={<BatchVerify />}
+                        />
+                        <Route
+                          path="/demo"
+                          element={<Navigate to={DEMO_VERIFY_URL} replace />}
+                        />
+                        <Route
+                          path="/test-hedera"
+                          element={
+                            <ProtectedRoute>
+                              <TestHedera />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/risk-intelligence"
+                          element={<RiskIntelligence />}
+                        />
+                        <Route
+                          path="/map"
+                          element={
+                            <ProtectedRoute>
+                              <MapExplore />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route path="/about" element={<About />} />
+                        <Route
+                          path="/journey/:batchId"
+                          element={<BatchJourney />}
+                        />
+                      </Route>
+                      <Route path="*" element={<NotFound />} />
                     </Routes>
-                    <ChatbotWidget />
-                    <ScrollToTopButton />
                   </Suspense>
                 </CoreWalletProvider>
               </WalletProvider>
