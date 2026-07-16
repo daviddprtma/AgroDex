@@ -56,13 +56,13 @@ const App = () => (
     <ThemeProvider defaultTheme="system" storageKey="agrodex-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <EasyLanguageProvider>
-            <Toaster />
-            <BrowserRouter>
-              <AuthProvider>
-                <WalletProvider>
-                  <CoreWalletProvider>
-                    <Suspense fallback={<PageLoader />}>
+          <Suspense fallback={<PageLoader />}>
+            <EasyLanguageProvider>
+              <Toaster />
+              <BrowserRouter>
+                <AuthProvider>
+                  <WalletProvider>
+                    <CoreWalletProvider>
                       <Routes>
                         <Route element={<WithChat />}>
                           <Route path="/login" element={<Login />} />
@@ -158,12 +158,12 @@ const App = () => (
                         </Route>
                         <Route path="*" element={<NotFound />} />
                       </Routes>
-                    </Suspense>
-                  </CoreWalletProvider>
-                </WalletProvider>
-              </AuthProvider>
-            </BrowserRouter>
-          </EasyLanguageProvider>
+                    </CoreWalletProvider>
+                  </WalletProvider>
+                </AuthProvider>
+              </BrowserRouter>
+            </EasyLanguageProvider>
+          </Suspense>
         </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>

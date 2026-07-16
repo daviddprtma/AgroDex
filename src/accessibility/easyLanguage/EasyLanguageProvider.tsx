@@ -16,7 +16,7 @@ export interface EasyLanguageContextType {
 export const EasyLanguageContext = createContext<EasyLanguageContextType | undefined>(undefined);
 
 export const EasyLanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { i18n } = useTranslation();
+  const { i18n } = useTranslation(undefined, { useSuspense: false });
 
   // Load from localStorage, default mode to normal
   const [mode, setMode] = useState<EasyMode>(() => {
