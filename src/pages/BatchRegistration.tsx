@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { registerBatch, verifyRegistration } from "@/lib/api";
 import { QRCodeCanvas } from "qrcode.react";
+import { useEasyLanguage } from "@/accessibility/easyLanguage/useEasyLanguage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,6 +50,7 @@ import { Helmet } from "react-helmet-async";
 import { CopyButton } from "@/components/CopyButton";
 
 export default function BatchRegistration() {
+  const { translate } = useEasyLanguage();
   const [productName, setProductName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
@@ -180,7 +182,7 @@ export default function BatchRegistration() {
           </h1>
           <p className="text-lg text-gray-600 dark:text-slate-300 max-w-2xl mx-auto">
             Record a new proof for your batch. This data will be permanently
-            saved on the Hedera Consensus Service (HCS).
+            saved on the {translate("HCS")}.
           </p>
         </div>
 
@@ -199,7 +201,7 @@ export default function BatchRegistration() {
           <CardHeader className="space-y-1 pb-6">
             <CardTitle className="text-2xl">Batch Information</CardTitle>
             <CardDescription className="text-base text-slate-500 dark:text-slate-400">
-              All data will be permanently recorded on Hedera Consensus Service
+              All data will be permanently recorded on {translate("HCS")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -339,7 +341,7 @@ export default function BatchRegistration() {
                 {mutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Recording on Hedera Blockchain...
+                    Recording on {translate("blockchain")}...
                   </>
                 ) : (
                   <>
@@ -466,7 +468,7 @@ export default function BatchRegistration() {
                           onClick={() => navigate(`/journey/${mutation.data.batchId}`)}
                           className="flex-1 px-4 py-2 font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 rounded-lg shadow-sm hover:bg-emerald-100 transition-colors dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-950/50"
                         >
-                          View Blockchain Journey
+                          View {translate("blockchain")} Journey
                         </button>
                       </div>
                     </div>
@@ -561,7 +563,7 @@ export default function BatchRegistration() {
               Pre-Registration AI Verification
             </DialogTitle>
             <DialogDescription className="text-sm text-slate-500 dark:text-slate-400">
-              Verify your batch metadata using Gemini 3.1 Flash Lite before saving to blockchain
+              Verify your batch metadata using Gemini 3.1 Flash Lite before saving to {translate("blockchain").toLowerCase()}
             </DialogDescription>
           </DialogHeader>
 

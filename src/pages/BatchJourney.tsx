@@ -27,6 +27,7 @@ import Footer from "@/components/Footer";
 import { CopyButton } from "@/components/CopyButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useEasyLanguage } from "@/accessibility/easyLanguage/useEasyLanguage";
 import {
   Card,
   CardContent,
@@ -278,6 +279,7 @@ function RiskBadge({ risk }: { risk?: FraudScore | null }) {
 }
 
 export default function BatchJourney() {
+  const { translate } = useEasyLanguage();
   const { batchId = "sample-batch" } = useParams<{ batchId: string }>();
   const isSample = batchId === "sample-batch";
 
@@ -371,8 +373,8 @@ export default function BatchJourney() {
         <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           {[
             { label: "Product Origin", value: productOrigin, icon: MapPin },
-            { label: "Hedera Token", value: tokenId, icon: Hash },
-            { label: "Verification Records", value: `${verificationRecords}`, icon: ShieldCheck },
+            { label: translate("nftCertificate"), value: tokenId, icon: Hash },
+            { label: translate("verificationStatus"), value: `${verificationRecords}`, icon: ShieldCheck },
             { label: "Last Event", value: formatDateTime(events[events.length - 1]?.timestamp), icon: Clock },
           ].map((metric) => (
             <Card key={metric.label} className="border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
@@ -401,7 +403,7 @@ export default function BatchJourney() {
                 <Route className="h-5 w-5 text-emerald-600" />
                 Interactive Timeline
               </CardTitle>
-              <CardDescription>Select any checkpoint to inspect its blockchain and operational context.</CardDescription>
+              <CardDescription>Select any checkpoint to inspect its {translate("blockchain").toLowerCase()} and operational context.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid min-w-0 gap-6 lg:grid-cols-[0.95fr_1.05fr]">
@@ -478,7 +480,7 @@ export default function BatchJourney() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
                 <Sparkles className="h-5 w-5 text-blue-600" />
-                AI Provenance Summary
+                {translate("provenance")}
               </CardTitle>
               <CardDescription>Origin, highlights, traceability, and quality insights.</CardDescription>
             </CardHeader>
@@ -499,9 +501,9 @@ export default function BatchJourney() {
                 </div>
               </div>
               <div className="rounded-lg border border-slate-200 p-4 dark:border-slate-800">
-                <p className="text-sm font-bold text-gray-900 dark:text-white">Traceability Information</p>
+                <p className="text-sm font-bold text-gray-900 dark:text-white">{translate("traceability")}</p>
                 <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                  {verificationRecords} blockchain-backed record{verificationRecords === 1 ? "" : "s"} connect origin, token, and verification milestones.
+                  {verificationRecords} {translate("blockchain").toLowerCase()}-backed record{verificationRecords === 1 ? "" : "s"} connect origin, token, and verification milestones.
                 </p>
               </div>
               <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/30">
@@ -576,7 +578,7 @@ export default function BatchJourney() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
                 <Hash className="h-5 w-5 text-slate-700 dark:text-slate-300" />
-                Blockchain Records
+                {translate("blockchain")} Records
               </CardTitle>
               <CardDescription>Hedera identifiers and event timestamps.</CardDescription>
             </CardHeader>

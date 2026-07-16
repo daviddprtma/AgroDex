@@ -5,8 +5,10 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { SupplyChainMap, MapBatch } from '@/components/SupplyChainMap';
 import { Loader2 } from 'lucide-react';
+import { useEasyLanguage } from '@/accessibility/easyLanguage/useEasyLanguage';
 
 export default function MapExplore() {
+  const { translate } = useEasyLanguage();
   const { data: batches, isLoading, error } = useQuery({
     queryKey: ['explore-batches'],
     queryFn: getBatches,
@@ -25,7 +27,7 @@ export default function MapExplore() {
             Supply Chain Map
           </h1>
           <p className="text-muted-foreground mt-2">
-            Explore registered agricultural batches across Indonesia. Click on any pin to view provenance, fraud risk, and Hedera verification status.
+            Explore registered agricultural batches across Indonesia. Click on any pin to view {translate("provenance").toLowerCase()}, {translate("fraudRisk").toLowerCase()}, and {translate("verificationStatus").toLowerCase()}.
           </p>
         </div>
 

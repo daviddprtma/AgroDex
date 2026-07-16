@@ -29,7 +29,9 @@ import { useCoreWallet } from "@/hooks/useCoreWallet";
 import { useState } from "react";
 import { useServiceStatus } from "@/hooks/useServiceStatus";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { EasyLanguageToggle } from "@/accessibility/easyLanguage/EasyLanguageToggle";
 import logoUrl from "@/assets/agritrust-logo.png";
+
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
@@ -152,6 +154,7 @@ export default function Navbar() {
               </div>
             )}
             <LanguageSelector />
+            <EasyLanguageToggle />
             <ThemeToggle />
             {/* if user not logged it, then hide the dropdownmenu */}
             {isAuthenticated && (
@@ -193,6 +196,7 @@ export default function Navbar() {
 
           {/* Mobile Menu */}
           <div className="flex items-center gap-2 lg:hidden">
+            <EasyLanguageToggle />
             <ThemeToggle />
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>

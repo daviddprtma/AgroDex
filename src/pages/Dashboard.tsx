@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useEasyLanguage } from "@/accessibility/easyLanguage/useEasyLanguage";
 import {
   Card,
   CardContent,
@@ -128,6 +129,7 @@ const getCleanInsightError = (
 
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
+  const { translate } = useEasyLanguage();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<"all" | "approved" | "flagged">("all");
   const [search, setSearch] = useState("");
@@ -332,7 +334,7 @@ export default function Dashboard() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-gray-600 dark:text-slate-400">
-                  {t("dashboard.stats.nftsCreated")}
+                  {translate("nftsCreated")}
                 </CardTitle>
                 <div className="bg-blue-100 dark:bg-blue-950/50 p-2 rounded-lg">
                   <Coins className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -348,7 +350,7 @@ export default function Dashboard() {
                 )}
               </div>
               <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-                {t("dashboard.stats.tokenizedCertificates")}
+                {translate("tokenizedCertificates")}
               </p>
             </CardContent>
           </Card>
@@ -357,7 +359,7 @@ export default function Dashboard() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-gray-600 dark:text-slate-400">
-                  {t("dashboard.stats.aiVerifications")}
+                  {translate("aiVerifications")}
                 </CardTitle>
                 <div className="bg-purple-100 dark:bg-purple-950/50 p-2 rounded-lg">
                   <ShieldCheck className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -373,15 +375,16 @@ export default function Dashboard() {
                 )}
               </div>
               <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-                {t("dashboard.stats.verifiedBatches")}
+                {translate("verifiedBatches")}
               </p>
             </CardContent>
           </Card>
         </div>
         {!statsLoading && !statsError && (
           <p className="text-xs text-gray-500 mb-8">
-            {kpis.totalVerifications.toLocaleString()} verifications IA
-            realisees, dont {audit.flaggedLots.length} lot(s) a surveiller.
+            {translate("aiVerificationsStatusText")
+              .replace("{count}", kpis.totalVerifications.toLocaleString())
+              .replace("{flagged}", audit.flaggedLots.length.toString())}
           </p>
         )}{" "}
         {/* AI Insight Card */}
@@ -390,7 +393,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
                 <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                {t("dashboard.aiInsight.title")}
+                {translate("provenance")}
               </CardTitle>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1 px-2 py-1 bg-purple-100 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 text-xs font-semibold rounded-full">
@@ -444,7 +447,7 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
                 <Activity className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                {t("dashboard.audit.title")}
+                {translate("auditJournal")}
               </CardTitle>
               <CardDescription className="text-gray-500 dark:text-slate-400">
                 {t("dashboard.audit.description")}

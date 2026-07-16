@@ -24,6 +24,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import logoUrl from "@/assets/agritrust-logo.png";
+import { useEasyLanguage } from "@/accessibility/easyLanguage/useEasyLanguage";
 
 const processSteps = [
   { key: "register", step: "01", icon: Sprout },
@@ -52,6 +53,7 @@ const heroSignals = [
 
 export default function About() {
   const { t } = useTranslation();
+  const { translate } = useEasyLanguage();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -266,7 +268,13 @@ export default function About() {
                         <Icon className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <CardTitle className="text-gray-900 dark:text-white">
-                        {t(`about.technology.cards.${key}.title`)}
+                        {key === "hcs"
+                          ? translate("consensusService")
+                          : key === "hts"
+                            ? translate("nftCertificate")
+                            : key === "ai"
+                              ? translate("smartVerification")
+                              : t(`about.technology.cards.${key}.title`)}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>

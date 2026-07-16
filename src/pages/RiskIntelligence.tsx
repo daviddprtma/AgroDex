@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
+import { useEasyLanguage } from "@/accessibility/easyLanguage/useEasyLanguage";
 import {
   Area,
   AreaChart,
@@ -204,6 +205,7 @@ function SupplierList({ suppliers }: { suppliers: SupplierReliability[] }) {
 }
 
 export default function RiskIntelligence() {
+  const { translate } = useEasyLanguage();
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ["supply-chain-risk-assessment"],
     queryFn: getSupplyChainRiskAssessment,
@@ -229,7 +231,7 @@ export default function RiskIntelligence() {
             <div className="max-w-3xl">
               <Badge className="mb-4 bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300">
                 <Sparkles className="mr-2 h-4 w-4" />
-                AI-powered risk assessment
+                {translate("fraudRisk")}
               </Badge>
               <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
                 Supply Chain Risk Dashboard
@@ -289,7 +291,7 @@ export default function RiskIntelligence() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BrainCircuit className="h-5 w-5 text-emerald-600" />
-                    AI Risk Summary
+                    {translate("fraudRisk")} Summary
                   </CardTitle>
                   <CardDescription>
                     Generated {new Date(data.generatedAt).toLocaleString()} · {data.confidence}% confidence

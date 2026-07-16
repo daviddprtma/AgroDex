@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
+import { useEasyLanguage } from "@/accessibility/easyLanguage/useEasyLanguage";
 import { verifyBatch, verifyBatchById } from "@/lib/api";
 import type { VerifyBatchResult, VerifyBatchResponse, VerifyBatchDeletedResult } from "@/lib/api";
 import { QRCodeCanvas } from "qrcode.react";
@@ -63,6 +64,7 @@ const isVerifiedResponse = (
   Boolean(result && (result as any).success === true);
 
 export default function BatchVerify() {
+  const { translate } = useEasyLanguage();
   const params = useParams<{ tokenId?: string; serialNumber?: string; batchId?: string }>();
   const navigate = useNavigate();
   const [tokenId, setTokenId] = useState("");
@@ -284,7 +286,7 @@ export default function BatchVerify() {
             Verify Batch Authenticity
           </h1>
           <p className="text-lg text-gray-600 dark:text-slate-300 max-w-2xl mx-auto">
-            Validate product provenance and trace complete supply chain history
+            Validate product {translate("provenance").toLowerCase()} and trace complete supply chain history
           </p>
         </div>
 
@@ -304,11 +306,11 @@ export default function BatchVerify() {
             <CardHeader className="space-y-1 pb-6">
               <CardTitle className="text-2xl flex items-center gap-2 text-gray-900 dark:text-white">
                 <Search className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                Verify Certificate
+                Verify {translate("nftCertificate")}
               </CardTitle>
               <CardDescription className="text-base text-slate-500 dark:text-slate-400">
-                Enter NFT credentials to validate batch authenticity and view
-                complete provenance
+                Enter credentials to validate batch authenticity and view
+                complete {translate("provenance").toLowerCase()}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -320,7 +322,7 @@ export default function BatchVerify() {
                       className="text-sm font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2"
                     >
                       <Hash className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                      Token ID
+                      {translate("tokenId")}
                     </Label>
                     <Input
                       id="tokenId"
@@ -338,7 +340,7 @@ export default function BatchVerify() {
                       className="text-sm font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2"
                     >
                       <Hash className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                      Serial Number
+                      {translate("serialNumber")}
                     </Label>
                     <Input
                       id="serialNumber"
@@ -359,7 +361,7 @@ export default function BatchVerify() {
                   {mutation.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Verifying on Hedera...
+                      {translate("verifyingOnHedera")}
                     </>
                   ) : (
                     <>
@@ -422,7 +424,7 @@ export default function BatchVerify() {
                     Loading Verification Data...
                   </h2>
                   <p className="text-gray-600 dark:text-slate-300 mt-2">
-                    Contacting Hedera Mirror Node and AI...
+                    {translate("contactingHederaMirrorNode")}
                   </p>
                 </div>
               )}
@@ -502,7 +504,7 @@ export default function BatchVerify() {
                     <Card className="border-blue-200 dark:border-blue-950/30 bg-card text-card-foreground shadow-lg">
                       <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0">
                         <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">
-                          Verification Details
+                          {translate("verificationDetails")}
                         </CardTitle>
                         <Button
                           onClick={handleExportPDF}
@@ -520,7 +522,7 @@ export default function BatchVerify() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-gray-200 dark:border-slate-800">
                                 <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1">
-                                  Token ID
+                                  {translate("tokenId")}
                                 </p>
                                 <div className="flex items-center gap-2 overflow-hidden">
                                   <p className="font-mono font-bold text-gray-900 dark:text-white truncate" title={verifiedResult.tokenId || ""}>
@@ -533,7 +535,7 @@ export default function BatchVerify() {
                               </div>
                               <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg border border-gray-200 dark:border-slate-800">
                                 <p className="text-xs font-semibold text-gray-600 dark:text-slate-400 mb-1">
-                                  Serial Number
+                                  {translate("serialNumber")}
                                 </p>
                                 <p className="font-mono font-bold text-gray-900 dark:text-white">
                                   {verifiedResult.serialNumber || "N/A"}
@@ -605,7 +607,7 @@ export default function BatchVerify() {
                         <div className="border-t border-gray-200 dark:border-slate-800 pt-4">
                           <p className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                             <ExternalLink className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                            HCS Transaction Trail
+                            {translate("auditTrail")}
                           </p>
                           <div className="space-y-2">
                             {verifiedResult.hcsTransactionIds.length === 0 && (
@@ -637,7 +639,7 @@ export default function BatchVerify() {
                               <div className="flex items-center gap-2">
                                 <Sparkles className="h-5 w-5 text-violet-600 dark:text-violet-400" />
                                 <p className="font-bold text-lg text-gray-900 dark:text-white">
-                                  AI Provenance Summary
+                                  {translate("provenance")}
                                 </p>
                               </div>
                               <div className="flex items-center gap-2">
@@ -664,7 +666,7 @@ export default function BatchVerify() {
                                   <Award className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
                                   <div className="flex-1">
                                     <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">
-                                      Trust Score:{" "}
+                                      {translate("trustScore")}:{" "}
                                       {verifiedResult.ai_summary.trustScore}/100
                                     </div>
                                     <div className="text-sm text-gray-700 dark:text-slate-300 mt-1">
@@ -747,7 +749,7 @@ export default function BatchVerify() {
                               <div className="space-y-4">
                                 <div className="flex gap-2">
                                   <Textarea
-                                    placeholder="Ask a question about this product's provenance... (e.g., 'When was this harvested?', 'What certifications does it have?')"
+                                    placeholder={`Ask a question about this product's ${translate("provenance").toLowerCase()}... (e.g., 'When was this harvested?', 'What certifications does it have?')`}
                                     value={question}
                                     onChange={(e) =>
                                       setQuestion(e.target.value)
@@ -813,7 +815,7 @@ export default function BatchVerify() {
                         {verifiedResult.nftMetadata && (
                           <details className="border-t border-gray-200 dark:border-slate-800 pt-4">
                             <summary className="font-semibold mb-2 cursor-pointer text-gray-900 dark:text-white">
-                              NFT Metadata
+                              {translate("nftMetadata")}
                             </summary>
                             <pre className="bg-gray-50 dark:bg-slate-900 p-3 rounded border border-gray-200 dark:border-slate-800 text-xs overflow-auto max-h-48 text-foreground">
                               {JSON.stringify(

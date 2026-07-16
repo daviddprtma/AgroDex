@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { QRCodeCanvas } from "qrcode.react";
+import { useEasyLanguage } from "@/accessibility/easyLanguage/useEasyLanguage";
 import { tokenizeBatch } from "@/lib/api";
 import { TrustBadge } from "@/components/TrustBadge";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ import { Helmet } from "react-helmet-async";
 import { CopyButton } from "@/components/CopyButton";
 
 export default function BatchTokenize() {
+  const { translate } = useEasyLanguage();
   const navigate = useNavigate();
   const [txIds, setTxIds] = useState("");
   const [isDemoMode, setIsDemoMode] = useState(true);
@@ -57,8 +59,8 @@ export default function BatchTokenize() {
     },
     onSuccess: (data) => {
       toast({
-        title: "AI Report Generated & Certificate Minted!",
-        description: `Token ID: ${data.tokenId} | Serial: ${data.serialNumber}`,
+        title: translate("tokenizationComplete"),
+        description: `${translate("tokenId")}: ${data.tokenId} | ${translate("serialNumber")}: ${data.serialNumber}`,
       });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -108,11 +110,11 @@ export default function BatchTokenize() {
           <div className="text-center p-6 md:p-8 bg-card text-card-foreground shadow-xl rounded-lg border border-gray-100 dark:border-slate-805">
             <CheckCircle2 className="h-16 w-16 text-green-600 dark:text-green-400 mx-auto mb-4" />
             <h1 className="text-3xl md:text-4xl font-bold text-green-600 dark:text-green-400 mb-2">
-              Report Generated & Certificate Minted!
+              {translate("tokenizationComplete")}
             </h1>
             <p className="text-gray-600 dark:text-slate-300 mb-8">
-              Your AI trust analysis is complete and permanently stored on
-              Hedera
+              Your AI trust analysis is complete and permanently stored on the
+              {translate("blockchain").toLowerCase()}
             </p>
 
             {ai_summary && (
@@ -147,7 +149,7 @@ export default function BatchTokenize() {
                   <div className="my-6 p-4 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg border border-emerald-200 dark:border-emerald-900/30">
                     <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-base mb-2">
                       <Award className="h-5 w-5" />
-                      <span>Trust Score Explanation</span>
+                      <span>{translate("trustScore")} Explanation</span>
                     </div>
                     <p className="text-gray-700 dark:text-slate-300 text-sm text-left">
                       {ai_summary.trustExplanation}
@@ -159,7 +161,7 @@ export default function BatchTokenize() {
 
             <div className="my-6 space-y-3 p-4 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-800">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-gray-700 dark:text-slate-400">Token ID:</span>
+                <span className="font-semibold text-gray-700 dark:text-slate-400">{translate("tokenId")}:</span>
                 <div className="flex items-center space-x-2">
                   <span className="font-mono text-sm text-gray-900 dark:text-slate-200">
                     {tokenId}
@@ -169,7 +171,7 @@ export default function BatchTokenize() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-gray-700 dark:text-slate-400">
-                  Serial Number:
+                  {translate("serialNumber")}:
                 </span>
                 <span className="font-mono text-sm text-gray-900 dark:text-slate-200">
                   {serialNumber}
@@ -212,7 +214,7 @@ export default function BatchTokenize() {
                 className="border border-gray-150 dark:border-slate-800 rounded shadow-sm"
               />
               <p className="mt-3 text-sm font-semibold text-gray-600 dark:text-slate-400">
-                Scan to verify certificate
+                Scan to verify {translate("nftCertificate").toLowerCase()}
               </p>
               
               <div className="flex gap-2 mt-4 w-full max-w-xs justify-center">
@@ -281,11 +283,11 @@ export default function BatchTokenize() {
             <Sparkles className="h-8 w-8 text-violet-600 dark:text-violet-400" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
-            Generate AI Trust Report & Certificate
+            Generate AI Trust Report & {translate("nftCertificate")}
           </h1>
           <p className="text-lg text-gray-600 dark:text-slate-300 max-w-2xl mx-auto">
-            Our AI will analyze your HCS proof, generate a Trust Score, and mint
-            it all as a permanent NFT certificate.
+            Our AI will analyze your {translate("HCS")} proof, generate a {translate("trustScore").toLowerCase()}, and mint
+            it all as a permanent {translate("nftCertificate").toLowerCase()}.
           </p>
         </div>
 
@@ -304,11 +306,11 @@ export default function BatchTokenize() {
           <CardHeader className="space-y-1 pb-6">
             <CardTitle className="text-2xl flex items-center gap-2">
               <Sparkles className="h-6 w-6 text-violet-600 dark:text-violet-400" />
-              AI Analysis & NFT Minting
+              AI Analysis & {translate("nftCertificate")} Minting
             </CardTitle>
             <CardDescription className="text-base text-slate-500 dark:text-slate-400">
-              Link HCS transaction IDs to generate an AI trust report and create
-              a permanent NFT certificate
+              Link {translate("HCS")} transaction IDs to generate an AI trust report and create
+              a permanent {translate("nftCertificate").toLowerCase()}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -319,7 +321,7 @@ export default function BatchTokenize() {
                   className="text-sm font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2"
                 >
                   <Link2 className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-                  HCS Transaction IDs
+                  {translate("HCS")} Transaction IDs
                 </Label>
                 <Textarea
                   id="txIds"
