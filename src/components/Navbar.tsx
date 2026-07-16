@@ -30,12 +30,15 @@ import { useState } from "react";
 import { useServiceStatus } from "@/hooks/useServiceStatus";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { EasyLanguageToggle } from "@/accessibility/easyLanguage/EasyLanguageToggle";
+import { AccessibilityToggle } from "@/accessibility/iconMode/AccessibilityToggle";
+import { useAccessibility } from "@/accessibility/iconMode/useAccessibility";
 import logoUrl from "@/assets/agritrust-logo.png";
 
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { accessibilityMode } = useAccessibility();
   const {
     accountId,
     isConnected: isHPConnected,
@@ -65,13 +68,25 @@ export default function Navbar() {
     statusTooltip = "Service disruption detected.";
   }
 
+  const getShortLabel = (key: string, defaultVal: string) => {
+    if (!accessibilityMode) return defaultVal;
+    const isId = i18n.language?.startsWith("id");
+    if (key === "nav.dashboard") return isId ? "Dasbor" : "Home";
+    if (key === "Risk AI") return "AI";
+    if (key === "nav.register") return isId ? "Daftar" : "Register";
+    if (key === "nav.tokenize") return isId ? "Koin" : "Tokenize";
+    if (key === "nav.verify") return isId ? "Cek" : "Verify";
+    if (key === "nav.about") return isId ? "Tentang" : "About";
+    return defaultVal;
+  };
+
   const navLinks = [
-    { to: "/dashboard", label: t("nav.dashboard"), icon: BarChart3 },
-    { to: "/risk-intelligence", label: "Risk AI", icon: BrainCircuit },
-    { to: "/register", label: t("nav.register"), icon: FileText },
-    { to: "/tokenize", label: t("nav.tokenize"), icon: Coins },
-    { to: "/verify", label: t("nav.verify"), icon: ShieldCheck },
-    { to: "/about", label: t("nav.about"), icon: Info },
+    { to: "/dashboard", label: getShortLabel("nav.dashboard", t("nav.dashboard")), icon: BarChart3 },
+    { to: "/risk-intelligence", label: getShortLabel("Risk AI", "Risk AI"), icon: BrainCircuit },
+    { to: "/register", label: getShortLabel("nav.register", t("nav.register")), icon: FileText },
+    { to: "/tokenize", label: getShortLabel("nav.tokenize", t("nav.tokenize")), icon: Coins },
+    { to: "/verify", label: getShortLabel("nav.verify", t("nav.verify")), icon: ShieldCheck },
+    { to: "/about", label: getShortLabel("nav.about", t("nav.about")), icon: Info },
   ];
 
   const isActive = (path: string) =>
@@ -96,7 +111,7 @@ export default function Navbar() {
             to="/"
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <img src={logoUrl} alt="AgroDex" className="h-10 w-auto" />
+            <img src={logoUrl} alt="AgroDex" className={accessibilityMode ? "h-12 w-auto" : "h-10 w-auto"} />
             <div className="flex items-center gap-2">
               {/* Status Indicator */}
               <div
@@ -110,18 +125,18 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className={`hidden lg:flex items-center ${accessibilityMode ? "gap-2.5" : "gap-1"}`}>
             {navLinks.map(({ to, label, icon: Icon }) => (
               <Link key={to} to={to}>
                 <Button
                   variant="ghost"
                   className={
                     isActive(to)
-                      ? "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900 rounded-full px-4 py-2"
-                      : "text-gray-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-full px-4 py-2"
+                      ? `${accessibilityMode ? "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900 text-lg px-5 py-3 h-12 rounded-2xl font-bold" : "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900 rounded-full px-4 py-2"}`
+                      : `${accessibilityMode ? "text-gray-700 dark:text-slate-350 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-lg px-5 py-3 h-12 rounded-2xl font-bold" : "text-gray-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-full px-4 py-2"}`
                   }
                 >
-                  <Icon className="h-4 w-4 mr-2" />
+                  <Icon className={accessibilityMode ? "h-5.5 w-5.5 mr-2.5" : "h-4 w-4 mr-2"} />
                   {label}
                 </Button>
               </Link>
@@ -155,6 +170,7 @@ export default function Navbar() {
             )}
             <LanguageSelector />
             <EasyLanguageToggle />
+            <AccessibilityToggle />
             <ThemeToggle />
             {/* if user not logged it, then hide the dropdownmenu */}
             {isAuthenticated && (
@@ -193,10 +209,10 @@ export default function Navbar() {
             </DropdownMenu>
             )}
           </div>
-
-          {/* Mobile Menu */}
+          {/* Mobile Menu */}
           <div className="flex items-center gap-2 lg:hidden">
             <EasyLanguageToggle />
+            <AccessibilityToggle />
             <ThemeToggle />
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -259,12 +275,14 @@ export default function Navbar() {
                         <Button
                           variant="ghost"
                           className={`w-full justify-start rounded-full ${
+                            accessibilityMode ? "text-lg py-6 px-4 rounded-2xl font-bold" : "rounded-full"
+                          } ${
                             isActive(to)
                               ? "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900"
                               : "text-gray-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
                           }`}
                         >
-                          <Icon className="h-4 w-4 mr-2" />
+                          <Icon className={accessibilityMode ? "h-6 w-6 mr-3" : "h-4 w-4 mr-2"} />
                           {label}
                         </Button>
                       </Link>
@@ -282,9 +300,11 @@ export default function Navbar() {
                     >
                       <Button
                         variant="ghost"
-                        className="w-full justify-start text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                        className={`w-full justify-start ${
+                          accessibilityMode ? "text-lg py-6 px-4 rounded-2xl font-bold text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30" : "text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                        }`}
                       >
-                        <User className="h-4 w-4 mr-2" />
+                        <User className={accessibilityMode ? "h-6 w-6 mr-3" : "h-4 w-4 mr-2"} />
                         {t("nav.profile")}
                       </Button>
                     </Link>
@@ -294,21 +314,25 @@ export default function Navbar() {
                     >
                       <Button
                         variant="ghost"
-                        className="w-full justify-start text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                        className={`w-full justify-start ${
+                          accessibilityMode ? "text-lg py-6 px-4 rounded-2xl font-bold text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30" : "text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                        }`}
                       >
-                        <Settings className="h-4 w-4 mr-2" />
+                        <Settings className={accessibilityMode ? "h-6 w-6 mr-3" : "h-4 w-4 mr-2"} />
                         {t("nav.settings")}
                       </Button>
                     </Link>
                     <Button
                       variant="ghost"
-                      className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                      className={`w-full justify-start text-red-600 hover:text-red-700 ${
+                        accessibilityMode ? "text-lg py-6 px-4 rounded-2xl font-bold" : "hover:bg-red-50 dark:hover:bg-red-950/30"
+                      }`}
                       onClick={() => {
                         setMobileMenuOpen(false);
                         handleLogout();
                       }}
                     >
-                      <LogOut className="h-4 w-4 mr-2" />
+                      <LogOut className={accessibilityMode ? "h-6 w-6 mr-3" : "h-4 w-4 mr-2"} />
                       {t("nav.logout")}
                     </Button>
                   </div>

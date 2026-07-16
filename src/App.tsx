@@ -15,6 +15,7 @@ import ScrollToTopButton from "@/components/ScrollToTopButton";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import { EasyLanguageProvider } from "@/accessibility/easyLanguage/EasyLanguageProvider";
+import { AccessibilityProvider } from "@/accessibility/iconMode/AccessibilityProvider";
 
 const Landing = lazy(() => import("./pages/Landing"));
 const Index = lazy(() => import("./pages/Index"));
@@ -57,13 +58,14 @@ const App = () => (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Suspense fallback={<PageLoader />}>
-            <EasyLanguageProvider>
-              <Toaster />
-              <BrowserRouter>
-                <AuthProvider>
-                  <WalletProvider>
-                    <CoreWalletProvider>
-                      <Routes>
+            <AccessibilityProvider>
+              <EasyLanguageProvider>
+                <Toaster />
+                <BrowserRouter>
+                  <AuthProvider>
+                    <WalletProvider>
+                      <CoreWalletProvider>
+                        <Routes>
                         <Route element={<WithChat />}>
                           <Route path="/login" element={<Login />} />
                           <Route path="/welcome" element={<AuthLanding />} />
@@ -162,7 +164,8 @@ const App = () => (
                   </WalletProvider>
                 </AuthProvider>
               </BrowserRouter>
-            </EasyLanguageProvider>
+              </EasyLanguageProvider>
+            </AccessibilityProvider>
           </Suspense>
         </TooltipProvider>
       </QueryClientProvider>

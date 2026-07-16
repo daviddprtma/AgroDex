@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useEasyLanguage } from "@/accessibility/easyLanguage/useEasyLanguage";
+import { useAccessibility } from "@/accessibility/iconMode/useAccessibility";
+import { AccessibilityLayout } from "@/accessibility/iconMode/AccessibilityLayout";
 import {
   Card,
   CardContent,
@@ -130,6 +132,7 @@ const getCleanInsightError = (
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const { translate } = useEasyLanguage();
+  const { accessibilityMode } = useAccessibility();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<"all" | "approved" | "flagged">("all");
   const [search, setSearch] = useState("");
@@ -222,87 +225,90 @@ export default function Dashboard() {
       </Helmet>
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-blue-50 to-white dark:from-emerald-950/20 dark:via-blue-950/20 dark:to-background">
-        {/* Decorative Elements */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
-        <div
-          className="absolute bottom-0 left-0 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
-          style={{ animationDelay: "1s" }}
-        />
+      <AccessibilityLayout>
+        {/* Hero Section */}
+        {!accessibilityMode && (
+          <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-blue-50 to-white dark:from-emerald-950/20 dark:via-blue-950/20 dark:to-background">
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
+            <div
+              className="absolute bottom-0 left-0 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+              style={{ animationDelay: "1s" }}
+            />
 
-        <div className="container mx-auto px-4 py-20 lg:py-32 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <motion.div
-              className="space-y-8"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              {/* Logo + Brand Name */}
-              <motion.div
-                className="flex items-center gap-4 mb-2"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1, duration: 0.6 }}
-              >
-                <img
-                  src={logoUrl}
-                  alt="AgroDex logo"
-                  className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl shadow-lg object-cover bg-white dark:bg-slate-900 p-2"
-                />
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-                    AgroDex
-                  </h2>
-                  <p className="text-sm sm:text-base text-emerald-600 font-semibold mt-0.5">
-                    {t("dashboard.hero.subtitle")}
+            <div className="container mx-auto px-4 py-20 lg:py-32 relative z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <motion.div
+                  className="space-y-8"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  {/* Logo + Brand Name */}
+                  <motion.div
+                    className="flex items-center gap-4 mb-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1, duration: 0.6 }}
+                  >
+                    <img
+                      src={logoUrl}
+                      alt="AgroDex logo"
+                      className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl shadow-lg object-cover bg-white dark:bg-slate-900 p-2"
+                    />
+                    <div>
+                      <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                        AgroDex
+                      </h2>
+                      <p className="text-sm sm:text-base text-emerald-600 font-semibold mt-0.5">
+                        {t("dashboard.hero.subtitle")}
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-5 py-2.5 rounded-full text-sm font-bold shadow-sm"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    {t("dashboard.hero.poweredBy")}
+                  </motion.div>
+
+                  <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-gray-900 dark:text-white leading-tight">
+                    {t("dashboard.hero.fighting")}
+                    <span className="text-emerald-600">
+                      {t("dashboard.hero.fraud")}
+                    </span>{" "}
+                    in
+                    {t("dashboard.hero.location")}
+                  </h1>
+
+                  <p className="text-xl sm:text-2xl font-body text-gray-600 dark:text-slate-300 leading-relaxed">
+                    {t("dashboard.hero.description")}
                   </p>
-                </div>
-              </motion.div>
+                </motion.div>
 
-              <motion.div
-                className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-5 py-2.5 rounded-full text-sm font-bold shadow-sm"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-              >
-                <CheckCircle2 className="h-4 w-4" />
-                {t("dashboard.hero.poweredBy")}
-              </motion.div>
+                <motion.div
+                  className="relative"
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3, duration: 0.8 }}
+                >
+                  <div className="absolute -inset-4 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-3xl blur-2xl opacity-20" />
+                  <img
+                    src="https://assets-gen.codenut.dev/images/1761634617_bb2f7a28.png"
+                    alt="Producteur africain avec grains de café"
+                    className="relative w-full h-auto rounded-2xl shadow-2xl"
+                  />
+                </motion.div>
+              </div>
+            </div>
+          </section>
+        )}
 
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-gray-900 dark:text-white leading-tight">
-                {t("dashboard.hero.fighting")}
-                <span className="text-emerald-600">
-                  {t("dashboard.hero.fraud")}
-                </span>{" "}
-                in
-                {t("dashboard.hero.location")}
-              </h1>
-
-              <p className="text-xl sm:text-2xl font-body text-gray-600 dark:text-slate-300 leading-relaxed">
-                {t("dashboard.hero.description")}
-              </p>
-            </motion.div>
-
-            <motion.div
-              className="relative"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-            >
-              <div className="absolute -inset-4 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-3xl blur-2xl opacity-20" />
-              <img
-                src="https://assets-gen.codenut.dev/images/1761634617_bb2f7a28.png"
-                alt="Producteur africain avec grains de café"
-                className="relative w-full h-auto rounded-2xl shadow-2xl"
-              />
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      <div className="container mx-auto px-4 py-8">
+        <div className={accessibilityMode ? "w-full space-y-8" : "container mx-auto px-4 py-8"}>
         {/* KPIs Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-8">
           <Card className="border-2 border-emerald-100 dark:border-emerald-950/30 bg-card text-card-foreground">
@@ -948,7 +954,8 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-      <Footer />
+    </AccessibilityLayout>
+    <Footer />
     </div>
   );
 }

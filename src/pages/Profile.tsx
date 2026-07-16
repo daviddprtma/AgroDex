@@ -19,6 +19,8 @@ import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import { DeleteProfileModal } from "@/components/DeleteProfileModal";
 import { Pencil, Mail, Wallet, Zap, Clock } from 'lucide-react';
+import { useAccessibility } from "@/accessibility/iconMode/useAccessibility";
+import { AccessibilityLayout } from "@/accessibility/iconMode/AccessibilityLayout";
 
 
 interface UserProfile {
@@ -32,6 +34,7 @@ interface UserProfile {
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { accessibilityMode } = useAccessibility();
   const { user, linkHederaWallet, isMetaMaskConnected, metaMaskAddress } = useAuth();
   const { accountId, isConnected, connect, network } = useWallet();
   const { address: coreAddress, isConnected: isCoreConnected, connect: coreConnect } = useCoreWallet();
@@ -249,22 +252,25 @@ export default function Profile() {
       </Helmet>
       <Navbar />
 
-      <div className="container mx-auto max-w-2xl py-8 px-4">
-        <Card className="bg-card text-card-foreground dark:border-slate-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div>
-              <CardTitle className="text-gray-900 dark:text-white">User Profile</CardTitle>
-              <CardDescription className="text-slate-500 dark:text-slate-400">
-                Manage your account and linked Hedera wallet
-              </CardDescription>
-            </div>
-            {!isEditing && (
-              <Button
-                onClick={handleStartEdit}
-                variant="outline"
-                size="sm"
-                className="border-gray-300 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all duration-300 ease-in-out hover:scale-105"
-              >
+      <AccessibilityLayout>
+        <div className={accessibilityMode ? "w-full max-w-2xl mx-auto space-y-6" : "container mx-auto max-w-2xl py-8 px-4"}>
+          <Card className="bg-card text-card-foreground dark:border-slate-800 rounded-3xl shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div>
+                <CardTitle className="text-gray-900 dark:text-white">User Profile</CardTitle>
+                <CardDescription className="text-slate-500 dark:text-slate-400">
+                  Manage your account and linked Hedera wallet
+                </CardDescription>
+              </div>
+              {!isEditing && (
+                <Button
+                  onClick={handleStartEdit}
+                  variant="outline"
+                  size={accessibilityMode ? "lg" : "sm"}
+                  className={`border-gray-300 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all duration-300 ease-in-out hover:scale-105 ${
+                    accessibilityMode ? "h-12 text-base px-5 font-bold rounded-xl" : ""
+                  }`}
+                >
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit Profile
               </Button>
@@ -556,9 +562,11 @@ export default function Profile() {
                 <Button
                   onClick={() => navigate("/session-settings")}
                   variant="outline"
-                  className="w-full border-gray-300 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 mb-4"
+                  className={`w-full border-gray-300 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 mb-4 ${
+                    accessibilityMode ? "h-14 text-lg font-bold rounded-2xl" : ""
+                  }`}
                 >
-                  <Clock className="mr-2 h-4 w-4" />
+                  <Clock className={accessibilityMode ? "mr-3 h-5 w-5" : "mr-2 h-4 w-4"} />
                   Manage session duration
                 </Button>
 
@@ -570,6 +578,7 @@ export default function Profile() {
           </CardContent>
         </Card>
       </div>
+      </AccessibilityLayout>
       <Footer />
     </div>
   );

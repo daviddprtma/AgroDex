@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEasyLanguage } from "@/accessibility/easyLanguage/useEasyLanguage";
+import { useAccessibility } from "@/accessibility/iconMode/useAccessibility";
+import { AccessibilityLayout } from "@/accessibility/iconMode/AccessibilityLayout";
 import { verifyBatch, verifyBatchById } from "@/lib/api";
 import type { VerifyBatchResult, VerifyBatchResponse, VerifyBatchDeletedResult } from "@/lib/api";
 import { QRCodeCanvas } from "qrcode.react";
@@ -65,6 +67,7 @@ const isVerifiedResponse = (
 
 export default function BatchVerify() {
   const { translate } = useEasyLanguage();
+  const { accessibilityMode } = useAccessibility();
   const params = useParams<{ tokenId?: string; serialNumber?: string; batchId?: string }>();
   const navigate = useNavigate();
   const [tokenId, setTokenId] = useState("");
@@ -276,7 +279,8 @@ export default function BatchVerify() {
         <title>Verify Batch | AgroDex</title>
       </Helmet>
       <Navbar />
-      <div className="max-w-5xl mx-auto space-y-8 p-4 md:p-8">
+      <AccessibilityLayout>
+        <div className={accessibilityMode ? "w-full max-w-5xl mx-auto space-y-8" : "max-w-5xl mx-auto space-y-8 p-4 md:p-8"}>
         {/* Hero Section */}
         <div className="text-center space-y-4">
           <div className="inline-block p-3 bg-blue-100 dark:bg-blue-950/50 rounded-2xl mb-2">
@@ -302,7 +306,7 @@ export default function BatchVerify() {
 
         {/* Verification Form - Only show if no URL params */}
         {!showResults && (
-          <Card className="shadow-xl border-0 bg-card text-card-foreground dark:border dark:border-slate-800">
+          <Card className={`shadow-xl border-0 bg-card text-card-foreground dark:border dark:border-slate-800 ${accessibilityMode ? "rounded-3xl" : ""}`}>
             <CardHeader className="space-y-1 pb-6">
               <CardTitle className="text-2xl flex items-center gap-2 text-gray-900 dark:text-white">
                 <Search className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -314,14 +318,14 @@ export default function BatchVerify() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className={`space-y-6 ${accessibilityMode ? "space-y-8" : ""}`}>
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${accessibilityMode ? "gap-6" : ""}`}>
                   <div className="space-y-2">
                     <Label
                       htmlFor="tokenId"
-                      className="text-sm font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2"
+                      className={`font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2 ${accessibilityMode ? "text-base font-bold" : "text-sm"}`}
                     >
-                      <Hash className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <Hash className={accessibilityMode ? "h-5 w-5 text-blue-600 dark:text-blue-400" : "h-4 w-4 text-blue-600 dark:text-blue-400"} />
                       {translate("tokenId")}
                     </Label>
                     <Input
@@ -329,7 +333,7 @@ export default function BatchVerify() {
                       placeholder="0.0.123456"
                       value={tokenId}
                       onChange={(e) => setTokenId(e.target.value)}
-                      className="h-11 font-mono border-gray-300 dark:border-slate-800 dark:bg-slate-900 text-foreground focus:border-blue-500 focus:ring-blue-500"
+                      className={`font-mono border-gray-300 dark:border-slate-800 dark:bg-slate-900 text-foreground focus:border-blue-500 focus:ring-blue-500 ${accessibilityMode ? "h-14 text-lg px-4 rounded-xl" : "h-11"}`}
                       required
                     />
                   </div>
@@ -337,9 +341,9 @@ export default function BatchVerify() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="serialNumber"
-                      className="text-sm font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2"
+                      className={`font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2 ${accessibilityMode ? "text-base font-bold" : "text-sm"}`}
                     >
-                      <Hash className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <Hash className={accessibilityMode ? "h-5 w-5 text-blue-600 dark:text-blue-400" : "h-4 w-4 text-blue-600 dark:text-blue-400"} />
                       {translate("serialNumber")}
                     </Label>
                     <Input
@@ -347,7 +351,7 @@ export default function BatchVerify() {
                       placeholder="1"
                       value={serialNumber}
                       onChange={(e) => setSerialNumber(e.target.value)}
-                      className="h-11 font-mono border-gray-300 dark:border-slate-800 dark:bg-slate-900 text-foreground focus:border-blue-500 focus:ring-blue-500"
+                      className={`font-mono border-gray-300 dark:border-slate-800 dark:bg-slate-900 text-foreground focus:border-blue-500 focus:ring-blue-500 ${accessibilityMode ? "h-14 text-lg px-4 rounded-xl" : "h-11"}`}
                       required
                     />
                   </div>
@@ -355,7 +359,7 @@ export default function BatchVerify() {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 text-base font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all"
+                  className={`w-full text-base font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all ${accessibilityMode ? "h-14 text-lg font-bold rounded-2xl" : "h-12"}`}
                   disabled={mutation.isPending}
                 >
                   {mutation.isPending ? (
@@ -380,7 +384,7 @@ export default function BatchVerify() {
                 <Button
                   type="button"
                   onClick={() => setIsScannerOpen(true)}
-                  className="w-full h-12 text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                  className={`w-full text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 ${accessibilityMode ? "h-14 text-lg font-bold rounded-2xl" : "h-12"}`}
                 >
                   <Camera className="h-5 w-5" />
                   Scan QR Code
@@ -859,6 +863,7 @@ export default function BatchVerify() {
           </VerificationAssistantProvider>
         )}
       </div>
+      </AccessibilityLayout>
       <Footer />
     </div>
   );

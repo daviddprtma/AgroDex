@@ -17,12 +17,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, Clock, CheckCircle, Info } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle, Info, Accessibility, LayoutGrid, Sparkles } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { Helmet } from "react-helmet-async";
+import { useAccessibility } from "@/accessibility/iconMode/useAccessibility";
+import { useEasyLanguage } from "@/accessibility/easyLanguage/useEasyLanguage";
 
 export default function SessionSettings() {
   const navigate = useNavigate();
+  const { accessibilityMode, toggle: toggleAccessibility } = useAccessibility();
+  const { easyMode, toggle: toggleEasy } = useEasyLanguage();
   const [sessionDuration, setSessionDuration] = useState<string>("3600"); // 1 heure par défaut
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -152,6 +156,74 @@ export default function SessionSettings() {
 
               <Button onClick={handleSave} className="w-full">
                 Save Settings
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Accessibility Settings Card */}
+        <Card className="bg-card text-card-foreground dark:border-slate-800 mt-6 shadow-md rounded-2xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+              <Accessibility className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              Accessibility Preferences
+            </CardTitle>
+            <CardDescription className="text-slate-500 dark:text-slate-400">
+              Customize your platform navigation and reading experience
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Icon Mode row */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-slate-50/40 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <LayoutGrid className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  <span className="font-bold text-gray-900 dark:text-white text-base">
+                    Icon-Based Easy Navigation
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed">
+                  Presents navigation and actions as large, touch-friendly cards with recognizable icons.
+                </p>
+              </div>
+              <Button
+                variant={accessibilityMode ? "default" : "outline"}
+                className={`sm:w-32 h-11 text-sm font-semibold rounded-xl ${
+                  accessibilityMode 
+                    ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md" 
+                    : "border-gray-300 dark:border-slate-800 text-gray-700 dark:text-slate-300"
+                }`}
+                onClick={toggleAccessibility}
+                aria-pressed={accessibilityMode}
+              >
+                {accessibilityMode ? "Enabled" : "Disabled"}
+              </Button>
+            </div>
+
+            {/* Easy Language Wording row */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-slate-50/40 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <span className="font-bold text-gray-900 dark:text-white text-base">
+                    Easy Language Wording
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed">
+                  Simplifies technical agricultural terminology and phrasing across the platform.
+                </p>
+              </div>
+              <Button
+                variant={easyMode ? "default" : "outline"}
+                className={`sm:w-32 h-11 text-sm font-semibold rounded-xl ${
+                  easyMode 
+                    ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md" 
+                    : "border-gray-300 dark:border-slate-800 text-gray-700 dark:text-slate-300"
+                }`}
+                onClick={toggleEasy}
+                aria-pressed={easyMode}
+              >
+                {easyMode ? "Enabled" : "Disabled"}
               </Button>
             </div>
           </CardContent>

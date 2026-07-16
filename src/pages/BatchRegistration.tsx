@@ -4,6 +4,8 @@ import { useMutation } from "@tanstack/react-query";
 import { registerBatch, verifyRegistration } from "@/lib/api";
 import { QRCodeCanvas } from "qrcode.react";
 import { useEasyLanguage } from "@/accessibility/easyLanguage/useEasyLanguage";
+import { useAccessibility } from "@/accessibility/iconMode/useAccessibility";
+import { AccessibilityLayout } from "@/accessibility/iconMode/AccessibilityLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +53,7 @@ import { CopyButton } from "@/components/CopyButton";
 
 export default function BatchRegistration() {
   const { translate } = useEasyLanguage();
+  const { accessibilityMode } = useAccessibility();
   const [productName, setProductName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
@@ -171,7 +174,8 @@ export default function BatchRegistration() {
         <title>Register Batch | AgroDex</title>
       </Helmet>
       <Navbar />
-      <div className="max-w-4xl mx-auto space-y-8 p-4 md:p-8">
+      <AccessibilityLayout>
+        <div className={accessibilityMode ? "w-full max-w-4xl mx-auto space-y-8" : "max-w-4xl mx-auto space-y-8 p-4 md:p-8"}>
         {/* Hero Section */}
         <div className="text-center space-y-4">
           <div className="inline-block p-3 bg-emerald-100 dark:bg-emerald-950/50 rounded-2xl mb-2">
@@ -205,13 +209,13 @@ export default function BatchRegistration() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleVerifyAndShowModal} className="space-y-6">
+            <form onSubmit={handleVerifyAndShowModal} className={`space-y-6 ${accessibilityMode ? "space-y-8" : ""}`}>
               <div className="space-y-2">
                 <Label
                   htmlFor="productName"
-                  className="text-sm font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2"
+                  className={`font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2 ${accessibilityMode ? "text-base font-bold" : "text-sm"}`}
                 >
-                  <Package className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <Package className={accessibilityMode ? "h-5 w-5 text-emerald-600 dark:text-emerald-400" : "h-4 w-4 text-emerald-600 dark:text-emerald-400"} />
                   Product Name
                 </Label>
                 <Input
@@ -219,7 +223,7 @@ export default function BatchRegistration() {
                   placeholder="e.g., Organic Arabica Coffee"
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
-                  className="h-11 border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground"
+                  className={`border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground ${accessibilityMode ? "h-14 text-lg px-4 rounded-xl" : "h-11"}`}
                   required
                 />
               </div>
@@ -227,9 +231,9 @@ export default function BatchRegistration() {
               <div className="space-y-2">
                 <Label
                   htmlFor="harvestBatch"
-                  className="text-sm font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2"
+                  className={`font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2 ${accessibilityMode ? "text-base font-bold" : "text-sm"}`}
                 >
-                  <Hash className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <Hash className={accessibilityMode ? "h-5 w-5 text-emerald-600 dark:text-emerald-400" : "h-4 w-4 text-emerald-600 dark:text-emerald-400"} />
                   Harvest Batch Identifier
                 </Label>
                 <Input
@@ -237,18 +241,18 @@ export default function BatchRegistration() {
                   placeholder="e.g., Batch #150 or HB-2026-150"
                   value={harvestBatch}
                   onChange={(e) => setHarvestBatch(e.target.value)}
-                  className="h-11 border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground"
+                  className={`border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground ${accessibilityMode ? "h-14 text-lg px-4 rounded-xl" : "h-11"}`}
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${accessibilityMode ? "gap-6" : ""}`}>
                 <div className="space-y-2">
                   <Label
                     htmlFor="quantity"
-                    className="text-sm font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2"
+                    className={`font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2 ${accessibilityMode ? "text-base font-bold" : "text-sm"}`}
                   >
-                    <Hash className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <Hash className={accessibilityMode ? "h-5 w-5 text-emerald-600 dark:text-emerald-400" : "h-4 w-4 text-emerald-600 dark:text-emerald-400"} />
                     Quantity
                   </Label>
                   <Input
@@ -257,16 +261,16 @@ export default function BatchRegistration() {
                     placeholder="1000"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
-                    className="h-11 border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground"
+                    className={`border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground ${accessibilityMode ? "h-14 text-lg px-4 rounded-xl" : "h-11"}`}
                     required
                   />
                 </div>
                 <div className="space-y-2">
                   <Label
                     htmlFor="unit"
-                    className="text-sm font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2"
+                    className={`font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2 ${accessibilityMode ? "text-base font-bold" : "text-sm"}`}
                   >
-                    <Package className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <Package className={accessibilityMode ? "h-5 w-5 text-emerald-600 dark:text-emerald-400" : "h-4 w-4 text-emerald-600 dark:text-emerald-400"} />
                     Unit
                   </Label>
                   <Input
@@ -274,7 +278,7 @@ export default function BatchRegistration() {
                     placeholder="kg, bags, tons"
                     value={unit}
                     onChange={(e) => setUnit(e.target.value)}
-                    className="h-11 border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground"
+                    className={`border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground ${accessibilityMode ? "h-14 text-lg px-4 rounded-xl" : "h-11"}`}
                     required
                   />
                 </div>
@@ -283,9 +287,9 @@ export default function BatchRegistration() {
               <div className="space-y-2">
                 <Label
                   htmlFor="origin"
-                  className="text-sm font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2"
+                  className={`font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2 ${accessibilityMode ? "text-base font-bold" : "text-sm"}`}
                 >
-                  <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <MapPin className={accessibilityMode ? "h-5 w-5 text-emerald-600 dark:text-emerald-400" : "h-4 w-4 text-emerald-600 dark:text-emerald-400"} />
                   Origin Location
                 </Label>
                 <Input
@@ -293,7 +297,7 @@ export default function BatchRegistration() {
                   placeholder="e.g., Kigali Region, Rwanda"
                   value={origin}
                   onChange={(e) => setOrigin(e.target.value)}
-                  className="h-11 border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground"
+                  className={`border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground ${accessibilityMode ? "h-14 text-lg px-4 rounded-xl" : "h-11"}`}
                   required
                 />
               </div>
@@ -301,9 +305,9 @@ export default function BatchRegistration() {
               <div className="space-y-2">
                 <Label
                   htmlFor="harvestDate"
-                  className="text-sm font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2"
+                  className={`font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2 ${accessibilityMode ? "text-base font-bold" : "text-sm"}`}
                 >
-                  <Calendar className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <Calendar className={accessibilityMode ? "h-5 w-5 text-emerald-600 dark:text-emerald-400" : "h-4 w-4 text-emerald-600 dark:text-emerald-400"} />
                   Harvest Date
                 </Label>
                 <Input
@@ -311,7 +315,7 @@ export default function BatchRegistration() {
                   type="date"
                   value={harvestDate}
                   onChange={(e) => setHarvestDate(e.target.value)}
-                  className="h-11 border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground"
+                  className={`border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground ${accessibilityMode ? "h-14 text-lg px-4 rounded-xl" : "h-11"}`}
                   required
                 />
               </div>
@@ -319,9 +323,9 @@ export default function BatchRegistration() {
               <div className="space-y-2">
                 <Label
                   htmlFor="metadata"
-                  className="text-sm font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2"
+                  className={`font-semibold text-gray-700 dark:text-slate-300 flex items-center gap-2 ${accessibilityMode ? "text-base font-bold" : "text-sm"}`}
                 >
-                  <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <FileText className={accessibilityMode ? "h-5 w-5 text-emerald-600 dark:text-emerald-400" : "h-4 w-4 text-emerald-600 dark:text-emerald-400"} />
                   Additional Product Metadata
                 </Label>
                 <Textarea
@@ -329,13 +333,13 @@ export default function BatchRegistration() {
                   placeholder="e.g., Certified Fair Trade, Moisture content 12%, Shade-grown, etc."
                   value={metadata}
                   onChange={(e) => setMetadata(e.target.value)}
-                  className="min-h-20 border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground"
+                  className={`border-gray-300 dark:border-slate-800 dark:bg-slate-900 focus:border-emerald-500 focus:ring-emerald-500 text-foreground ${accessibilityMode ? "min-h-32 text-lg rounded-xl" : "min-h-20"}`}
                 />
               </div>
 
               <Button
                 type="submit"
-                className="w-full h-12 text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl transition-all"
+                className={`w-full text-base font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl transition-all ${accessibilityMode ? "h-14 text-lg font-bold rounded-2xl" : "h-12"}`}
                 disabled={mutation.isPending}
               >
                 {mutation.isPending ? (
@@ -777,6 +781,7 @@ export default function BatchRegistration() {
           )}
         </DialogContent>
       </Dialog>
+      </AccessibilityLayout>
       <Footer />
     </div>
   );
