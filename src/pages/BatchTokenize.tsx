@@ -33,6 +33,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import { CopyButton } from "@/components/CopyButton";
+import { exportTokenizationResultToPDF } from "@/utils/batchPdfExport";
 
 export default function BatchTokenize() {
   const navigate = useNavigate();
@@ -89,6 +90,34 @@ export default function BatchTokenize() {
     }
 
     mutation.mutate({ hcsTransactionIds, isDemoMode });
+  };
+
+  const handleExportTokenizationPDF = () => {
+    if (!mutation.data) return;
+    try {
+      const canvas = document.getElementById("tokenize-qr-canvas") as HTMLCanvasElement;
+      const qrCodeDataUrl = canvas?.toDataURL("image/png");
+
+      const doc = exportTokenizationResultToPDF(mutation.data, {
+        qrCodeDataUrl,
+        language: "en",
+      });
+
+      const filenameId = mutation.data.batchId || `${mutation.data.tokenId}_${mutation.data.serialNumber}`;
+      doc.save(`agrodex-nft-certificate-${filenameId}.pdf`);
+
+      toast({
+        title: "PDF Exported",
+        description: "Your NFT certificate has been downloaded.",
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to generate PDF.";
+      toast({
+        title: "Export Error",
+        description: message,
+        variant: "destructive",
+      });
+    }
   };
 
   // Success screen
@@ -243,6 +272,15 @@ export default function BatchTokenize() {
                 >
                   Copy Link
                 </CopyButton>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleExportTokenizationPDF}
+                  className="flex-1 border-gray-300 dark:border-slate-800 text-gray-700 dark:text-slate-350 hover:bg-gray-100 dark:hover:bg-slate-800 font-semibold"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Export PDF
+                </Button>
               </div>
 
             </div>

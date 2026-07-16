@@ -47,6 +47,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
 import { CopyButton } from "@/components/CopyButton";
+import { exportRegistrationResultToPDF } from "@/utils/batchPdfExport";
 
 export default function BatchRegistration() {
   const [productName, setProductName] = useState("");
@@ -161,6 +162,38 @@ export default function BatchRegistration() {
       harvestDate: harvestDate, // Will be normalized to YYYY-MM-DD in api.ts
       aiVerification: verificationResult // Save audit trail
     });
+  };
+
+  const handleExportRegistrationPDF = () => {
+    if (!mutation.data) return;
+    try {
+      const canvas = document.getElementById("registration-qr-canvas") as HTMLCanvasElement;
+      const qrCodeDataUrl = canvas?.toDataURL("image/png");
+
+      const doc = exportRegistrationResultToPDF(mutation.data, {
+        qrCodeDataUrl,
+        productName,
+        harvestBatch,
+        quantity,
+        unit,
+        location: origin,
+        harvestDate,
+      });
+
+      doc.save(`agrodex-registration-certificate-${mutation.data.batchId}.pdf`);
+
+      toast({
+        title: "PDF Exported",
+        description: "Your registration certificate has been downloaded.",
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to generate PDF.";
+      toast({
+        title: "Export Error",
+        description: message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -417,7 +450,7 @@ export default function BatchRegistration() {
                       <div className="text-[11px] text-gray-500 font-mono select-all text-center max-w-xs break-all">
                         {window.location.origin}/verify/{mutation.data.batchId}
                       </div>
-                      <div className="flex gap-2 w-full max-w-xs justify-center pt-2">
+                    <div className="flex gap-2 w-full max-w-xs justify-center pt-2">
                         <Button
                           type="button"
                           size="sm"
@@ -446,6 +479,16 @@ export default function BatchRegistration() {
                         >
                           Copy Link
                         </CopyButton>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={handleExportRegistrationPDF}
+                          className="flex-1 text-xs border-emerald-250 dark:border-slate-800 text-gray-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800 font-semibold"
+                        >
+                          <FileText className="h-3.5 w-3.5 mr-1" />
+                          Export PDF
+                        </Button>
                       </div>
                     </div>
 
