@@ -84,10 +84,6 @@ export default function Login() {
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
-    setAuthSuccess(null);
-    setAuthLoading(true);
-
-    setAuthError(null);
   setAuthSuccess(null);
   setAuthLoading(true);
 
@@ -101,9 +97,7 @@ export default function Login() {
     }
   }
 
-  try {
-    if (isSignUp) {
-
+  
     try {
       if (isSignUp) {
         const { data, error } = await supabase.auth.signUp({
