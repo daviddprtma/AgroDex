@@ -85,9 +85,20 @@ export default function Login() {
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
-    setAuthSuccess(null);
-    setAuthLoading(true);
+  setAuthSuccess(null);
+  setAuthLoading(true);
 
+  // Custom Frontend Password Validation for Sign Up
+  if (isSignUp) {
+    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
+    if (password.length < 6 || !specialCharRegex.test(password)) {
+      setAuthError("Password must be at least 6 characters and contain a special character.");
+      setAuthLoading(false);
+      return;
+    }
+  }
+
+  
     try {
       if (isSignUp) {
         const { data, error } = await supabase.auth.signUp({
