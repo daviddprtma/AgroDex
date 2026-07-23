@@ -12,6 +12,8 @@ import { DEMO_VERIFY_URL } from "@/lib/demo";
 import { lazy, Suspense } from "react";
 import { ChatbotWidget } from "@/components/chat/ChatbotWidget";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
+import { HelpProvider } from "@/contexts/HelpContext";
+import { HelpCommandPalette } from "@/components/help";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import { EasyLanguageProvider } from "@/accessibility/easyLanguage/EasyLanguageProvider";
@@ -47,6 +49,7 @@ function WithChat() {
       <Outlet />
       <ChatbotWidget />
       <ScrollToTopButton />
+      <HelpCommandPalette />
     </>
   );
 }
@@ -55,6 +58,7 @@ const App = () => (
   <HelmetProvider>
     <ThemeProvider defaultTheme="system" storageKey="agrodex-theme">
       <QueryClientProvider client={queryClient}>
+        <HelpProvider>
         <TooltipProvider>
           <Suspense fallback={<PageLoader />}>
             <EasyLanguageProvider>
@@ -165,6 +169,7 @@ const App = () => (
             </EasyLanguageProvider>
           </Suspense>
         </TooltipProvider>
+        </HelpProvider>
       </QueryClientProvider>
     </ThemeProvider>
   </HelmetProvider>

@@ -58,6 +58,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import logoUrl from "@/assets/agritrust-logo.png";
+import { ContextHelp, InteractiveWalkthrough } from "@/components/help";
 
 interface DashboardKPIs {
   totalBatches: number;
@@ -221,6 +222,7 @@ export default function Dashboard() {
         <title>Dashboard | AgroDex</title>
       </Helmet>
       <Navbar />
+      <InteractiveWalkthrough />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-blue-50 to-white dark:from-emerald-950/20 dark:via-blue-950/20 dark:to-background">
@@ -308,8 +310,9 @@ export default function Dashboard() {
           <Card className="border-2 border-emerald-100 dark:border-emerald-950/30 bg-card text-card-foreground">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600 dark:text-slate-400">
+                <CardTitle className="text-sm font-medium text-gray-600 dark:text-slate-400 flex items-center gap-1.5">
                   {t("dashboard.stats.registeredBatches")}
+                  <ContextHelp helpId="dashboard.totalBatches" size={12} side="right" />
                 </CardTitle>
                 <div className="bg-emerald-100 dark:bg-emerald-950/50 p-2 rounded-lg">
                   <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
@@ -335,6 +338,9 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-gray-600 dark:text-slate-400">
                   {translate("nftsCreated")}
+                <CardTitle className="text-sm font-medium text-gray-600 dark:text-slate-400 flex items-center gap-1.5">
+                  {t("dashboard.stats.nftsCreated")}
+                  <ContextHelp helpId="dashboard.totalNfts" size={12} side="right" />
                 </CardTitle>
                 <div className="bg-blue-100 dark:bg-blue-950/50 p-2 rounded-lg">
                   <Coins className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -360,6 +366,9 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-gray-600 dark:text-slate-400">
                   {translate("aiVerifications")}
+                <CardTitle className="text-sm font-medium text-gray-600 dark:text-slate-400 flex items-center gap-1.5">
+                  {t("dashboard.stats.aiVerifications")}
+                  <ContextHelp helpId="dashboard.aiVerified" size={12} side="right" />
                 </CardTitle>
                 <div className="bg-purple-100 dark:bg-purple-950/50 p-2 rounded-lg">
                   <ShieldCheck className="h-5 w-5 text-purple-600 dark:text-purple-400" />
