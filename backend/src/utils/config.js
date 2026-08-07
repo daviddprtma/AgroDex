@@ -9,12 +9,12 @@ const __dirname = dirname(__filename);
 // Force load .env file with override to bypass system env vars
 dotenv.config({ path: join(__dirname, "../../.env"), override: true });
 
-// Debug: Log what we're getting
-console.log("🔍 Debug - SUPABASE_SERVICE_ROLE_KEY from process.env:");
-console.log("   Value:", process.env.SUPABASE_SERVICE_ROLE_KEY);
-console.log("   Length:", process.env.SUPABASE_SERVICE_ROLE_KEY?.length || 0);
+// Debug: Log env loading status (never log secret values)
+console.log("🔍 Debug - Environment loading status:");
+console.log("   SUPABASE_SERVICE_ROLE_KEY present:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+console.log("   SUPABASE_SERVICE_ROLE_KEY length:", process.env.SUPABASE_SERVICE_ROLE_KEY?.length || 0);
 console.log(
-  "   Starts with eyJ:",
+  "   SUPABASE_SERVICE_ROLE_KEY valid JWT prefix:",
   process.env.SUPABASE_SERVICE_ROLE_KEY?.startsWith("eyJ")
 );
 

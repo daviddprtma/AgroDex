@@ -3,6 +3,9 @@ import { supabase } from "./supabaseClient";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://agro-dex-nine.vercel.app";
 
+const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL || "https://udnpbqtvbnepicwyubnm.supabase.co";
+
 /**
  * Normalize date from DD-MM-YYYY to YYYY-MM-DD (ISO date-only format)
  * Also accepts YYYY-MM-DD and returns it unchanged
@@ -390,7 +393,7 @@ export const tokenizeBatch = async (
   }
 
   const response = await fetch(
-    "https://udnpbqtvbnepicwyubnm.supabase.co/functions/v1/tokenize-batch",
+    `${SUPABASE_URL}/functions/v1/tokenize-batch`,
     {
       method: "POST",
       headers,
@@ -424,7 +427,7 @@ export const verifyBatch = async (
   serialNumber: string | number,
 ): Promise<VerifyBatchResult> => {
   const res = await fetch(
-    "https://udnpbqtvbnepicwyubnm.supabase.co/functions/v1/verify-batch",
+    `${SUPABASE_URL}/functions/v1/verify-batch`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
