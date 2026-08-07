@@ -174,7 +174,7 @@ export async function getFarmerFraudScores(farmerId, limit = 20) {
  *
  * @returns {Promise<Object>} Overview stats
  */
-export async function getFraudOverview() {
+export async function getFraudOverview({ topN = 10, farmerLimit = 50 } = {}) {
   const [
     totalResult,
     levelCountsResult,
@@ -203,7 +203,7 @@ export async function getFraudOverview() {
       `)
       .in('risk_level', ['HIGH', 'CRITICAL'])
       .order('risk_score', { ascending: false })
-      .limit(10),
+      .limit(topN),
 
     // 30-day trend: count per day
     supabase
@@ -250,7 +250,7 @@ export async function getFraudOverview() {
     .not('farmer_id', 'is', null)
     .in('risk_level', ['MEDIUM', 'HIGH', 'CRITICAL'])
     .order('risk_score', { ascending: false })
-    .limit(50);
+    .limit(farmerLimit);
 
   const farmerMap = {};
   for (const row of farmerScores || []) {
@@ -274,7 +274,7 @@ export async function getFraudOverview() {
   const farmerRanking = Object.values(farmerMap)
     .map(f => ({ ...f, avgScore: Math.round(f.scoreSum / f.batchCount) }))
     .sort((a, b) => b.maxScore - a.maxScore)
-    .slice(0, 10);
+    .slice(0, topN);
 
   const totalAnalyzed = totalResult.count || 0;
   const flaggedCount = (levelCounts.HIGH || 0) + (levelCounts.CRITICAL || 0);
