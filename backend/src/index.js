@@ -11,6 +11,7 @@ import gasEstimateRoutes from "./routes/gasEstimate.js";
 import { getHederaClient, isMainnet } from "./hederaClient.js";
 import { generalLimiter } from "./middleware/rateLimiter.js";
 import { logger } from "./middleware/logger.js";
+import { requestId } from "./middleware/requestId.js";
 import { startCronJobs } from "./services/cron.js";
 import EventEmitter from 'events';
 
@@ -33,6 +34,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(requestId);
 app.use(logger);
 app.use("/api", (req, res, next) => {
   // Exclude all fraud routes from the global generalLimiter
