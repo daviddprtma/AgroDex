@@ -60,10 +60,14 @@ const fr = {
       flagged: "Lots à examiner",
       noApproved: "Aucun lot approuvé.",
       noFlagged: "Aucun lot signalé par l'IA.",
+      verificationSummary: "{count} vérifications IA réalisées, dont {flagged} lot(s) à surveiller.",
     },
     status: {
       title: "État du service",
       description: "État en temps réel de tous les services",
+      checking: "Vérification des services...",
+      connectionError: "Erreur de connexion",
+      checkBackend: "Vérifier que le backend est démarré et accessible.",
     },
   },
   general: {
