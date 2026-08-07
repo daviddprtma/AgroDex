@@ -7,6 +7,7 @@ import { WalletProvider } from "@/context/WalletContext";
 import { CoreWalletProvider } from "@/context/CoreWalletContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { HelmetProvider } from "react-helmet-async";
 import { DEMO_VERIFY_URL } from "@/lib/demo";
 import { lazy, Suspense } from "react";
@@ -65,7 +66,23 @@ const App = () => (
               <WalletProvider>
                 <CoreWalletProvider>
                   <Suspense fallback={<PageLoader />}>
-                    <Routes>
+                    <ErrorBoundary
+                      fallback={
+                        <div className="flex flex-col items-center justify-center min-h-screen bg-background p-8 text-center">
+                          <h2 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h2>
+                          <p className="text-gray-600 dark:text-slate-300 mb-6">
+                            An unexpected error occurred while loading the page.
+                          </p>
+                          <button
+                            onClick={() => window.location.reload()}
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                          >
+                            Reload Page
+                          </button>
+                        </div>
+                      }
+                    >
+                      <Routes>
                       <Route element={<WithChat />}>
                         <Route path="/login" element={<Login />} />
                         <Route path="/welcome" element={<AuthLanding />} />
@@ -159,7 +176,8 @@ const App = () => (
                         />
                       </Route>
                       <Route path="*" element={<NotFound />} />
-                    </Routes>
+                      </Routes>
+                    </ErrorBoundary>
                   </Suspense>
                 </CoreWalletProvider>
               </WalletProvider>
