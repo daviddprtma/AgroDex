@@ -1,5 +1,3 @@
-testing readme.md
-
 <div align="center">
 
 <h1>🌾 AgroDex 🌾</h1>
