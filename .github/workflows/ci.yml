@@ -53,5 +53,20 @@ jobs:
         run: npm ci
 
       - name: Check Syntax
-        # Basic syntax check since there are no backend tests
         run: node --check src/index.js
+
+      - name: Run Tests
+        run: node --test src/**/*.test.js
+        env:
+          SUPABASE_URL: https://test.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: eyJ${{ 'a'.repeat(120) }}
+          SUPABASE_ANON_KEY: anon-test-key
+          HEDERA_OPERATOR_ID: "0.0.1234"
+          HEDERA_OPERATOR_KEY: "302e020100300506032b657004220420${{ 'a'.repeat(64) }}${{ 'b'.repeat(60) }}"
+          HEDERA_TOPIC_ID: "0.0.5678"
+          HEDERA_NETWORK: testnet
+          MIRROR_NODE_URL: https://testnet.mirrornode.hedera.com
+          GEMINI_API_KEY: gemini-test-key
+          PORT: "4000"
+          NODE_ENV: test
+          FRONTEND_URL: http://localhost:5173
