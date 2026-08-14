@@ -11,6 +11,7 @@ import gasEstimateRoutes from "./routes/gasEstimate.js";
 import { getHederaClient, isMainnet } from "./hederaClient.js";
 import { generalLimiter } from "./middleware/rateLimiter.js";
 import { logger } from "./middleware/logger.js";
+import { requestId } from "./middleware/requestId.js";
 import { startCronJobs } from "./services/cron.js";
 import EventEmitter from 'events';
 
@@ -33,6 +34,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(requestId);
 app.use(logger);
 app.use("/api", (req, res, next) => {
   // Exclude all fraud routes from the global generalLimiter
@@ -115,3 +117,21 @@ const PORT = env.PORT || 4000;
 const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`AgroDex API running on http://localhost:${PORT}`);
 });
+
+// Graceful shutdown handling
+const shutdown = (signal) => {
+  console.log(`\n${signal} received. Starting graceful shutdown...`);
+  server.close(() => {
+    console.log("HTTP server closed.");
+    process.exit(0);
+  });
+
+  // Force shutdown after 10 seconds if graceful shutdown hangs
+  setTimeout(() => {
+    console.error("Forced shutdown after timeout.");
+    process.exit(1);
+  }, 10000);
+};
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

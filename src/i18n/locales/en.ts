@@ -60,10 +60,14 @@ const en = {
       flagged: "Flagged Lots",
       noApproved: "No approved lots.",
       noFlagged: "No flagged lots.",
+      verificationSummary: "{count} AI verifications completed, {flagged} lot(s) to monitor.",
     },
     status: {
       title: "Service Status",
       description: "Real-time status of all services",
+      checking: "Verifying services...",
+      connectionError: "Connection Error",
+      checkBackend: "Make sure the backend is started and accessible.",
     },
   },
   verify: {

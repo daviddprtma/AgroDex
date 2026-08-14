@@ -60,8 +60,20 @@ serve(async (req) => {
       throw new Error("Missing Hedera credentials");
     }
 
-    console.log("[tokenize-batch] Creating Hedera client...");
-    const client = Client.forTestnet();
+    console.log("[tokenize-batch] Creating Hedera client for network:", network);
+    let client;
+    switch (network) {
+      case "mainnet":
+        client = Client.forMainnet();
+        break;
+      case "previewnet":
+        client = Client.forPreviewnet();
+        break;
+      case "testnet":
+      default:
+        client = Client.forTestnet();
+        break;
+    }
 
     console.log("[tokenize-batch] Parsing operator key...");
     let privateKey;

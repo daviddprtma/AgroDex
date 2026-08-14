@@ -385,8 +385,10 @@ export default function Dashboard() {
         </div>
         {!statsLoading && !statsError && (
           <p className="text-xs text-gray-500 mb-8">
-            {kpis.totalVerifications.toLocaleString()} verifications IA
-            realisees, dont {audit.flaggedLots.length} lot(s) a surveiller.
+            {t("dashboard.audit.verificationSummary", {
+              count: kpis.totalVerifications.toLocaleString(),
+              flagged: audit.flaggedLots.length,
+            })}
           </p>
         )}{" "}
         {/* AI Insight Card */}
@@ -731,18 +733,18 @@ export default function Dashboard() {
             <CardContent>
               {healthLoading ? (
                 <div className="text-center py-8 text-gray-500 dark:text-slate-400">
-                  Verification des services...
+                  {t("dashboard.status.checking")}
                 </div>
               ) : healthError ? (
                 <div className="text-center py-8">
                   <p className="text-red-600 dark:text-red-400 font-semibold mb-2">
-                    ⚠️ Connection Error
+                    ⚠️ {t("dashboard.status.connectionError")}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-slate-300 mb-2">
                     {healthError}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-                    Verifier que le backend est demarre et accessible.
+                    {t("dashboard.status.checkBackend")}
                   </p>
                 </div>
               ) : !healthStatus ? (

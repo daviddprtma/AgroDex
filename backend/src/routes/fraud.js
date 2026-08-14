@@ -145,10 +145,13 @@ router.get('/farmer/:farmerId', requireAuth, async (req, res) => {
  */
 router.get('/overview', optionalAuth, async (req, res) => {
   try {
-    console.log('📊 [fraud] Generating fraud overview');
+    const topN = Math.min(Math.max(parseInt(req.query.topN || '10', 10), 1), 50);
+    const farmerLimit = Math.min(Math.max(parseInt(req.query.farmerLimit || '50', 10), 1), 100);
+
+    console.log(`📊 [fraud] Generating fraud overview (topN=${topN}, farmerLimit=${farmerLimit})`);
 
     const [overview, regionalAnalytics] = await Promise.all([
-      getFraudOverview(),
+      getFraudOverview({ topN, farmerLimit }),
       getRegionalAnalytics(),
     ]);
 
